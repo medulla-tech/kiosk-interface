@@ -21,10 +21,7 @@
 # MA 02110-1301, USA.
 
 import sys
-from PyQt5.QtGui import *
-from PyQt5.QtWidgets import *
-from PyQt5.QtCore import *
-
+from PyQt5.QtWidgets import QWidget, QTabBar, QGridLayout, QPushButton
 
 class KioskMainWindow(QWidget):
     def __init__(self):
