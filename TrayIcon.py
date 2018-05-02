@@ -61,5 +61,5 @@ class TrayIcon(QWidget):
         # Add the menu to the tray
         self.tray.setContextMenu(self.menu)
 
-        def bind_menu_action(self, action, function):
-            action.triggered.connect(function)
+    def bind_menu_action(self, action, function):
+        action.triggered.connect(function)
