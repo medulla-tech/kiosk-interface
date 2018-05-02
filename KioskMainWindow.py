@@ -40,7 +40,7 @@ class KioskMainWindow(QWidget):
 
         #self.horizontalGroupBox = QGroupBox(self)
         self.layout = QGridLayout(self)
-        self.layout.setColumnStretch(0,0)
+        self.layout.setColumnStretch(0, 0)
 
         self.layout.addWidget(QPushButton('1'), 0, 0)
         self.layout.addWidget(QPushButton('2'), 0, 1)
