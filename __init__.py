@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 # coding: utf-8
-"""Declare the Kiosk object"""
+"""This module launch the kiosk interface"""
 #
 # (c) 2018 Siveo, http://www.siveo.net
 #
@@ -21,16 +21,16 @@
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
 # MA 02110-1301, USA.
 
-from PyQt5.QtWidgets import QWidget
-from views.kiosk import kiosk_main_view
+import sys
+from PyQt5.QtWidgets import QApplication
+from tray import Tray
 
 
-class Kiosk(QWidget):
-    """This class define the main window of the kiosk"""
+app = QApplication(sys.argv)
+app.setApplicationName("Kiosk")
+# When the window is closed, the process is not killed
+app.setQuitOnLastWindowClosed(False)
 
-    def __init__(self, criterion):
-        """Initialize """
-        super().__init__()
-        self.criterion = criterion
+tray = Tray()
 
-        kiosk_main_view(self)
+app.exec_()

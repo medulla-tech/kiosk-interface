@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 # coding: utf-8
-"""Declare the Kiosk object"""
+"""Generate Model objects for datas"""
 #
 # (c) 2018 Siveo, http://www.siveo.net
 #
@@ -21,16 +21,22 @@
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
 # MA 02110-1301, USA.
 
-from PyQt5.QtWidgets import QWidget
-from views.kiosk import kiosk_main_view
 
+class Package(object):
+    """Manage the datas for a Package"""
 
-class Kiosk(QWidget):
-    """This class define the main window of the kiosk"""
-
-    def __init__(self, criterion):
-        """Initialize """
-        super().__init__()
-        self.criterion = criterion
-
-        kiosk_main_view(self)
+    def __init__(self, row_datas):
+        """Initialize a package object
+        Args:
+            row_datas:  Dict which contains the elements of the package
+        """
+        if 'name' in row_datas.keys():
+            self.name = row_datas['name']
+        if 'description' in row_datas.keys():
+            self.description = row_datas['description']
+        if 'version' in row_datas.keys():
+            self.version = row_datas['version']
+        if 'actions' in row_datas.keys():
+            self.actions = row_datas['actions']
+        if 'icon' in row_datas.keys():
+            self.icon = row_datas['icon']
