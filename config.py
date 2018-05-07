@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 # coding: utf-8
-"""Manage the configuration of the kiosk""" 
+"""Manage the configuration of the kiosk"""
 #
 # (c) 2018 Siveo, http://www.siveo.net
 #
