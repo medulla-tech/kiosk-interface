@@ -49,6 +49,7 @@ class Tray(QWidget):
     def open(self):
         """This method is called if the event 'open' is launched"""
         self.main_window = Kiosk(self.criterion)
+        self.main_window.resize(650, 550)
         self.main_window.show()
 
     def quit(self):

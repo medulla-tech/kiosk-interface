@@ -20,8 +20,12 @@
 # along with Pulse 2; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
 # MA 02110-1301, USA.
+
 from PyQt5.QtWidgets import QVBoxLayout, QTabWidget, QWidget, QLineEdit, QGridLayout, QPushButton, \
-    QListWidget
+    QListWidget, QLabel, QHBoxLayout
+from PyQt5.QtWidgets import QListWidgetItem
+from views.custom_package_item import CustomPackageWidget
+from PyQt5.QtCore import QCoreApplication
 
 
 def kiosk_main_view(ref):
@@ -34,17 +38,20 @@ def kiosk_main_view(ref):
 
     ref.setLayout(QVBoxLayout(ref))
     # Tabs for differents kind of view
+
     ref.tabs = QTabWidget()
-    ref.tabs.resize(600, 400)
 
     ref.tabs_content = [QWidget(), QWidget()]
     ref.tabs.addTab(ref.tabs_content[0], "Grid")
     ref.tabs.addTab(ref.tabs_content[1], "List")
 
-    grid_content(ref)
+    ref.searchbar = QLineEdit(ref)
+    # Call the tab views
     list_content(ref)
+    grid_content(ref)
 
-    ref.layout().addWidget(QLineEdit(ref))
+    ref.searchbar.setPlaceholderText(QCoreApplication.translate("TrayIcon", "Search Package"))
+    ref.layout().addWidget(ref.searchbar)
     ref.layout().addWidget(ref.tabs)
 
 
@@ -71,10 +78,10 @@ def grid_content(ref):
 
 def list_content(ref):
     """
-        Define the view for the tab 'list' in the main window.
-        param:
-            ref is a reference to the Kiosk object
-        """
+    Define the view for the tab 'list' in the main window.
+    param:
+        ref is a reference to the Kiosk object
+    """
     ref.tabs_content[1].layout = QVBoxLayout(ref.tabs)
     # ref.content_scroll = QScrollArea(ref.tabs_content[1])
     ref.list = QListWidget(ref.tabs_content[1])
@@ -82,6 +89,19 @@ def list_content(ref):
     ref.tabs_content[1].layout.addWidget(ref.list)
 
     ref.list.adjustSize()
-    ref.list.addItems(['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l'])
 
+    ref.items_list = []
+    # For each package found, an item is created
+    for package in ref.result_list:
+        ref.items_list.append({'item': QListWidgetItem(ref.list),
+                           'item_package': CustomPackageWidget(package)})
+
+    # Attach each item to the list
+    for element in ref.items_list:
+        element['item'].setSizeHint(element['item_package'].sizeHint())
+
+        ref.list.addItem(element['item'])
+        ref.list.setItemWidget(element['item'], element['item_package'])
+
+    # Update the general layout
     ref.tabs_content[1].setLayout(ref.tabs_content[1].layout)

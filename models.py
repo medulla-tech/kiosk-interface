@@ -34,9 +34,28 @@ class Package(object):
             self.name = row_datas['name']
         if 'description' in row_datas.keys():
             self.description = row_datas['description']
+        else:
+            self.description = ""
         if 'version' in row_datas.keys():
             self.version = row_datas['version']
+        else:
+            self.version = ""
         if 'actions' in row_datas.keys():
             self.actions = row_datas['actions']
         if 'icon' in row_datas.keys():
             self.icon = row_datas['icon']
+        else:
+            self.icon = 'kiosk.png'
+
+    def get_all(self):
+        return [Package({'name': 'Firefox', 'version': '61.0', 'description': 'Best browser ever',
+                  'icon': 'kiosk.png',
+                  'actions': ['Install']}),
+         Package({'name': 'Thunderbird', 'version': '52.7', 'description': 'If you need to read your mails',
+                  'icon': 'kiosk.png',
+                  'actions': ['Ask']}),
+         Package({'name': 'Vlc', 'icon': 'vlc.png', 'description': 'Video player',
+                  'actions': ['Update', 'Launch', 'Delete']}),
+         Package({'name': '7zip', 'icon': 'kiosk.png',
+                  'actions': ['Launch', 'Delete']})
+         ]
