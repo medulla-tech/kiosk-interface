@@ -59,3 +59,6 @@ class Package(object):
          Package({'name': '7zip', 'icon': 'kiosk.png',
                   'actions': ['Launch', 'Delete']})
          ]
+
+    def getname(self):
+        return self.name

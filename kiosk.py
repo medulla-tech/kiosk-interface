@@ -34,32 +34,34 @@ class Kiosk(QWidget):
     """This class define the main window of the kiosk"""
 
     def __init__(self, criterion):
-        """Initialize """
+        """Initialize the kiosk object. This object set up the mechanism to controll the kiosk window"""
         super().__init__()
         self.criterion = criterion
 
         self.packages_list = self.result_list = Package.get_all(self)
-
-        kiosk_main_view(self)
+        self.items_list = None
+        kiosk_main_view(self, criterion)
         self.searchbar.textChanged.connect(self.filter_packages)
 
-    def filter_packages(self):
-        if self.searchbar.text() != self.criterion:
-            self.criterion = self.searchbar.text()
-
-        if self.searchbar.text() == "":
-            self.result_list = self.packages_list
+    def filter_packages(self, criterion):
+        if criterion:
+            self.criterion = criterion
         else:
-            self.result_list = []
-            for package in self.packages_list:
-                if re.search(self.criterion, package.name, flags=re.IGNORECASE) and self.criterion != "":
-                    self.result_list.append(package)
+            if self.searchbar.text() != self.criterion:
+                self.criterion = self.searchbar.text()
 
-        for element in self.items_list:
-            # Delete all the element in the list
-            self.list.removeItemWidget(element['item'])
+        if self.criterion == "":
+            self.result_list = self.packages_list
 
-        # Regenerate the list
+        self.list.clear()
+        self.result_list = []
+
+        for item in self.packages_list:
+            if re.search(self.criterion, item.getname(), flags=re.IGNORECASE):
+                self.result_list.append(item)
+
+        self.items_list = []
+        # For each package found, an item is created
         for package in self.result_list:
             self.items_list.append({'item': QListWidgetItem(self.list),
                                    'item_package': CustomPackageWidget(package)})
@@ -70,3 +72,6 @@ class Kiosk(QWidget):
 
             self.list.addItem(element['item'])
             self.list.setItemWidget(element['item'], element['item_package'])
+
+            # Update the general layout
+            self.tabs_content[1].setLayout(self.tabs_content[1].layout)

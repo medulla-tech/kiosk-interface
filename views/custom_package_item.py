@@ -62,3 +62,6 @@ class CustomPackageWidget(QWidget):
         self.setLayout(self.layout)
 
         self.show()
+
+    def getname(self):
+        return self.name.text()

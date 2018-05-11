@@ -28,14 +28,13 @@ from views.custom_package_item import CustomPackageWidget
 from PyQt5.QtCore import QCoreApplication
 
 
-def kiosk_main_view(ref):
+def kiosk_main_view(ref, criterion):
     """
     Define the main view for the kiosk window.
     param:
         ref is a reference to the Kiosk object
     """
     ref.setWindowTitle("Kiosk")
-
     ref.setLayout(QVBoxLayout(ref))
     # Tabs for differents kind of view
 
@@ -46,21 +45,7 @@ def kiosk_main_view(ref):
     ref.tabs.addTab(ref.tabs_content[1], "List")
 
     ref.searchbar = QLineEdit(ref)
-    # Call the tab views
-    list_content(ref)
-    grid_content(ref)
-
-    ref.searchbar.setPlaceholderText(QCoreApplication.translate("TrayIcon", "Search Package"))
-    ref.layout().addWidget(ref.searchbar)
-    ref.layout().addWidget(ref.tabs)
-
-
-def grid_content(ref):
-    """
-    Define the view for the tab 'grid' in the main window.
-    param:
-        ref is a reference to the Kiosk object
-    """
+    # Tab "grid"
     ref.tabs_content[0].layout = QGridLayout(ref)
     # ref.tabs_content[0].layout.setColumnStretch(0, 0)
 
@@ -75,13 +60,7 @@ def grid_content(ref):
     ref.tabs_content[0].layout.addWidget(QPushButton('9'), 2, 2)
     ref.tabs_content[0].setLayout(ref.tabs_content[0].layout)
 
-
-def list_content(ref):
-    """
-    Define the view for the tab 'list' in the main window.
-    param:
-        ref is a reference to the Kiosk object
-    """
+    # Tab "list"
     ref.tabs_content[1].layout = QVBoxLayout(ref.tabs)
     # ref.content_scroll = QScrollArea(ref.tabs_content[1])
     ref.list = QListWidget(ref.tabs_content[1])
@@ -92,9 +71,10 @@ def list_content(ref):
 
     ref.items_list = []
     # For each package found, an item is created
+
     for package in ref.result_list:
         ref.items_list.append({'item': QListWidgetItem(ref.list),
-                           'item_package': CustomPackageWidget(package)})
+                               'item_package': CustomPackageWidget(package)})
 
     # Attach each item to the list
     for element in ref.items_list:
@@ -105,3 +85,7 @@ def list_content(ref):
 
     # Update the general layout
     ref.tabs_content[1].setLayout(ref.tabs_content[1].layout)
+
+    ref.searchbar.setPlaceholderText(QCoreApplication.translate("TrayIcon", "Search Package"))
+    ref.layout().addWidget(ref.searchbar)
+    ref.layout().addWidget(ref.tabs)

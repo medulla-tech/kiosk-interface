@@ -59,3 +59,4 @@ class Tray(QWidget):
     def criterion_modified(self):
         """This method is called when the search criterion is modified """
         self.criterion = self.input_search.text()
+        self.open()
