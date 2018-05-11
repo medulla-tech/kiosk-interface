@@ -39,11 +39,21 @@ class Kiosk(QWidget):
             This object set up the mechanism to controll the kiosk window
         """
         super().__init__()
-        self.criterion = criterion
 
+        # If the search bar in the tray is not shown the criterion is set to False.
+        # So with this test the problem doesn't occurs.
+        if criterion is False:
+            self.criterion = ""
+        else:
+            self.criterion = criterion
+
+        # Get the packages list and genere the display objects
         self.packages_list = self.result_list = Package.get_all(self)
         self.items_list = None
+
         kiosk_main_view(self)
+
+        # Link the tray search criterion with the main search bar
         self.searchbar.setText(self.criterion)
         self.filter_packages(self.criterion)
         self.searchbar.textChanged.connect(self.filter_packages)

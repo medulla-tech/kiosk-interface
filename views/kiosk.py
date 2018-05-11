@@ -22,7 +22,7 @@
 # MA 02110-1301, USA.
 
 from PyQt5.QtWidgets import QVBoxLayout, QTabWidget, QWidget, QLineEdit, QGridLayout, QPushButton, \
-    QListWidget, QLabel, QHBoxLayout
+    QListWidget, QLabel, QHBoxLayout, QScrollArea
 from PyQt5.QtWidgets import QListWidgetItem
 from views.custom_package_item import CustomPackageWidget
 from PyQt5.QtCore import QCoreApplication
@@ -46,20 +46,19 @@ def kiosk_main_view(ref):
 
     ref.searchbar = QLineEdit(ref)
 
-
     # Tab "grid"
-    ref.tabs_content[0].layout = QGridLayout(ref)
-    # ref.tabs_content[0].layout.setColumnStretch(0, 0)
+    ref.tabs_content[0].layout = QHBoxLayout(ref.tabs_content[0])
+    ref.tabs_content[0].scroll = QScrollArea(ref.tabs_content[0])
+    ref.tabs_content[0].scroll.setWidgetResizable(True)
+    ref.tabs_content[0].scroll_content = QWidget()
+    ref.tabs_content[0].grid = QGridLayout(ref.tabs_content[0].scroll_content)
+    ref.tabs_content[0].scroll.setWidget(ref.tabs_content[0].scroll_content)
+    ref.tabs_content[0].layout.addWidget(ref.tabs_content[0].scroll)
 
-    ref.tabs_content[0].layout.addWidget(QPushButton('1'), 0, 0)
-    ref.tabs_content[0].layout.addWidget(QPushButton('2'), 0, 1)
-    ref.tabs_content[0].layout.addWidget(QPushButton('3'), 0, 2)
-    ref.tabs_content[0].layout.addWidget(QPushButton('4'), 1, 0)
-    ref.tabs_content[0].layout.addWidget(QPushButton('5'), 1, 1)
-    ref.tabs_content[0].layout.addWidget(QPushButton('6'), 1, 2)
-    ref.tabs_content[0].layout.addWidget(QPushButton('7'), 2, 0)
-    ref.tabs_content[0].layout.addWidget(QPushButton('8'), 2, 1)
-    ref.tabs_content[0].layout.addWidget(QPushButton('9'), 2, 2)
+    # Generate the grid items
+    for i in range(5):
+        for j in range(5):
+            ref.tabs_content[0].grid.addWidget(QPushButton(), i, j)
     ref.tabs_content[0].setLayout(ref.tabs_content[0].layout)
 
     # Tab "list"
