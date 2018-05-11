@@ -34,7 +34,10 @@ class Kiosk(QWidget):
     """This class define the main window of the kiosk"""
 
     def __init__(self, criterion):
-        """Initialize the kiosk object. This object set up the mechanism to controll the kiosk window"""
+        """
+            Initialize the kiosk object. 
+            This object set up the mechanism to controll the kiosk window
+        """
         super().__init__()
         self.criterion = criterion
 
