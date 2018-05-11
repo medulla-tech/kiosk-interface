@@ -25,8 +25,8 @@ import sys
 
 from PyQt5.QtCore import QCoreApplication
 from PyQt5.QtGui import QIcon
-from PyQt5.QtWidgets import QSystemTrayIcon, QMenu, QAction, QLineEdit, QWidgetAction, QPushButton
-
+from PyQt5.QtWidgets import QSystemTrayIcon, QMenu, QAction, QLineEdit, QWidgetAction, QPushButton, QHBoxLayout
+from views.custom_search_bar import CustomSearchBar
 
 def tray_main_view(ref):
     """
@@ -50,11 +50,9 @@ def tray_main_view(ref):
     # The searchbar is not added if the kiosk is running on mac
     if sys.platform != "darwin":
         ref.search_action = QWidgetAction(ref)
-        ref.input_search = QLineEdit()
-        ref.input_search.setPlaceholderText(
-            QCoreApplication.translate("TrayIcon", "Search Package"))
+
+        ref.input_search = CustomSearchBar()
         ref.search_action.setDefaultWidget(ref.input_search)
-        ref.btn_launch_search = QPushButton("search")
 
     # Add the open option to the menu
     ref.open_action = QAction(QCoreApplication.translate("TrayIcon", "Open"))

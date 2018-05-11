@@ -28,7 +28,7 @@ from views.custom_package_item import CustomPackageWidget
 from PyQt5.QtCore import QCoreApplication
 
 
-def kiosk_main_view(ref, criterion):
+def kiosk_main_view(ref):
     """
     Define the main view for the kiosk window.
     param:
@@ -45,6 +45,8 @@ def kiosk_main_view(ref, criterion):
     ref.tabs.addTab(ref.tabs_content[1], "List")
 
     ref.searchbar = QLineEdit(ref)
+
+
     # Tab "grid"
     ref.tabs_content[0].layout = QGridLayout(ref)
     # ref.tabs_content[0].layout.setColumnStretch(0, 0)
@@ -68,7 +70,6 @@ def kiosk_main_view(ref, criterion):
     ref.tabs_content[1].layout.addWidget(ref.list)
 
     ref.list.adjustSize()
-
     ref.items_list = []
     # For each package found, an item is created
 

@@ -44,11 +44,12 @@ class Tray(QWidget):
         # Bind the actions
         self.open_action.triggered.connect(self.open)
         if hasattr(self, 'input_search'):
-            self.input_search.textChanged.connect(self.criterion_modified)
+            # self.input_search.textChanged.connect(self.criterion_modified)
+            self.input_search.clicked.connect(self.criterion_modified)
 
-    def open(self):
+    def open(self, criterion = ""):
         """This method is called if the event 'open' is launched"""
-        self.main_window = Kiosk(self.criterion)
+        self.main_window = Kiosk(criterion)
         self.main_window.resize(650, 550)
         self.main_window.show()
 
@@ -59,4 +60,4 @@ class Tray(QWidget):
     def criterion_modified(self):
         """This method is called when the search criterion is modified """
         self.criterion = self.input_search.text()
-        self.open()
+        self.open(self.criterion)

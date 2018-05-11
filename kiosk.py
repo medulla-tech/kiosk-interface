@@ -40,7 +40,9 @@ class Kiosk(QWidget):
 
         self.packages_list = self.result_list = Package.get_all(self)
         self.items_list = None
-        kiosk_main_view(self, criterion)
+        kiosk_main_view(self)
+        self.searchbar.setText(self.criterion)
+        self.filter_packages(self.criterion)
         self.searchbar.textChanged.connect(self.filter_packages)
 
     def filter_packages(self, criterion):
