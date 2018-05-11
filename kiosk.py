@@ -49,6 +49,7 @@ class Kiosk(QWidget):
 
         # Get the packages list and genere the display objects
         self.packages_list = self.result_list = Package.get_all(self)
+        self.packages_grid = self.result_grid = Package.get_all(self)
         self.items_list = None
 
         kiosk_main_view(self)
@@ -79,7 +80,7 @@ class Kiosk(QWidget):
         # For each package found, an item is created
         for package in self.result_list:
             self.items_list.append({'item': QListWidgetItem(self.list),
-                                   'item_package': CustomPackageWidget(package)})
+                                   'item_package': CustomPackageWidget(package, "list")})
 
         # Attach each item to the list
         for element in self.items_list:

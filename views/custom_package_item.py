@@ -25,42 +25,55 @@ from PyQt5.QtGui import QPixmap
 from PyQt5.QtWidgets import QVBoxLayout, QTabWidget, QWidget, QLineEdit, QGridLayout, QPushButton, \
     QListWidget, QLabel, QHBoxLayout
 
-class CustomPackageWidget(QWidget):
-    def __init__(self, package):
-        super().__init__()
 
+class CustomPackageWidget(QWidget):
+    def __init__(self, package, type="grid"):
+        super().__init__()
+        self.type = type
         self.icon = QLabel("")
         icon = QPixmap("datas/" + package.icon)
-        icon = icon.scaled(24, 24)
+        if self.type == "list":
+            icon = icon.scaled(24, 24)
+        else:
+            icon = icon.scaled(50, 50)
         self.icon.setPixmap(icon)
         self.name = QLabel(package.name)
-
-        mini_layout = QHBoxLayout()
-        mini_layout.addWidget(self.icon)
-        mini_layout.addWidget(self.name)
-
         self.description = QLabel(package.description)
         self.version = QLabel(package.version)
 
+        self.layout = QGridLayout(self)
         self.actions = []
         for action in package.actions:
             self.actions.append(QPushButton(action))
 
-        self.layout = QGridLayout(self)
+        if type == "list":
+            mini_layout = QHBoxLayout()
+            mini_layout.addWidget(self.icon)
+            mini_layout.addWidget(self.name)
+            self.layout.addLayout(mini_layout, 0, 0)
+            self.layout.addWidget(self.version, 0, 1)
+            self.layout.addWidget(self.description, 0, 2)
 
-        # self.layout.addWidget(self.icon, 0, 0)
-        # self.layout.addWidget(self.name, 0, 1)
-        self.layout.addLayout(mini_layout, 0, 0)
-        self.layout.addWidget(self.version, 0, 1)
-        self.layout.addWidget(self.description, 0, 2)
 
-        column = 0
-        while column < len(self.actions):
-            self.layout.addWidget(self.actions[column], 1, column)
-            column += 1
+        else:
+            self.setFixedWidth(200)
+            self.setFixedHeight(200)
+            self.description.setFixedWidth(self.width())
+            mini_layout = QHBoxLayout()
+            mini_layout.addWidget(self.icon)
+            mini_layout.addWidget(self.name)
+
+            self.layout.addWidget(self.icon, 0, 0)
+            self.layout.addWidget(self.name, 1, 0)
+            self.layout.addWidget(self.version, 1, 1)
+            self.layout.addWidget(self.description, 2, 0)
+
+        row = 0
+        while row < len(self.actions):
+            self.layout.addWidget(self.actions[row], row, 3)
+            row += 1
 
         self.setLayout(self.layout)
-
         self.show()
 
     def getname(self):

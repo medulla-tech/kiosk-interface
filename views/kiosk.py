@@ -46,6 +46,8 @@ def kiosk_main_view(ref):
 
     ref.searchbar = QLineEdit(ref)
 
+    ref.items_grid = []
+
     # Tab "grid"
     ref.tabs_content[0].layout = QHBoxLayout(ref.tabs_content[0])
     ref.tabs_content[0].scroll = QScrollArea(ref.tabs_content[0])
@@ -56,9 +58,20 @@ def kiosk_main_view(ref):
     ref.tabs_content[0].layout.addWidget(ref.tabs_content[0].scroll)
 
     # Generate the grid items
-    for i in range(5):
-        for j in range(5):
-            ref.tabs_content[0].grid.addWidget(QPushButton(), i, j)
+
+    ref.items_grid = []
+    for package in ref.packages_list:
+        ref.items_grid.append(CustomPackageWidget(package, "grid"))
+
+
+    # grid(widget, row, col)
+    ref.tabs_content[0].grid.addWidget(ref.items_grid[0], 0, 0)
+    ref.tabs_content[0].grid.addWidget(ref.items_grid[1], 0, 1)
+    ref.tabs_content[0].grid.addWidget(ref.items_grid[2], 1, 0)
+    ref.tabs_content[0].grid.addWidget(ref.items_grid[3], 1, 1)
+
+    #print(ref.tabs_content[0].grid.width())
+
     ref.tabs_content[0].setLayout(ref.tabs_content[0].layout)
 
     # Tab "list"
@@ -74,7 +87,7 @@ def kiosk_main_view(ref):
 
     for package in ref.result_list:
         ref.items_list.append({'item': QListWidgetItem(ref.list),
-                               'item_package': CustomPackageWidget(package)})
+                               'item_package': CustomPackageWidget(package, "list")})
 
     # Attach each item to the list
     for element in ref.items_list:
