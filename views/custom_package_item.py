@@ -36,6 +36,7 @@ class CustomPackageWidget(QWidget):
             icon = icon.scaled(24, 24)
         else:
             icon = icon.scaled(50, 50)
+
         self.icon.setPixmap(icon)
         self.name = QLabel(package.name)
         self.description = QLabel(package.description)
@@ -54,6 +55,11 @@ class CustomPackageWidget(QWidget):
             self.layout.addWidget(self.version, 0, 1)
             self.layout.addWidget(self.description, 0, 2)
 
+            line = 0
+            while line < len(self.actions):
+                self.layout.addWidget(self.actions[line], 1, line)
+                line += 1
+
 
         else:
             self.setFixedWidth(200)
@@ -68,10 +74,10 @@ class CustomPackageWidget(QWidget):
             self.layout.addWidget(self.version, 1, 1)
             self.layout.addWidget(self.description, 2, 0)
 
-        row = 0
-        while row < len(self.actions):
-            self.layout.addWidget(self.actions[row], row, 3)
-            row += 1
+            row = 0
+            while row < len(self.actions):
+                self.layout.addWidget(self.actions[row], row, 3)
+                row += 1
 
         self.setLayout(self.layout)
         self.show()

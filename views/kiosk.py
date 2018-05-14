@@ -41,7 +41,7 @@ def kiosk_main_view(ref):
     ref.tabs = QTabWidget()
 
     ref.tabs_content = [QWidget(), QWidget()]
-    ref.tabs.addTab(ref.tabs_content[0], "Grid")
+    #ref.tabs.addTab(ref.tabs_content[0], "Grid")
     ref.tabs.addTab(ref.tabs_content[1], "List")
 
     ref.searchbar = QLineEdit(ref)
@@ -70,10 +70,7 @@ def kiosk_main_view(ref):
     ref.tabs_content[0].grid.addWidget(ref.items_grid[2], 1, 0)
     ref.tabs_content[0].grid.addWidget(ref.items_grid[3], 1, 1)
 
-    #print(ref.tabs_content[0].grid.width())
-
     ref.tabs_content[0].setLayout(ref.tabs_content[0].layout)
-
     # Tab "list"
     ref.tabs_content[1].layout = QVBoxLayout(ref.tabs)
     # ref.content_scroll = QScrollArea(ref.tabs_content[1])
