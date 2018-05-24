@@ -25,43 +25,82 @@ from PyQt5.QtGui import QPixmap
 from PyQt5.QtWidgets import QVBoxLayout, QTabWidget, QWidget, QLineEdit, QGridLayout, QPushButton, \
     QListWidget, QLabel, QHBoxLayout
 
-class CustomPackageWidget(QWidget):
-    def __init__(self, package):
-        super().__init__()
 
+class CustomPackageWidget(QWidget):
+    def __init__(self, package, type="grid"):
+        super().__init__()
+        self.type = type
         self.icon = QLabel("")
+        self._message = ""
         icon = QPixmap("datas/" + package.icon)
-        icon = icon.scaled(24, 24)
+        if self.type == "list":
+            icon = icon.scaled(24, 24)
+        else:
+            icon = icon.scaled(50, 50)
+
         self.icon.setPixmap(icon)
         self.name = QLabel(package.name)
-
-        mini_layout = QHBoxLayout()
-        mini_layout.addWidget(self.icon)
-        mini_layout.addWidget(self.name)
-
         self.description = QLabel(package.description)
         self.version = QLabel(package.version)
-
-        self.actions = []
-        for action in package.actions:
-            self.actions.append(QPushButton(action))
+        self.uuid = package.uuid
 
         self.layout = QGridLayout(self)
+        self.actions = []
+        self.action_button = {}
+        for action in package.actions:
+            self.actions.append(action)
+            self.action_button[action] = QPushButton(action)
 
-        # self.layout.addWidget(self.icon, 0, 0)
-        # self.layout.addWidget(self.name, 0, 1)
-        self.layout.addLayout(mini_layout, 0, 0)
-        self.layout.addWidget(self.version, 0, 1)
-        self.layout.addWidget(self.description, 0, 2)
+        if type == "list":
+            mini_layout = QHBoxLayout()
+            mini_layout.addWidget(self.icon)
+            mini_layout.addWidget(self.name)
+            self.layout.addLayout(mini_layout, 0, 0)
+            self.layout.addWidget(self.version, 0, 1)
+            self.layout.addWidget(self.description, 0, 2)
 
-        column = 0
-        while column < len(self.actions):
-            self.layout.addWidget(self.actions[column], 1, column)
-            column += 1
+            line = 0
+            while line < len(self.actions):
+                self.layout.addWidget(self.action_button[self.actions[line]], 1, line)
+                line += 1
+
+        else:
+            self.setFixedWidth(200)
+            self.setFixedHeight(200)
+            self.description.setFixedWidth(self.width())
+            mini_layout = QHBoxLayout()
+            mini_layout.addWidget(self.icon)
+            mini_layout.addWidget(self.name)
+
+            self.layout.addWidget(self.icon, 0, 0)
+            self.layout.addWidget(self.name, 1, 0)
+            self.layout.addWidget(self.version, 1, 1)
+            self.layout.addWidget(self.description, 2, 0)
+
+            row = 0
+            while row < len(self.actions):
+                #self.layout.addWidget(self.action_button[self.actions[row]], row, 3)
+                row += 1
 
         self.setLayout(self.layout)
-
         self.show()
+
+        if "Install" in self.actions:
+            self.action_button["Install"].clicked.connect(lambda: self.return_message("install"))
+        if "Ask" in self.actions:
+            self.action_button["Ask"].clicked.connect(lambda: self.return_message("ask"))
+        if "Update" in self.actions:
+            self.action_button["Update"].clicked.connect(lambda: self.return_message("update"))
+        if "Delete" in self.actions:
+            self.action_button["Delete"].clicked.connect(lambda: self.return_message("delete"))
+        if "Launch" in self.actions:
+            self.action_button["Launch"].clicked.connect(lambda: self.return_message("launch"))
+
+    def return_message(self, action):
+
+        self._message = """{'uuid' : %s, "action": "kioskinterface%s", "subaction" : "%s"}"""%(self.uuid,\
+         action, action)
+        print(self._message)
 
     def getname(self):
         return self.name.text()

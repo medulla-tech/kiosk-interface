@@ -24,7 +24,9 @@
 import sys
 from PyQt5.QtWidgets import QApplication
 from tray import Tray
+from config import ConfParameter
 
+parameters = ConfParameter()
 
 app = QApplication(sys.argv)
 app.setApplicationName("Kiosk")

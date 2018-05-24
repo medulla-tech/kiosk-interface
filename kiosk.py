@@ -34,16 +34,32 @@ class Kiosk(QWidget):
     """This class define the main window of the kiosk"""
 
     def __init__(self, criterion):
-        """Initialize the kiosk object. This object set up the mechanism to controll the kiosk window"""
+        """
+            Initialize the kiosk object. 
+            This object set up the mechanism to controll the kiosk window
+        """
         super().__init__()
-        self.criterion = criterion
 
+        # If the search bar in the tray is not shown the criterion is set to False.
+        # So with this test the problem doesn't occurs.
+        if criterion is False:
+            self.criterion = ""
+        else:
+            self.criterion = criterion
+
+        # Get the packages list and genere the display objects
         self.packages_list = self.result_list = Package.get_all(self)
+        self.packages_grid = self.result_grid = Package.get_all(self)
         self.items_list = None
+
         kiosk_main_view(self)
+
+        # Link the tray search criterion with the main search bar
         self.searchbar.setText(self.criterion)
         self.filter_packages(self.criterion)
         self.searchbar.textChanged.connect(self.filter_packages)
+
+        self.list.itemSelectionChanged.connect(self.select_row)
 
     def filter_packages(self, criterion):
         if criterion:
@@ -66,7 +82,7 @@ class Kiosk(QWidget):
         # For each package found, an item is created
         for package in self.result_list:
             self.items_list.append({'item': QListWidgetItem(self.list),
-                                   'item_package': CustomPackageWidget(package)})
+                                   'item_package': CustomPackageWidget(package, "list")})
 
         # Attach each item to the list
         for element in self.items_list:
@@ -77,3 +93,12 @@ class Kiosk(QWidget):
 
             # Update the general layout
             self.tabs_content[1].setLayout(self.tabs_content[1].layout)
+
+    def select_row(self):
+        """select_row get the actual row and listen if there are any action launched. If an action is launched,
+        the appropriate message is generated and send to agent-machine."""
+        selected_item = self.list.itemWidget(self.list.currentItem())
+
+        # Kind of messages the kiosk needs to return to the agent
+        # {'uuid' : "45d4-3124c21-3123", "action": "kioskinterfaceinstall", "subaction" : "install"}
+
