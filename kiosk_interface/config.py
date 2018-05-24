@@ -24,7 +24,7 @@ import sys
 
 import os
 import configparser
-
+import socket
 
 def conffilename(agenttype):
     """
@@ -97,3 +97,47 @@ class ConfParameter:
             self.kiosk_local_port = config.getint('kiosk', 'kiosk_local_port')
         if config.has_option('kiosk', 'am_server'):
             self.am_server = config.get('kiosk', 'am_server')
+
+
+class MessengerToAM(object):
+    def __init__(self):
+        """Initialization of the MessagerToAM object"""
+
+        parameters = ConfParameter()
+        # Next we create a TCP/IP socket
+        self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        # Connect the socket to the port where the server is listening
+        server_address = (parameters.am_server, parameters.am_local_port)
+        self.active = False
+
+        try:
+            self.sock.connect(server_address)
+            self.active = True
+        except socket.error:
+            self.active = False
+            print("The communication with the agent machine can't be established")
+
+    def send(self, msg=""):
+        """Send the specified message to the agent machine.
+        Args:
+            msg: str of the message sent to the agent machine. This message must has the following structure:
+            '{"uuid" : "45d4-3124c21-3123", "action": "kioskinterfaceinstall", "subaction" : "install"}'
+        """
+        if self.active:
+            print('msg = '+msg)
+            self.sock.sendall(msg)
+            self.handle()
+        else:
+            self.sock.close()
+
+    def handle(self):
+        """The handle allow the agent machine to return back a response to the kiosk-interface.
+        The datas returned back by the agent machine are returned by this function.
+
+        Returns:
+            str: The return back message
+        """
+        data = self.sock.recv(1024).strip()
+        print('received "%s"' % data)
+        self.sock.close()
+        return data

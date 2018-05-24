@@ -1,6 +1,8 @@
 #!/usr/bin/env python3
 # coding: utf-8
 """Generate Model objects for datas"""
+
+
 #
 # (c) 2018 Siveo, http://www.siveo.net
 #
@@ -20,6 +22,8 @@
 # along with Pulse 2; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
 # MA 02110-1301, USA.
+
+from config import MessengerToAM
 
 
 class Package(object):
@@ -51,20 +55,24 @@ class Package(object):
 
     def get_all(self):
         return [Package({'name': 'Firefox', 'version': '61.0', 'description': 'Best browser ever',
-                  'uuid': "45d4-3124c21-3123",
-                  'icon': 'kiosk.png',
-                  'actions': ['Install']}),
-         Package({'name': 'Thunderbird', 'version': '52.7', 'description': 'If you need to read your mails',
-                  'uuid': "45d4-3124c21-3134",
-                  'icon': 'kiosk.png',
-                  'actions': ['Ask']}),
-         Package({'name': 'Vlc', 'icon': 'vlc.png', 'description': 'Video player',
-                  'uuid': "45d4-3124c21-3145",
-                  'actions': ['Update', 'Launch', 'Delete']}),
-         Package({'name': '7zip', 'icon': 'kiosk.png',
-                  'uuid': "45d4-3124c21-3156",
-                  'actions': ['Launch', 'Delete']})
-         ]
+                         'uuid': "45d4-3124c21-3123",
+                         'icon': 'kiosk.png',
+                         'actions': ['Install']}),
+                Package({'name': 'Thunderbird', 'version': '52.7', 'description': 'If you need to read your mails',
+                         'uuid': "45d4-3124c21-3134",
+                         'icon': 'kiosk.png',
+                         'actions': ['Ask']}),
+                Package({'name': 'Vlc', 'icon': 'vlc.png', 'description': 'Video player',
+                         'uuid': "45d4-3124c21-3145",
+                         'actions': ['Update', 'Launch', 'Delete']}),
+                Package({'name': '7zip', 'icon': 'kiosk.png',
+                         'uuid': "45d4-3124c21-3156",
+                         'actions': ['Launch', 'Delete']})
+                ]
 
     def getname(self):
         return self.name
+
+
+def send_message_to_am(message=""):
+    MessengerToAM().send(message)
