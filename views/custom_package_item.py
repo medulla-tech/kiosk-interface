@@ -31,6 +31,7 @@ class CustomPackageWidget(QWidget):
         super().__init__()
         self.type = type
         self.icon = QLabel("")
+        self._message = ""
         icon = QPixmap("datas/" + package.icon)
         if self.type == "list":
             icon = icon.scaled(24, 24)
@@ -41,11 +42,14 @@ class CustomPackageWidget(QWidget):
         self.name = QLabel(package.name)
         self.description = QLabel(package.description)
         self.version = QLabel(package.version)
+        self.uuid = package.uuid
 
         self.layout = QGridLayout(self)
         self.actions = []
+        self.action_button = {}
         for action in package.actions:
-            self.actions.append(QPushButton(action))
+            self.actions.append(action)
+            self.action_button[action] = QPushButton(action)
 
         if type == "list":
             mini_layout = QHBoxLayout()
@@ -57,9 +61,8 @@ class CustomPackageWidget(QWidget):
 
             line = 0
             while line < len(self.actions):
-                self.layout.addWidget(self.actions[line], 1, line)
+                self.layout.addWidget(self.action_button[self.actions[line]], 1, line)
                 line += 1
-
 
         else:
             self.setFixedWidth(200)
@@ -76,11 +79,28 @@ class CustomPackageWidget(QWidget):
 
             row = 0
             while row < len(self.actions):
-                self.layout.addWidget(self.actions[row], row, 3)
+                #self.layout.addWidget(self.action_button[self.actions[row]], row, 3)
                 row += 1
 
         self.setLayout(self.layout)
         self.show()
+
+        if "Install" in self.actions:
+            self.action_button["Install"].clicked.connect(lambda: self.return_message("install"))
+        if "Ask" in self.actions:
+            self.action_button["Ask"].clicked.connect(lambda: self.return_message("ask"))
+        if "Update" in self.actions:
+            self.action_button["Update"].clicked.connect(lambda: self.return_message("update"))
+        if "Delete" in self.actions:
+            self.action_button["Delete"].clicked.connect(lambda: self.return_message("delete"))
+        if "Launch" in self.actions:
+            self.action_button["Launch"].clicked.connect(lambda: self.return_message("launch"))
+
+    def return_message(self, action):
+
+        self._message = """{'uuid' : %s, "action": "kioskinterface%s", "subaction" : "%s"}"""%(self.uuid,\
+         action, action)
+        print(self._message)
 
     def getname(self):
         return self.name.text()

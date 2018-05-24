@@ -46,17 +46,23 @@ class Package(object):
             self.icon = row_datas['icon']
         else:
             self.icon = 'kiosk.png'
+        if 'uuid' in row_datas.keys():
+            self.uuid = row_datas['uuid']
 
     def get_all(self):
         return [Package({'name': 'Firefox', 'version': '61.0', 'description': 'Best browser ever',
+                  'uuid': "45d4-3124c21-3123",
                   'icon': 'kiosk.png',
                   'actions': ['Install']}),
          Package({'name': 'Thunderbird', 'version': '52.7', 'description': 'If you need to read your mails',
+                  'uuid': "45d4-3124c21-3134",
                   'icon': 'kiosk.png',
                   'actions': ['Ask']}),
          Package({'name': 'Vlc', 'icon': 'vlc.png', 'description': 'Video player',
+                  'uuid': "45d4-3124c21-3145",
                   'actions': ['Update', 'Launch', 'Delete']}),
          Package({'name': '7zip', 'icon': 'kiosk.png',
+                  'uuid': "45d4-3124c21-3156",
                   'actions': ['Launch', 'Delete']})
          ]
 

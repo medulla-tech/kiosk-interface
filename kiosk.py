@@ -59,6 +59,8 @@ class Kiosk(QWidget):
         self.filter_packages(self.criterion)
         self.searchbar.textChanged.connect(self.filter_packages)
 
+        self.list.itemSelectionChanged.connect(self.select_row)
+
     def filter_packages(self, criterion):
         if criterion:
             self.criterion = criterion
@@ -91,3 +93,12 @@ class Kiosk(QWidget):
 
             # Update the general layout
             self.tabs_content[1].setLayout(self.tabs_content[1].layout)
+
+    def select_row(self):
+        """select_row get the actual row and listen if there are any action launched. If an action is launched,
+        the appropriate message is generated and send to agent-machine."""
+        selected_item = self.list.itemWidget(self.list.currentItem())
+
+        # Kind of messages the kiosk needs to return to the agent
+        # {'uuid' : "45d4-3124c21-3123", "action": "kioskinterfaceinstall", "subaction" : "install"}
+
