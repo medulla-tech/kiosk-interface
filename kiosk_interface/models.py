@@ -44,8 +44,8 @@ class Package(object):
             self.version = row_datas['version']
         else:
             self.version = ""
-        if 'actions' in row_datas.keys():
-            self.actions = row_datas['actions']
+        if 'action' in row_datas.keys():
+            self.actions = row_datas['action']
         if 'icon' in row_datas.keys():
             self.icon = row_datas['icon']
         else:
@@ -59,21 +59,26 @@ class Package(object):
         print ("___________chang struct__________________________")
         print (datainitialisation)
         print ("_____________________________________")
-        return [Package({'name': 'Firefox', 'version': '61.0', 'description': 'Best browser ever',
-                         'uuid': "45d4-3124c21-3123",
-                         'icon': 'kiosk.png',
-                         'actions': ['Install']}),
-                Package({'name': 'Thunderbird', 'version': '52.7', 'description': 'If you need to read your mails',
-                         'uuid': "45d4-3124c21-3134",
-                         'icon': 'kiosk.png',
-                         'actions': ['Ask']}),
-                Package({'name': 'Vlc', 'icon': 'vlc.png', 'description': 'Video player',
-                         'uuid': "45d4-3124c21-3145",
-                         'actions': ['Update', 'Launch', 'Delete']}),
-                Package({'name': '7zip', 'icon': 'kiosk.png',
-                         'uuid': "45d4-3124c21-3156",
-                         'actions': ['Launch', 'Delete']})
-                ]
+        d=[]
+        for z in datainitialisation:
+            d.append(Package(z))
+        return d
+
+##        return [Package({'name': 'Firefox', 'version': '61.0', 'description': 'Best browser ever',
+##                         'uuid': "45d4-3124c21-3123",
+##                         'icon': 'kiosk.png',
+##                         'actions': ['Install']}),
+##                Package({'name': 'Thunderbird', 'version': '52.7', 'description': 'If you need to read your mails',
+##                         'uuid': "45d4-3124c21-3134",
+##                         'icon': 'kiosk.png',
+##                         'actions': ['Ask']}),
+##                Package({'name': 'Vlc', 'icon': 'vlc.png', 'description': 'Video player',
+##                         'uuid': "45d4-3124c21-3145",
+##                         'actions': ['Update', 'Launch', 'Delete']}),
+##                Package({'name': '7zip', 'icon': 'kiosk.png',
+##                         'uuid': "45d4-3124c21-3156",
+##                         'actions': ['Launch', 'Delete']})
+##                ]
 
     def getname(self):
         return self.name

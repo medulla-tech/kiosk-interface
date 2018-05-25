@@ -73,7 +73,7 @@ def handle_client_connection(client_socket):
         recv_msg_from_AM = recv_msg_from_AM.decode("utf-8")
         print (recv_msg_from_AM)
         print ("initialise la data")
-        set_datakiosk(recv_msg_from_AM)
+        set_datakiosk(json.loads(recv_msg_from_AM))
         print (get_datakiosk())
         client_socket.send(recv_msg_from_AM.encode("utf-8"))
     finally:
