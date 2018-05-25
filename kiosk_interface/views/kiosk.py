@@ -57,20 +57,6 @@ def kiosk_main_view(ref):
     ref.tabs_content[0].scroll.setWidget(ref.tabs_content[0].scroll_content)
     ref.tabs_content[0].layout.addWidget(ref.tabs_content[0].scroll)
 
-    # Generate the grid items
-
-    ref.items_grid = []
-    for package in ref.packages_list:
-        ref.items_grid.append(CustomPackageWidget(package, "grid"))
-
-
-    # grid(widget, row, col)
-    ref.tabs_content[0].grid.addWidget(ref.items_grid[0], 0, 0)
-    ref.tabs_content[0].grid.addWidget(ref.items_grid[1], 0, 1)
-    ref.tabs_content[0].grid.addWidget(ref.items_grid[2], 1, 0)
-    ref.tabs_content[0].grid.addWidget(ref.items_grid[3], 1, 1)
-
-    ref.tabs_content[0].setLayout(ref.tabs_content[0].layout)
     # Tab "list"
     ref.tabs_content[1].layout = QVBoxLayout(ref.tabs)
     # ref.content_scroll = QScrollArea(ref.tabs_content[1])
