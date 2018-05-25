@@ -29,9 +29,15 @@ import socket
 from server import tcpserver
 import threading
 
-parameters = ConfParameter()
-print (parameters.am_local_ports)
 
+
+
+
+parameters = ConfParameter()
+##print (parameters.am_local_ports)
+
+
+    
 app = QApplication(sys.argv)
 app.setApplicationName("Kiosk")
 

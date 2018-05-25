@@ -24,7 +24,7 @@
 # MA 02110-1301, USA.
 
 from config import MessengerToAM
-
+from server import get_datakiosk, set_datakiosk
 
 class Package(object):
     """Manage the datas for a Package"""
@@ -53,7 +53,12 @@ class Package(object):
         if 'uuid' in row_datas.keys():
             self.uuid = row_datas['uuid']
 
+    
     def get_all(self):
+        datainitialisation = get_datakiosk()
+        print ("___________chang struct__________________________")
+        print (datainitialisation)
+        print ("_____________________________________")
         return [Package({'name': 'Firefox', 'version': '61.0', 'description': 'Best browser ever',
                          'uuid': "45d4-3124c21-3123",
                          'icon': 'kiosk.png',

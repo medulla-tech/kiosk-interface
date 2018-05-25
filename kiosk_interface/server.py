@@ -22,7 +22,21 @@
 # MA 02110-1301, USA.
 import threading
 import socket
+import json
 
+
+global datakiosk
+
+def get_datakiosk():
+    global datakiosk
+    return datakiosk
+
+def set_datakiosk(data):
+    global datakiosk
+    datakiosk = data
+
+
+    
 def tcpserver(sock, eventkill):
         """
         this function is the listening function of the tcp server of the machine agent, to serve the request of the kiosk
@@ -55,10 +69,13 @@ def handle_client_connection(client_socket):
     """
     try:
         # request the recv message
-        recv_msg_from_kiosk = client_socket.recv(1024)
-        # print 'Received {}'.format(recv_msg_from_kiosk)
-        # send result or acquit
-        client_socket.send(recv_msg_from_kiosk)
+        recv_msg_from_AM = client_socket.recv(1024)
+        recv_msg_from_AM = recv_msg_from_AM.decode("utf-8")
+        print (recv_msg_from_AM)
+        print ("initialise la data")
+        set_datakiosk(recv_msg_from_AM)
+        print (get_datakiosk())
+        client_socket.send(recv_msg_from_AM.encode("utf-8"))
     finally:
         client_socket.close()
 
