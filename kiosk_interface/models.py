@@ -74,5 +74,5 @@ class Package(object):
         return self.name
 
 
-def send_message_to_am(message=""):
-    MessengerToAM().send(message)
+def send_message_to_am(message):
+    MessengerToAM().send(message.encode('utf-8'))

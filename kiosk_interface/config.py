@@ -117,14 +117,14 @@ class MessengerToAM(object):
             self.active = False
             print("The communication with the agent machine can't be established")
 
-    def send(self, msg=""):
+    def send(self, msg):
         """Send the specified message to the agent machine.
         Args:
             msg: str of the message sent to the agent machine. This message must has the following structure:
             '{"uuid" : "45d4-3124c21-3123", "action": "kioskinterfaceinstall", "subaction" : "install"}'
         """
         if self.active:
-            print('msg = '+msg)
+            print('msg = '+str(msg))
             self.sock.sendall(msg)
             self.handle()
         else:

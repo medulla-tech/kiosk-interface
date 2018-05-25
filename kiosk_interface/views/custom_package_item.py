@@ -98,10 +98,8 @@ class CustomPackageWidget(QWidget):
             self.action_button["Launch"].clicked.connect(lambda: self.return_message("Launch"))
 
     def return_message(self, action):
-
-        self._message = """{'uuid' : %s, "action": "kioskinterface%s", "subaction" : "%s"}""" % (self.uuid, \
+        self._message = "{'uuid': %s, 'action': 'kioskinterface%s', 'subaction': '%s'}"% (self.uuid, \
                                                                                                  action, action)
-        print(self._message)
         send_message_to_am(self._message)
 
     def getname(self):
