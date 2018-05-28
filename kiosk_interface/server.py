@@ -57,6 +57,7 @@ def tcpserver(sock, eventkill):
             client_handler.start()
         print("Stopping Kiosk")
 
+
 def handle_client_connection(client_socket):
     """
         this function handles the message received from kiosk
@@ -78,6 +79,3 @@ def handle_client_connection(client_socket):
         client_socket.send(recv_msg_from_AM.encode("utf-8"))
     finally:
         client_socket.close()
-
-
-        

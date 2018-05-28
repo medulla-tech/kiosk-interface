@@ -28,10 +28,10 @@ from config import ConfParameter
 import socket
 from server import tcpserver
 import threading
+from server import set_datakiosk
 
 
-
-
+set_datakiosk(None)
 
 parameters = ConfParameter()
 ##print (parameters.am_local_ports)
