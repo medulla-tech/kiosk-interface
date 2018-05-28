@@ -23,8 +23,8 @@
 
 import sys
 
-from PyQt5.QtWidgets import QWidget
-from kiosk import Kiosk
+from PyQt5.QtWidgets import QWidget,QErrorMessage
+from server import get_datakiosk
 
 from views.tray import tray_main_view
 
@@ -49,10 +49,14 @@ class Tray(QWidget):
 
     def open(self, criterion = ""):
         """This method is called if the event 'open' is launched"""
-        self.main_window = Kiosk(criterion)
-        self.main_window.resize(650, 550)
-        self.main_window.show()
-
+        try:
+            get_datakiosk()
+            self.main_window = Kiosk(criterion)
+            self.main_window.resize(650, 550)
+            self.main_window.show()
+        except Exception:
+            self.main_window = QErrorMessage()
+            self.main_window.showMessage("No data found")
     def quit(self):
         """This method is called if the event 'quit' is launched"""
         sys.exit()
