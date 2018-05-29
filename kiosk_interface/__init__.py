@@ -29,10 +29,12 @@ import socket
 from server import tcpserver
 import threading
 from server import set_datakiosk
+from models import send_message_to_am
 
 
 set_datakiosk(None)
-
+message = """{"action": "kioskinterface", "subaction": "initialization"}"""
+send_message_to_am(message)
 parameters = ConfParameter()
 ##print (parameters.am_local_ports)
 
