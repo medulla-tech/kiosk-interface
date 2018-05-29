@@ -23,8 +23,9 @@
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
 # MA 02110-1301, USA.
 
-from config import MessengerToAM
+from server import MessengerToAM
 from server import get_datakiosk, set_datakiosk
+
 
 class Package(object):
     """Manage the datas for a Package"""
@@ -85,4 +86,5 @@ class Package(object):
 
 
 def send_message_to_am(message):
-    MessengerToAM().send(message.encode('utf-8'))
+    client = MessengerToAM()
+    client.send(message.encode('utf-8'))
