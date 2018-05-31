@@ -1,6 +1,8 @@
 #!/usr/bin/env python3
 # coding: utf-8
 """Generate Model objects for datas"""
+
+
 #
 # (c) 2018 Siveo, http://www.siveo.net
 #
@@ -21,6 +23,9 @@
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
 # MA 02110-1301, USA.
 
+from server import MessengerToAM
+from server import get_datakiosk, set_datakiosk
+
 
 class Package(object):
     """Manage the datas for a Package"""
@@ -40,8 +45,8 @@ class Package(object):
             self.version = row_datas['version']
         else:
             self.version = ""
-        if 'actions' in row_datas.keys():
-            self.actions = row_datas['actions']
+        if 'action' in row_datas.keys():
+            self.actions = row_datas['action']
         if 'icon' in row_datas.keys():
             self.icon = row_datas['icon']
         else:
@@ -49,22 +54,37 @@ class Package(object):
         if 'uuid' in row_datas.keys():
             self.uuid = row_datas['uuid']
 
+    
     def get_all(self):
-        return [Package({'name': 'Firefox', 'version': '61.0', 'description': 'Best browser ever',
-                  'uuid': "45d4-3124c21-3123",
-                  'icon': 'kiosk.png',
-                  'actions': ['Install']}),
-         Package({'name': 'Thunderbird', 'version': '52.7', 'description': 'If you need to read your mails',
-                  'uuid': "45d4-3124c21-3134",
-                  'icon': 'kiosk.png',
-                  'actions': ['Ask']}),
-         Package({'name': 'Vlc', 'icon': 'vlc.png', 'description': 'Video player',
-                  'uuid': "45d4-3124c21-3145",
-                  'actions': ['Update', 'Launch', 'Delete']}),
-         Package({'name': '7zip', 'icon': 'kiosk.png',
-                  'uuid': "45d4-3124c21-3156",
-                  'actions': ['Launch', 'Delete']})
-         ]
+        datainitialisation = get_datakiosk()
+        print ("___________chang struct__________________________")
+        print (datainitialisation)
+        print ("_____________________________________")
+        d=[]
+        for z in datainitialisation:
+            d.append(Package(z))
+        return d
+
+##        return [Package({'name': 'Firefox', 'version': '61.0', 'description': 'Best browser ever',
+##                         'uuid': "45d4-3124c21-3123",
+##                         'icon': 'kiosk.png',
+##                         'actions': ['Install']}),
+##                Package({'name': 'Thunderbird', 'version': '52.7', 'description': 'If you need to read your mails',
+##                         'uuid': "45d4-3124c21-3134",
+##                         'icon': 'kiosk.png',
+##                         'actions': ['Ask']}),
+##                Package({'name': 'Vlc', 'icon': 'vlc.png', 'description': 'Video player',
+##                         'uuid': "45d4-3124c21-3145",
+##                         'actions': ['Update', 'Launch', 'Delete']}),
+##                Package({'name': '7zip', 'icon': 'kiosk.png',
+##                         'uuid': "45d4-3124c21-3156",
+##                         'actions': ['Launch', 'Delete']})
+##                ]
 
     def getname(self):
         return self.name
+
+
+def send_message_to_am(message):
+    client = MessengerToAM()
+    client.send(message.encode('utf-8'))

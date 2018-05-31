@@ -24,6 +24,7 @@
 from PyQt5.QtGui import QPixmap
 from PyQt5.QtWidgets import QVBoxLayout, QTabWidget, QWidget, QLineEdit, QGridLayout, QPushButton, \
     QListWidget, QLabel, QHBoxLayout
+from models import send_message_to_am
 
 
 class CustomPackageWidget(QWidget):
@@ -79,28 +80,27 @@ class CustomPackageWidget(QWidget):
 
             row = 0
             while row < len(self.actions):
-                #self.layout.addWidget(self.action_button[self.actions[row]], row, 3)
+                # self.layout.addWidget(self.action_button[self.actions[row]], row, 3)
                 row += 1
 
         self.setLayout(self.layout)
         self.show()
 
         if "Install" in self.actions:
-            self.action_button["Install"].clicked.connect(lambda: self.return_message("install"))
+            self.action_button["Install"].clicked.connect(lambda: self.return_message("Install"))
         if "Ask" in self.actions:
-            self.action_button["Ask"].clicked.connect(lambda: self.return_message("ask"))
+            self.action_button["Ask"].clicked.connect(lambda: self.return_message("Ask"))
         if "Update" in self.actions:
-            self.action_button["Update"].clicked.connect(lambda: self.return_message("update"))
+            self.action_button["Update"].clicked.connect(lambda: self.return_message("Update"))
         if "Delete" in self.actions:
-            self.action_button["Delete"].clicked.connect(lambda: self.return_message("delete"))
+            self.action_button["Delete"].clicked.connect(lambda: self.return_message("Delete"))
         if "Launch" in self.actions:
-            self.action_button["Launch"].clicked.connect(lambda: self.return_message("launch"))
+            self.action_button["Launch"].clicked.connect(lambda: self.return_message("Launch"))
 
     def return_message(self, action):
-
-        self._message = """{'uuid' : %s, "action": "kioskinterface%s", "subaction" : "%s"}"""%(self.uuid,\
-         action, action)
-        print(self._message)
+        self._message = """{"uuid": "%s", "action": "kioskinterface%s", "subaction": "%s"}"""% (self.uuid, \
+                                                                                                 action, action)
+        send_message_to_am(self._message)
 
     def getname(self):
         return self.name.text()
