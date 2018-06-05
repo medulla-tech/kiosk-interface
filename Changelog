@@ -1,0 +1,3 @@
+kiosk-interface 0.2
+=============
+* [BUGFIX] Fix install of images into data/ folder
