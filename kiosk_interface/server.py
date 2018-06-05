@@ -70,7 +70,7 @@ def handle_client_connection(client_socket):
     """
     try:
         # request the recv message
-        recv_msg_from_AM = client_socket.recv(1024)
+        recv_msg_from_AM = client_socket.recv(5000)
         recv_msg_from_AM = recv_msg_from_AM.decode("utf-8")
         print (recv_msg_from_AM)
         print ("initialise la data")
