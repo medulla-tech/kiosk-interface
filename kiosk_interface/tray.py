@@ -57,6 +57,8 @@ class Tray(QWidget):
             send_message_to_am(message, self.main_window)
             self.main_window.resize(650, 550)
             self.main_window.show()
+            message = """{"action": "kioskinterface", "subaction": "initialization"}"""
+            send_message_to_am(message, self.main_window)
         else:
             self.main_window = QErrorMessage()
             self.main_window.showMessage("No data found")
