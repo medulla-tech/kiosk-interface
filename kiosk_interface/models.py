@@ -48,43 +48,36 @@ class Package(object):
         if 'action' in row_datas.keys():
             self.actions = row_datas['action']
         if 'icon' in row_datas.keys():
+            # Test if the icon exists
+            #TODO test if the icon exists in datas directory
             self.icon = row_datas['icon']
         else:
             self.icon = 'kiosk.png'
         if 'uuid' in row_datas.keys():
             self.uuid = row_datas['uuid']
 
-    
     def get_all(self):
+        """Generage and returns the list of package
+        Returns : the list of packages
+        """
         datainitialisation = get_datakiosk()
-        print ("___________chang struct__________________________")
-        print (datainitialisation)
-        print ("_____________________________________")
-        d=[]
-        for z in datainitialisation:
-            d.append(Package(z))
-        return d
-
-##        return [Package({'name': 'Firefox', 'version': '61.0', 'description': 'Best browser ever',
-##                         'uuid': "45d4-3124c21-3123",
-##                         'icon': 'kiosk.png',
-##                         'actions': ['Install']}),
-##                Package({'name': 'Thunderbird', 'version': '52.7', 'description': 'If you need to read your mails',
-##                         'uuid': "45d4-3124c21-3134",
-##                         'icon': 'kiosk.png',
-##                         'actions': ['Ask']}),
-##                Package({'name': 'Vlc', 'icon': 'vlc.png', 'description': 'Video player',
-##                         'uuid': "45d4-3124c21-3145",
-##                         'actions': ['Update', 'Launch', 'Delete']}),
-##                Package({'name': '7zip', 'icon': 'kiosk.png',
-##                         'uuid': "45d4-3124c21-3156",
-##                         'actions': ['Launch', 'Delete']})
-##                ]
+        print("___________chang struct______________")
+        print(datainitialisation)
+        print("_____________________________________")
+        list=[]
+        for element in datainitialisation:
+            list.append(Package(element))
+        return list
 
     def getname(self):
         return self.name
 
 
-def send_message_to_am(message):
+def send_message_to_am(message, ref=None):
     client = MessengerToAM()
     client.send(message.encode('utf-8'))
+    get_datakiosk()
+
+    if ref is not None:
+        ref.updated.emit()
+

@@ -23,16 +23,18 @@
 
 from PyQt5.QtWidgets import QWidget
 from PyQt5.QtWidgets import QListWidgetItem
+from PyQt5.QtCore import pyqtSignal
 
-from models import Package
+from models import Package, get_datakiosk
 from views.custom_package_item import CustomPackageWidget
 from views.kiosk import kiosk_main_view
+
 import re
 
 
 class Kiosk(QWidget):
     """This class define the main window of the kiosk"""
-
+    updated = pyqtSignal(name="updated")
     def __init__(self, criterion):
         """
             Initialize the kiosk object. 
@@ -48,18 +50,12 @@ class Kiosk(QWidget):
             self.criterion = criterion
 
         # Get the packages list and genere the display objects
-        self.packages_list = self.result_list = Package.get_all(self)
-        self.packages_grid = self.result_grid = Package.get_all(self)
+        self.packages_list = None
         self.items_list = None
+        self.searchbar = None
+        self.list = None
 
-        kiosk_main_view(self)
-
-        # Link the tray search criterion with the main search bar
-        self.searchbar.setText(self.criterion)
-        self.filter_packages(self.criterion)
-        self.searchbar.textChanged.connect(self.filter_packages)
-
-        self.list.itemSelectionChanged.connect(self.select_row)
+        self.init_ui()
 
     def filter_packages(self, criterion):
         if criterion:
@@ -102,3 +98,23 @@ class Kiosk(QWidget):
         # Kind of messages the kiosk needs to return to the agent
         # {'uuid' : "45d4-3124c21-3123", "action": "kioskinterfaceinstall", "subaction" : "install"}
 
+    def init_ui(self):
+        self.packages_list = self.result_list = Package.get_all(self)
+
+        kiosk_main_view(self)
+
+        # Link the tray search criterion with the main search bar
+        self.searchbar.setText(self.criterion)
+        self.filter_packages(self.criterion)
+        self.searchbar.textChanged.connect(self.filter_packages)
+
+        self.list.itemSelectionChanged.connect(self.select_row)
+        self.updated.connect(self.datas_update)
+
+    def datas_update(self):
+        """This method get the list of all packages and generate the main window"""
+        self.packages_list = self.result_list = Package.get_all(self)
+        for i in reversed(range(self.layout().count())):
+            self.layout().itemAt(i).widget().setParent(None)
+        self.setLayout(self.layout())
+        self.init_ui()

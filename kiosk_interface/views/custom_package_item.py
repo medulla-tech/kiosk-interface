@@ -98,7 +98,8 @@ class CustomPackageWidget(QWidget):
             self.action_button["Launch"].clicked.connect(lambda: self.return_message(self.action_button["Launch"], "Launch"))
 
     def return_message(self, button, action):
-        button.setEnabled(False)
+        if action == "Install":
+            button.setEnabled(False)
         self._message = """{"uuid": "%s", "action": "kioskinterface%s", "subaction": "%s"}"""% (self.uuid, \
                                                                                                  action, action)
         send_message_to_am(self._message)

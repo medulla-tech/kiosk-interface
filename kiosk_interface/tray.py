@@ -44,6 +44,7 @@ class Tray(QWidget):
 
         # Bind the actions
         self.open_action.triggered.connect(self.open)
+
         if hasattr(self, 'input_search'):
             # self.input_search.textChanged.connect(self.criterion_modified)
             self.input_search.clicked.connect(self.criterion_modified)
@@ -51,17 +52,14 @@ class Tray(QWidget):
     def open(self, criterion = ""):
         """This method is called if the event 'open' is launched"""
         if get_datakiosk() is not None:
-            message = """{"action": "kioskinterface", "subaction": "initialization"}"""
-            send_message_to_am(message)
             self.main_window = Kiosk(criterion)
+            message = """{"action": "kioskinterface", "subaction": "initialization"}"""
+            send_message_to_am(message, self.main_window)
             self.main_window.resize(650, 550)
             self.main_window.show()
         else:
             self.main_window = QErrorMessage()
             self.main_window.showMessage("No data found")
-    def quit(self):
-        """This method is called if the event 'quit' is launched"""
-        sys.exit()
 
     def criterion_modified(self):
         """This method is called when the search criterion is modified """

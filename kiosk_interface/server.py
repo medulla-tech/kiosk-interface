@@ -25,18 +25,19 @@ import socket
 import json
 from config import ConfParameter
 
-global datakiosk
 
+global datakiosk
+datakiosk=None
 def get_datakiosk():
     global datakiosk
     return datakiosk
+
 
 def set_datakiosk(data):
     global datakiosk
     datakiosk = data
 
 
-    
 def tcpserver(sock, eventkill):
         """
         this function is the listening function of the tcp server of the machine agent, to serve the request of the kiosk
@@ -49,7 +50,7 @@ def tcpserver(sock, eventkill):
         print("Server Kiosk Start")
         while not eventkill.wait(1):
             # Wait for a connection
-            print('waiting for a connection kiosk service')
+            # print('waiting for a connection kiosk service')
             connection, client_address = sock.accept()
             client_handler = threading.Thread(
                                                 target=handle_client_connection,
@@ -72,8 +73,8 @@ def handle_client_connection(client_socket):
         # request the recv message
         recv_msg_from_AM = client_socket.recv(5000)
         recv_msg_from_AM = recv_msg_from_AM.decode("utf-8")
-        print (recv_msg_from_AM)
-        print ("initialise la data")
+        print(recv_msg_from_AM)
+        print("Initialize the datas")
         set_datakiosk(json.loads(recv_msg_from_AM))
         print (get_datakiosk())
         client_socket.send(recv_msg_from_AM.encode("utf-8"))
@@ -82,6 +83,7 @@ def handle_client_connection(client_socket):
 
 
 class MessengerToAM(object):
+
     def __init__(self):
         """Initialization of the MessagerToAM object"""
 
