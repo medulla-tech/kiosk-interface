@@ -23,6 +23,7 @@
 
 import sys
 from PyQt5.QtWidgets import QApplication
+from PyQt5.QtGui import QIcon
 from tray import Tray
 from config import ConfParameter
 import socket
@@ -36,6 +37,7 @@ send_message_to_am(message)
 parameters = ConfParameter()
 
 app = QApplication(sys.argv)
+app.setWindowIcon(QIcon("datas/kiosk.png"))
 app.setApplicationName("Kiosk")
 
 eventkill = threading.Event()
