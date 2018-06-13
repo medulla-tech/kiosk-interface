@@ -30,45 +30,7 @@ import socket
 from server import tcpserver
 import threading
 from models import send_message_to_am
+from Application import Application
 
+app = Application()
 
-message = """{"action": "kioskinterface", "subaction": "initialization"}"""
-send_message_to_am(message)
-parameters = ConfParameter()
-
-app = QApplication(sys.argv)
-app.setWindowIcon(QIcon("datas/kiosk.png"))
-app.setApplicationName("Kiosk")
-
-eventkill = threading.Event()
-sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-
-# Bind the socket to the port
-server_address = ('localhost',  8766)
-print ('starting server tcp kiosk qt on %s port %s' % server_address)
-sock.bind(server_address)
-
-# Listen for incoming connections
-sock.listen(5)
-client_handlertcp = threading.Thread(target=tcpserver, args=(sock,eventkill,))
-
-# run server tcpserver for kiosk
-client_handlertcp.start()
-
-# When the window is closed, the process is not killed
-app.setQuitOnLastWindowClosed(False)
-
-tray = Tray()
-
-app.exec_()
-#using event eventkill for signal stop thread
-eventkill.set()
-sock.close()
-
-#connect server for pass accept for end
-sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-# Connect the socket to the port where the server is listening
-server_address = ('localhost', 8766)
-print( 'deconnecting to %s:%s' % server_address)
-sock.connect(server_address)
-sock.close()
