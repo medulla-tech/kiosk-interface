@@ -32,10 +32,13 @@ from tray import Tray
 from server import MessengerToAM
 from server import get_datakiosk, set_datakiosk
 
+
 class Application(object):
+    """This module generate the main app object"""
     parameters = ConfParameter()
 
     def __init__(self):
+        """Initialize the object"""
         self.app = None
         self.eventkill = None
         self.sock = None
@@ -45,21 +48,20 @@ class Application(object):
         self.init_app()
 
     def init_app(self):
+        """The mechanics are launched here"""
+        
         self.app = QApplication(sys.argv)
         self.app.setWindowIcon(QIcon("datas/kiosk.png"))
         self.app.setApplicationName("Kiosk")
         message = """{"action": "kioskinterface", "subaction": "initialization"}"""
 
-        print("aaa")
         self.send(message)
-        print("bbb")
         self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
         # Bind the socket to the port
         server_address = ('localhost', 8766)
         print('starting server tcp kiosk qt on %s port %s' % server_address)
         self.sock.bind(server_address)
-        print("ccc")
 
         # Listen for incoming connections
         self.sock.listen(5)
@@ -87,6 +89,10 @@ class Application(object):
         self.sock.close()
 
     def send(self, message):
+        """Send the specified message to the agent machine
+        Params:
+            message: string which represent the commande launched into the agent machine.
+        """
         client = MessengerToAM()
         client.send(message.encode('utf-8'))
         get_datakiosk()
