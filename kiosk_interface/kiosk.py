@@ -35,12 +35,14 @@ import re
 class Kiosk(QWidget):
     """This class define the main window of the kiosk"""
     updated = pyqtSignal(name="updated")
-    def __init__(self, criterion):
+
+    def __init__(self, criterion, app):
         """
             Initialize the kiosk object. 
             This object set up the mechanism to controll the kiosk window
         """
         super().__init__()
+        self.parent_app = app
 
         # If the search bar in the tray is not shown the criterion is set to False.
         # So with this test the problem doesn't occurs.

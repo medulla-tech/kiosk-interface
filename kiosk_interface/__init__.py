@@ -33,4 +33,3 @@ from models import send_message_to_am
 from Application import Application
 
 app = Application()
-

@@ -25,7 +25,7 @@ from PyQt5.QtGui import QPixmap
 from PyQt5.QtWidgets import QVBoxLayout, QTabWidget, QWidget, QLineEdit, QGridLayout, QPushButton, \
     QListWidget, QLabel, QHBoxLayout
 from models import send_message_to_am
-
+import os
 
 class CustomPackageWidget(QWidget):
     def __init__(self, package, type="grid"):
@@ -100,6 +100,8 @@ class CustomPackageWidget(QWidget):
     def return_message(self, button, action):
         if action == "Install":
             button.setEnabled(False)
+        elif action =="Delete":
+            os.system("appwiz.cpl")
         self._message = """{"uuid": "%s", "action": "kioskinterface%s", "subaction": "%s"}"""% (self.uuid, \
                                                                                                  action, action)
         send_message_to_am(self._message)
