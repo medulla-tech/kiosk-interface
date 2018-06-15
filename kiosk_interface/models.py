@@ -61,6 +61,7 @@ class Package(object):
         Returns : the list of packages
         """
         datainitialisation = get_datakiosk()
+        send_message_to_am('{"action":"kioskLog","type":"info","message":"Generate the package list"}')
         print("___________chang struct______________")
         print(datainitialisation)
         print("_____________________________________")
@@ -80,4 +81,3 @@ def send_message_to_am(message, ref=None):
 
     if ref is not None:
         ref.updated.emit()
-

@@ -104,7 +104,9 @@ class MessengerToAM(object):
             self.active = True
         except socket.error:
             self.active = False
-            logging.warning("The communication with the agent machine can't be established")
+            self.send('{"action":"kioskLog","type":"warning","message":\
+"The communication with the agent machine can\'t be established"}'.encode('utf-8'))
+
 
     def send(self, msg):
         """Send the specified message to the agent machine.
@@ -113,7 +115,8 @@ class MessengerToAM(object):
             '{"uuid" : "45d4-3124c21-3123", "action": "kioskinterfaceinstall", "subaction" : "install"}'
         """
         if self.active:
-            logging.info('MessengerToAM.send(%s)'%(str(msg)))
+#            self.sock.sendall('{"action":"kioskLog","type":"info",\
+#"message":"Call MessengerToAM.send() method"}'.encode("utf-8"))
             self.sock.sendall(msg)
             self.handle()
         else:

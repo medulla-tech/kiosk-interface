@@ -43,9 +43,10 @@ class Tray(QWidget):
         self.criterion = ""
         self.main_window = None
         self.parent_app = app
+        self.first_open = True
 
         # Call the view for the System Tray
-        logging.info("Call the tray main view")
+        send_message_to_am('{"action":"kioskLog","type":"info","message":"Call the tray main view"}')
         tray_main_view(self)
 
         # Bind the actions
@@ -58,17 +59,20 @@ class Tray(QWidget):
     def open(self, criterion = ""):
         """This method is called if the event 'open' is launched"""
 
-        logging.info("Tray <open action> pressed : try to open the kiosk main window")
+        send_message_to_am('{"action":"kioskLog","type":"info",\
+        "message":"Tray <open action> pressed : try to open the kiosk main window"}')
         if get_datakiosk() is not None:
-            logging.info("Initialize the kiosk main window")
+            send_message_to_am('{"action":"kioskLog","type":"info","message":"Initialize the kiosk main window"}')
             self.main_window = Kiosk(criterion, self.parent_app)
-            message = """{"action": "kioskinterface", "subaction": "initialization"}"""
-            send_message_to_am(message, self.main_window)
+            if self.first_open is False:
+                print("regenerate list")
+                message = """{"action": "kioskinterface", "subaction": "initialization"}"""
+                send_message_to_am(message, self.main_window)
+            else:
+                self.first_open = False
             self.main_window.resize(650, 550)
-            logging.info("Calling the kiosk main view")
+            send_message_to_am('{"action":"kioskLog","type":"info","message":"Calling the kiosk main view"}')
             self.main_window.show()
-            message = """{"action": "kioskinterface", "subaction": "initialization"}"""
-            send_message_to_am(message, self.main_window)
         else:
             self.main_window = QErrorMessage()
             self.main_window.showMessage("No data found")

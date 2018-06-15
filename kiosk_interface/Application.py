@@ -31,23 +31,21 @@ from server import tcpserver
 from tray import Tray
 from server import MessengerToAM
 from server import get_datakiosk, set_datakiosk
-import logging
+
 
 class Application(object):
     """This module generate the main app object"""
     parameters = ConfParameter()
 
     def __init__(self):
-        logging.basicConfig(level=logging.INFO)
         """Initialize the object"""
-        logging.info("Kiosk Initialization")
+        self.send("""{"action": "kioskLog","type":"info","message":"Kiosk Initialization"}""")
         self.app = None
         self.eventkill = None
         self.sock = None
         self.client_handlertcp = None
         self.tray = None
-
-        logging.info("Call Application.init_app()")
+        self.send('{"action": "kioskLog", "type": "info", "message": "Call Application init method"}')
         self.init_app()
 
     def init_app(self):
@@ -56,15 +54,16 @@ class Application(object):
         self.app.setWindowIcon(QIcon("datas/kiosk.png"))
         self.app.setApplicationName("Kiosk")
 
-        message = """{"action": "kioskinterface", "subaction": "initialization"}"""
-        logging.info("Call Application.send(%s)"% (message))
+        message = '{"action": "kioskinterface", "subaction": "initialization"}'
         self.send(message)
+        self.send('{"action":"kioskLog","type":"info","message":"Call Application.send(%s)"}' %(message))
         self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
         # Bind the socket to the port
         server_address = ('localhost', 8766)
 
-        logging.info('starting server tcp kiosk qt on %s port %s' % server_address)
+        self.send('{"action": "kioskLog", "type": "info",\
+        "message": "starting server tcp kiosk qt on %s port %s"}' %server_address)
         self.sock.bind(server_address)
 
         # Listen for incoming connections
@@ -77,7 +76,7 @@ class Application(object):
         # When the window is closed, the process is not killed
         self.app.setQuitOnLastWindowClosed(False)
 
-        logging.info("Call tray controller")
+        self.send('{"action":"kioskLog", "type":"info", "message":"Call tray controller"}')
         self.tray = Tray(self)
 
         self.app.exec_()
@@ -89,7 +88,7 @@ class Application(object):
         self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         # Connect the socket to the port where the server is listening
         server_address = ('localhost', 8766)
-        print('deconnecting to %s:%s' % server_address)
+        self.send('{"action":"kioskLog", "type":"info", "message":"deconnecting to %s:%s"}' % server_address)
         self.sock.connect(server_address)
         self.sock.close()
 
@@ -100,6 +99,5 @@ class Application(object):
         """
 
         client = MessengerToAM()
-        logging.info("Call client.send(%s)"%(message.encode('utf-8')))
         client.send(message.encode('utf-8'))
         get_datakiosk()
