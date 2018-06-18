@@ -28,6 +28,7 @@ from PyQt5.QtCore import pyqtSignal
 from models import Package, get_datakiosk
 from views.custom_package_item import CustomPackageWidget
 from views.kiosk import kiosk_main_view
+from server import MessengerToAM
 
 import re
 
@@ -43,7 +44,7 @@ class Kiosk(QWidget):
         """
         super().__init__()
         self.parent_app = app
-        self.parent.send('{"action":"kioskLog","type":"info","message":"Kiosk main view initialization"}')
+        self.send('{"action":"kioskLog","type":"info","message":"Kiosk main view initialization"}')
         self.first_open = True
 
         # If the search bar in the tray is not shown the criterion is set to False.
@@ -60,11 +61,11 @@ class Kiosk(QWidget):
         self.list = None
 
         self.packages_list = self.result_list = Package.get_all(self)
-        self.parent.send('{"action":"kioskLog","type":"info","message":"Show kiosk main window"}')
+        self.send('{"action":"kioskLog","type":"info","message":"Show kiosk main window"}')
         self.init_ui()
 
     def filter_packages(self, criterion):
-        self.parent.send('{"action":"kioskLog","type":"info","message":"Search criterion changed : %s"}' % criterion)
+        self.send('{"action":"kioskLog","type":"info","message":"Search criterion changed : %s"}' % criterion)
         if criterion:
             self.criterion = criterion
         else:
@@ -84,7 +85,7 @@ class Kiosk(QWidget):
         self.items_list = []
         # For each package found, an item is created
         for package in self.result_list:
-            self.parent.send('{"action":"kioskLog","type":"info","message":"Package found : %"}'%package.getname())
+            self.send('{"action":"kioskLog","type":"info","message":"Package found : %s"}'%package.getname())
             self.items_list.append({'item': QListWidgetItem(self.list),
                                    'item_package': CustomPackageWidget(package, "list")})
 
@@ -120,7 +121,7 @@ class Kiosk(QWidget):
 
     def datas_update(self):
         """This method get the list of all packages and generate the main window"""
-        self.parent.send('{"action":"kioskLog","type":"info","message":"Reload kiosk main window"}')
+        self.send('{"action":"kioskLog","type":"info","message":"Reload kiosk main window"}')
         if self.first_open is False:
             self.packages_list = self.result_list = Package.get_all(self)
         else:
@@ -129,3 +130,12 @@ class Kiosk(QWidget):
             self.layout().itemAt(i).widget().setParent(None)
         self.setLayout(self.layout())
         self.init_ui()
+
+    def send(self, message):
+        """Send the specified message to the agent machine
+                Params:
+                    message: string which represent the commande launched into the agent machine.
+                """
+
+        client = MessengerToAM()
+        client.send(message.encode('utf-8'))

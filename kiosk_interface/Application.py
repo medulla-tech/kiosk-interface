@@ -100,4 +100,3 @@ class Application(object):
 
         client = MessengerToAM()
         client.send(message.encode('utf-8'))
-        get_datakiosk()

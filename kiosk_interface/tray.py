@@ -56,18 +56,21 @@ class Tray(QWidget):
             # self.input_search.textChanged.connect(self.criterion_modified)
             self.input_search.clicked.connect(self.criterion_modified)
 
-    def open(self, criterion = ""):
+    def open(self, criterion=""):
         """This method is called if the event 'open' is launched"""
-
         send_message_to_am('{"action":"kioskLog","type":"info",\
         "message":"Tray <open action> pressed : try to open the kiosk main window"}')
-        if get_datakiosk() is not None:
+
+        datas = get_datakiosk()
+        if datas is not None:
             send_message_to_am('{"action":"kioskLog","type":"info","message":"Initialize the kiosk main window"}')
             self.main_window = Kiosk(criterion, self.parent_app)
+
             if self.first_open is False:
                 print("regenerate list")
                 message = """{"action": "kioskinterface", "subaction": "initialization"}"""
                 send_message_to_am(message, self.main_window)
+
             else:
                 self.first_open = False
             self.main_window.resize(650, 550)
