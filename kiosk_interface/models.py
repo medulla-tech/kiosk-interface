@@ -25,7 +25,7 @@
 
 from server import MessengerToAM
 from server import get_datakiosk, set_datakiosk
-
+import os
 
 class Package(object):
     """Manage the datas for a Package"""
@@ -49,8 +49,10 @@ class Package(object):
             self.actions = row_datas['action']
         if 'icon' in row_datas.keys():
             # Test if the icon exists
-            #TODO test if the icon exists in datas directory
-            self.icon = row_datas['icon']
+            if os.path.isfile(os.path.join("datas", row_datas['icon'])):
+                self.icon = row_datas['icon']
+            else:
+                self.icon = 'kiosk.png'
         else:
             self.icon = 'kiosk.png'
         if 'uuid' in row_datas.keys():
