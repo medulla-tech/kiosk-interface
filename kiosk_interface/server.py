@@ -79,10 +79,17 @@ def handle_client_connection(client_socket):
         recv_msg_from_AM = recv_msg_from_AM.decode("utf-8")
         logging.info("Datas received from AM : %s"%(recv_msg_from_AM))
 
-        logging.info("Call set_datakiosk("+recv_msg_from_AM+")")
-        set_datakiosk(json.loads(recv_msg_from_AM))
+        recv_msg_from_AM = json.loads(recv_msg_from_AM)
 
-        client_socket.send(recv_msg_from_AM.encode("utf-8"))
+        if "subaction" in recv_msg_from_AM:
+            if recv_msg_from_AM["action"] == "update":
+                logging.info("Call set_datakiosk("+recv_msg_from_AM+")")
+                set_datakiosk(recv_msg_from_AM['data'])
+        else:
+            set_datakiosk(recv_msg_from_AM)
+
+        thread = threading.Thread(target=client_socket.send, args=(json.dumps(recv_msg_from_AM).encode('utf-8'),))
+        thread.start()
     finally:
         client_socket.close()
 

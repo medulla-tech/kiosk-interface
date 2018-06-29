@@ -29,7 +29,7 @@ from models import Package, get_datakiosk
 from views.custom_package_item import CustomPackageWidget
 from views.kiosk import kiosk_main_view
 from server import MessengerToAM
-
+import threading
 import re
 
 
@@ -84,26 +84,23 @@ class Kiosk(QWidget):
 
         self.items_list = []
         # For each package found, an item is created
+        package_names = []
         for package in self.result_list:
-            self.send('{"action":"kioskLog","type":"info","message":"Package found : %s"}'%package.getname())
-            self.items_list.append({'item': QListWidgetItem(self.list),
-                                   'item_package': CustomPackageWidget(package, "list")})
+            package_names.append(package.getname())
+            tmp = QListWidgetItem(self.list)
+            tmp1 = CustomPackageWidget(package, "list")
+            tmp.setSizeHint(tmp1.sizeHint())
 
-        # Attach each item to the list
-        for element in self.items_list:
-            element['item'].setSizeHint(element['item_package'].sizeHint())
-
-            self.list.addItem(element['item'])
-            self.list.setItemWidget(element['item'], element['item_package'])
-
-            # Update the general layout
+            self.list.addItem(tmp)
+            self.list.setItemWidget(tmp, tmp1)
             self.tabs_content[1].setLayout(self.tabs_content[1].layout)
+        self.send('{"action":"kioskLog","type":"info","message":"Package found : %s"}'%' '.join(package_names))
 
     def select_row(self):
         """select_row get the actual row and listen if there are any action launched. If an action is launched,
         the appropriate message is generated and send to agent-machine."""
         selected_item = self.list.itemWidget(self.list.currentItem())
-
+        self.updated.emit()
         # Kind of messages the kiosk needs to return to the agent
         # {'uuid' : "45d4-3124c21-3123", "action": "kioskinterfaceinstall", "subaction" : "install"}
 
@@ -122,14 +119,14 @@ class Kiosk(QWidget):
     def datas_update(self):
         """This method get the list of all packages and generate the main window"""
         self.send('{"action":"kioskLog","type":"info","message":"Reload kiosk main window"}')
-        if self.first_open is False:
+        """if self.first_open is False:
             self.packages_list = self.result_list = Package.get_all(self)
         else:
             self.first_open = True
         for i in reversed(range(self.layout().count())):
             self.layout().itemAt(i).widget().setParent(None)
         self.setLayout(self.layout())
-        self.init_ui()
+        self.init_ui()"""
 
     def send(self, message):
         """Send the specified message to the agent machine
@@ -138,4 +135,5 @@ class Kiosk(QWidget):
                 """
 
         client = MessengerToAM()
-        client.send(message.encode('utf-8'))
+        thread = threading.Thread(target=client.send, args=(message.encode('utf-8'),))
+        thread.start()

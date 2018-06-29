@@ -94,9 +94,11 @@ class Application(object):
 
     def send(self, message):
         """Send the specified message to the agent machine
-        Params:
-            message: string which represent the commande launched into the agent machine.
-        """
+                Params:
+                    message: string which represent the commande launched into the agent machine.
+                """
 
         client = MessengerToAM()
-        client.send(message.encode('utf-8'))
+        thread = threading.Thread(target=client.send, args=(message.encode('utf-8'),))
+        #client.send(message.encode('utf-8'))
+        thread.start()

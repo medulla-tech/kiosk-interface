@@ -29,7 +29,8 @@ from server import get_datakiosk
 from models import send_message_to_am
 from views.tray import tray_main_view
 from PyQt5.QtCore import pyqtSignal
-import logging
+import threading
+from server import MessengerToAM
 
 
 class Tray(QWidget):
@@ -46,7 +47,7 @@ class Tray(QWidget):
         self.first_open = True
 
         # Call the view for the System Tray
-        send_message_to_am('{"action":"kioskLog","type":"info","message":"Call the tray main view"}')
+        self.send('{"action":"kioskLog","type":"info","message":"Call the tray main view"}')
         tray_main_view(self)
 
         # Bind the actions
@@ -58,23 +59,23 @@ class Tray(QWidget):
 
     def open(self, criterion=""):
         """This method is called if the event 'open' is launched"""
-        send_message_to_am('{"action":"kioskLog","type":"info",\
+        self.send('{"action":"kioskLog","type":"info",\
         "message":"Tray <open action> pressed : try to open the kiosk main window"}')
 
         datas = get_datakiosk()
+
         if datas is not None:
-            send_message_to_am('{"action":"kioskLog","type":"info","message":"Initialize the kiosk main window"}')
+            self.send('{"action":"kioskLog","type":"info","message":"Initialize the kiosk main window"}')
             self.main_window = Kiosk(criterion, self.parent_app)
 
             if self.first_open is False:
-                print("regenerate list")
                 message = """{"action": "kioskinterface", "subaction": "initialization"}"""
-                send_message_to_am(message, self.main_window)
+                self.send(message)
 
             else:
                 self.first_open = False
             self.main_window.resize(650, 550)
-            send_message_to_am('{"action":"kioskLog","type":"info","message":"Calling the kiosk main view"}')
+            self.send('{"action":"kioskLog","type":"info","message":"Calling the kiosk main view"}')
             self.main_window.show()
         else:
             self.main_window = QErrorMessage()
@@ -82,6 +83,16 @@ class Tray(QWidget):
 
     def criterion_modified(self):
         """This method is called when the search criterion is modified """
-        logging.info("Set criterion to %s"%self.input_search.text)
+        self.send('{"action":"kioskLog","type":"info","message":"Set criterion to %s"}'%self.input_search.text)
         self.criterion = self.input_search.text()
         self.open(self.criterion)
+
+    def send(self, message):
+        """Send the specified message to the agent machine
+                Params:
+                    message: string which represent the commande launched into the agent machine.
+                """
+
+        client = MessengerToAM()
+        thread = threading.Thread(target=client.send, args=(message.encode('utf-8'),))
+        thread.start()
