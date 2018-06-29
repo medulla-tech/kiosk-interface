@@ -81,7 +81,7 @@ def handle_client_connection(client_socket):
 
         recv_msg_from_AM = json.loads(recv_msg_from_AM)
 
-        if "subaction" in recv_msg_from_AM:
+        if "action" in recv_msg_from_AM:
             if recv_msg_from_AM["action"] == "update":
                 logging.info("Call set_datakiosk("+recv_msg_from_AM+")")
                 set_datakiosk(recv_msg_from_AM['data'])
