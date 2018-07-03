@@ -22,7 +22,7 @@
 # MA 02110-1301, USA.
 
 from PyQt5.QtWidgets import QVBoxLayout, QTabWidget, QWidget, QLineEdit, QGridLayout, \
-    QListWidget, QLabel, QHBoxLayout, QScrollArea
+    QListWidget, QHBoxLayout, QScrollArea
 from PyQt5.QtWidgets import QListWidgetItem
 from views.custom_package_item import CustomPackageWidget
 from PyQt5.QtCore import QCoreApplication
@@ -41,7 +41,6 @@ def kiosk_main_view(ref):
     ref.tabs = QTabWidget()
 
     ref.tabs_content = [QWidget(), QWidget()]
-    #ref.tabs.addTab(ref.tabs_content[0], "Grid")
     ref.tabs.addTab(ref.tabs_content[1], "List")
 
     ref.searchbar = QLineEdit(ref)
@@ -59,9 +58,7 @@ def kiosk_main_view(ref):
 
     # Tab "list"
     ref.tabs_content[1].layout = QVBoxLayout(ref.tabs)
-    # ref.content_scroll = QScrollArea(ref.tabs_content[1])
     ref.list = QListWidget(ref.tabs_content[1])
-    # ref.tabs_content[1].layout.addWidget(ref.content_scroll)
     ref.tabs_content[1].layout.addWidget(ref.list)
 
     ref.list.adjustSize()

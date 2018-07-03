@@ -73,12 +73,20 @@ class Package(object):
         return list
 
     def getname(self):
+        """getter for the name property
+            Returns: string of the package name"""
         return self.name
 
     def getuuid(self):
+        """getter for the name property
+            Returns: string of the package uuid"""
         return self.uuid
 
     def package_in_list(self, uuid):
+        """package_in_list search the package from the package list by it's uuid
+            Param:
+                uuid: string of the uuid of the package
+            Returns: boolean true if the package is existing in the list or false in the opposite"""
         list = self.getname()
         is_present = False
         for package in list:
@@ -86,10 +94,14 @@ class Package(object):
                 is_present = True
         return is_present
 
-def send_message_to_am(message, ref=None):
+
+def send_message_to_am(message):
+    """This function the message to the agent-machine.
+    Params:
+        message: formated string is the message send to the agent. The message have to look like :
+        '{"action":"kioskLog","type":"info","message":"Generate the package list"}'
+    """
     client = MessengerToAM()
     client.send(message.encode('utf-8'))
     get_datakiosk()
 
-    #if ref is not None:
-    #    ref.updated.emit()

@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 # coding: utf-8
-"""Manage the configuration of the kiosk"""
+"""Manage the communication between the kiosk and the agent machine."""
 #
 # (c) 2018 Siveo, http://www.siveo.net
 #
@@ -31,12 +31,21 @@ datakiosk=None
 
 
 def get_datakiosk():
+    """Getter for the datas sent by the agent-machine
+    Returns:
+        List of packages info
+    """
     global datakiosk
     logging.info("Get datas : %s" %datakiosk)
     return datakiosk
 
 
 def set_datakiosk(data):
+    """
+    Modify the actual packages datas by the newly received datas
+    Params:
+        data is a list of packages info
+    """
     logging.info("Set the datas with %s"%data)
     global datakiosk
     datakiosk = data
@@ -44,17 +53,14 @@ def set_datakiosk(data):
 
 def tcpserver(sock, eventkill):
         """
-        this function is the listening function of the tcp server of the machine agent, to serve the request of the kiosk
-        Args:
-            no arguments
-
-        Returns:
-            no return value
+        This function is the listening function of the tcp server of the machine agent, to serve the request of the kiosk
+        Params:
+            sock socket object which receives the message form agent-machine
+            eventkill threading event object used to signal the end of the standby
         """
         logging.info("Server Kiosk launched")
         while not eventkill.wait(1):
             # Wait for a connection
-            # print('waiting for a connection kiosk service')
             connection, client_address = sock.accept()
             client_handler = threading.Thread(
                                                 target=handle_client_connection,
@@ -95,7 +101,7 @@ def handle_client_connection(client_socket):
 
 
 class MessengerToAM(object):
-
+    """MessengerToAM is a client socket class"""
     def __init__(self):
         """Initialization of the MessagerToAM object"""
 
@@ -122,8 +128,6 @@ class MessengerToAM(object):
             '{"uuid" : "45d4-3124c21-3123", "action": "kioskinterfaceinstall", "subaction" : "install"}'
         """
         if self.active:
-#            self.sock.sendall('{"action":"kioskLog","type":"info",\
-#"message":"Call MessengerToAM.send() method"}'.encode("utf-8"))
             self.sock.sendall(msg)
             self.handle()
         else:

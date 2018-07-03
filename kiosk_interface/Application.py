@@ -30,7 +30,6 @@ import socket
 from server import tcpserver
 from tray import Tray
 from server import MessengerToAM
-from server import get_datakiosk, set_datakiosk
 
 
 class Application(object):

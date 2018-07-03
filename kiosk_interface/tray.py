@@ -26,7 +26,6 @@ import sys
 from PyQt5.QtWidgets import QWidget,QErrorMessage
 from kiosk import Kiosk
 from server import get_datakiosk
-from models import send_message_to_am
 from views.tray import tray_main_view
 from PyQt5.QtCore import pyqtSignal
 import threading

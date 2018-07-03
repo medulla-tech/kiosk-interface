@@ -22,13 +22,20 @@
 # MA 02110-1301, USA.
 
 from PyQt5.QtGui import QPixmap
-from PyQt5.QtWidgets import QVBoxLayout, QTabWidget, QWidget, QLineEdit, QGridLayout, QPushButton, \
-    QListWidget, QLabel, QHBoxLayout
+from PyQt5.QtWidgets import QWidget, QGridLayout, QPushButton, QLabel, QHBoxLayout
 from models import send_message_to_am
 import os
 
+
 class CustomPackageWidget(QWidget):
+    """This class create specialized widget for the package list."""
     def __init__(self, package, type="grid"):
+        """
+        Initialize the list-element object
+        Params:
+            package: Package object is the package we want to represent into the UI.
+            type: string used originally to generate to kind of displaying : grid or list
+        """
         super().__init__()
         self.type = type
         self.icon = QLabel("")
@@ -80,7 +87,6 @@ class CustomPackageWidget(QWidget):
 
             row = 0
             while row < len(self.actions):
-                # self.layout.addWidget(self.action_button[self.actions[row]], row, 3)
                 row += 1
 
         self.setLayout(self.layout)
@@ -98,6 +104,13 @@ class CustomPackageWidget(QWidget):
             self.action_button["Launch"].clicked.connect(lambda: self.return_message(self.action_button["Launch"], "Launch"))
 
     def return_message(self, button, action):
+        """
+        return_message method send a signal to the agent-machine when a button is clicked
+        Params:
+            button : QPushButton is a reference to the clicked button
+            action: string added to the message sent to the agent-machine. The possibilities are:
+                "Install" | "Delete" | "Launch" | "Ask" | "Update"
+        """
         if action == "Install":
             button.setEnabled(False)
         elif action =="Delete":
@@ -107,4 +120,8 @@ class CustomPackageWidget(QWidget):
         send_message_to_am(self._message)
 
     def getname(self):
+        """
+        getname returns the name of the package
+            return: string representing the name of the package
+        """
         return self.name.text()

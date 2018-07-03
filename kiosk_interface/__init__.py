@@ -21,15 +21,6 @@
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
 # MA 02110-1301, USA.
 
-import sys
-from PyQt5.QtWidgets import QApplication
-from PyQt5.QtGui import QIcon
-from tray import Tray
-from config import ConfParameter
-import socket
-from server import tcpserver
-import threading
-from models import send_message_to_am
 from Application import Application
 
 app = Application()

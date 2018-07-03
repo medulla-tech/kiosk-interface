@@ -39,7 +39,11 @@ class Kiosk(QWidget):
     def __init__(self, criterion, app, caller):
         """
             Initialize the kiosk object. 
-            This object set up the mechanism to controll the kiosk window
+            This object set up the mechanism to control the kiosk window
+            Params:
+                criterion: string of the searched criterion. This string is basically the  text from searchbar.
+                app: QApplication is a reference of the main application
+                caller: QWidget is a reference to the object which creates this one.
         """
         super().__init__()
         self.parent_app = app
@@ -65,6 +69,11 @@ class Kiosk(QWidget):
         self.init_ui()
 
     def filter_packages(self, criterion):
+        """
+        filter_packages is a function which search all the packages with the specified criterion
+        Param:
+            criterion: string contains the research criterion.
+        """
         self.send('{"action":"kioskLog","type":"info","message":"Search criterion changed : %s"}' % criterion)
         if criterion:
             self.criterion = criterion
@@ -73,7 +82,6 @@ class Kiosk(QWidget):
                 self.criterion = self.searchbar.text()
 
         if self.criterion == "":
-            #self.result_list = self.packages_list
             self.datas_update()
             return
         self.list.clear()
@@ -102,10 +110,12 @@ class Kiosk(QWidget):
         the appropriate message is generated and send to agent-machine."""
         selected_item = self.list.itemWidget(self.list.currentItem())
         self.updated.emit()
-        # Kind of messages the kiosk needs to return to the agent
-        # {'uuid' : "45d4-3124c21-3123", "action": "kioskinterfaceinstall", "subaction" : "install"}
 
     def init_ui(self):
+        """
+        init_ui generate all the initial element needed for the view and the mechanisms. When the element are loaded
+        init_ui call the view.
+        """
         self.first_open = False
         kiosk_main_view(self)
 
