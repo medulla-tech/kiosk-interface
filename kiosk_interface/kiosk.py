@@ -73,8 +73,9 @@ class Kiosk(QWidget):
                 self.criterion = self.searchbar.text()
 
         if self.criterion == "":
-            self.result_list = self.packages_list
-
+            #self.result_list = self.packages_list
+            self.datas_update()
+            return
         self.list.clear()
         self.result_list = []
 
@@ -123,9 +124,12 @@ class Kiosk(QWidget):
         self.list.clear()
 
         packages = get_datakiosk()
-
+        self.packages_list = []
+        self.result_list = []
         for package in packages:
             package_object = Package(package)
+            self.packages_list.append(package_object)
+            self.result_list.append(package_object)
             tmp = QListWidgetItem(self.list)
             tmp1 = CustomPackageWidget(package_object, "list")
             tmp.setSizeHint(tmp1.sizeHint())
