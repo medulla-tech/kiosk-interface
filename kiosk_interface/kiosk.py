@@ -21,10 +21,9 @@
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
 # MA 02110-1301, USA.
 
-from PyQt5.QtWidgets import QWidget
+from PyQt5.QtWidgets import QWidget, QMessageBox
 from PyQt5.QtWidgets import QListWidgetItem
 from PyQt5.QtCore import pyqtSignal
-
 from models import Package, get_datakiosk
 from views.custom_package_item import CustomPackageWidget
 from views.kiosk import kiosk_main_view
@@ -37,13 +36,14 @@ class Kiosk(QWidget):
     """This class define the main window of the kiosk"""
     updated = pyqtSignal(name="updated")
 
-    def __init__(self, criterion, app):
+    def __init__(self, criterion, app, caller):
         """
             Initialize the kiosk object. 
             This object set up the mechanism to controll the kiosk window
         """
         super().__init__()
         self.parent_app = app
+        self.caller = caller
         self.send('{"action":"kioskLog","type":"info","message":"Kiosk main view initialization"}')
         self.first_open = True
 
@@ -119,21 +119,30 @@ class Kiosk(QWidget):
     def datas_update(self):
         """This method get the list of all packages and generate the main window"""
         self.send('{"action":"kioskLog","type":"info","message":"Reload kiosk main window"}')
-        """if self.first_open is False:
-            self.packages_list = self.result_list = Package.get_all(self)
-        else:
-            self.first_open = True
-        for i in reversed(range(self.layout().count())):
-            self.layout().itemAt(i).widget().setParent(None)
-        self.setLayout(self.layout())
-        self.init_ui()"""
 
-    def send(self, message):
+        self.list.clear()
+
+        packages = get_datakiosk()
+
+        for package in packages:
+            package_object = Package(package)
+            tmp = QListWidgetItem(self.list)
+            tmp1 = CustomPackageWidget(package_object, "list")
+            tmp.setSizeHint(tmp1.sizeHint())
+            self.list.addItem(tmp)
+            self.list.setItemWidget(tmp, tmp1)
+            self.tabs_content[1].setLayout(self.tabs_content[1].layout)
+
+    def send(self, message, parallel=True):
         """Send the specified message to the agent machine
                 Params:
                     message: string which represent the commande launched into the agent machine.
+                    parallel: boolean representing a flag if the message will be send un a thread or not
                 """
 
         client = MessengerToAM()
-        thread = threading.Thread(target=client.send, args=(message.encode('utf-8'),))
-        thread.start()
+        if parallel:
+            thread = threading.Thread(target=client.send, args=(message.encode('utf-8'),))
+            thread.start()
+        else:
+            client.send(message.encode('utf-8'))

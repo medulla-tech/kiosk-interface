@@ -66,7 +66,7 @@ class Tray(QWidget):
 
         if datas is not None:
             self.send('{"action":"kioskLog","type":"info","message":"Initialize the kiosk main window"}')
-            self.main_window = Kiosk(criterion, self.parent_app)
+            self.main_window = Kiosk(criterion, self.parent_app, self)
 
             if self.first_open is False:
                 message = """{"action": "kioskinterface", "subaction": "initialization"}"""
@@ -87,12 +87,16 @@ class Tray(QWidget):
         self.criterion = self.input_search.text()
         self.open(self.criterion)
 
-    def send(self, message):
+    def send(self, message, parallel=True):
         """Send the specified message to the agent machine
                 Params:
                     message: string which represent the commande launched into the agent machine.
+                    parallel: boolean representing a flag if the message will be send un a thread or not
                 """
 
         client = MessengerToAM()
-        thread = threading.Thread(target=client.send, args=(message.encode('utf-8'),))
-        thread.start()
+        if parallel:
+            thread = threading.Thread(target=client.send, args=(message.encode('utf-8'),))
+            thread.start()
+        else:
+            client.send(message.encode('utf-8'))

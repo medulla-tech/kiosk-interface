@@ -75,11 +75,21 @@ class Package(object):
     def getname(self):
         return self.name
 
+    def getuuid(self):
+        return self.uuid
+
+    def package_in_list(self, uuid):
+        list = self.getname()
+        is_present = False
+        for package in list:
+            if package.getuuid == uuid:
+                is_present = True
+        return is_present
 
 def send_message_to_am(message, ref=None):
     client = MessengerToAM()
     client.send(message.encode('utf-8'))
     get_datakiosk()
 
-    if ref is not None:
-        ref.updated.emit()
+    #if ref is not None:
+    #    ref.updated.emit()

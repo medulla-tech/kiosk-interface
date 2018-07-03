@@ -55,7 +55,7 @@ class Application(object):
         self.app.setApplicationName("Kiosk")
 
         message = '{"action": "kioskinterface", "subaction": "initialization"}'
-        self.send(message)
+        self.send(message, parallel=False)
         self.send('{"action":"kioskLog","type":"info","message":"Call Application.send(%s)"}' %(message))
         self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
@@ -92,13 +92,16 @@ class Application(object):
         self.sock.connect(server_address)
         self.sock.close()
 
-    def send(self, message):
+    def send(self, message, parallel=True):
         """Send the specified message to the agent machine
                 Params:
                     message: string which represent the commande launched into the agent machine.
+                    parallel: boolean representing a flag if the message will be send in a thread or not
                 """
 
         client = MessengerToAM()
-        thread = threading.Thread(target=client.send, args=(message.encode('utf-8'),))
-        #client.send(message.encode('utf-8'))
-        thread.start()
+        if parallel:
+            thread = threading.Thread(target=client.send, args=(message.encode('utf-8'),))
+            thread.start()
+        else:
+            client.send(message.encode('utf-8'))
