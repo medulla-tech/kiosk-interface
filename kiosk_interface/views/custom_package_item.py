@@ -93,15 +93,20 @@ class CustomPackageWidget(QWidget):
         self.show()
 
         if "Install" in self.actions:
-            self.action_button["Install"].clicked.connect(lambda: self.return_message(self.action_button["Install"], "Install"))
+            self.action_button["Install"].clicked.connect(
+                lambda: self.return_message(self.action_button["Install"], "Install"))
         if "Ask" in self.actions:
-            self.action_button["Ask"].clicked.connect(lambda: self.return_message(self.action_button["Ask"], "Ask"))
+            self.action_button["Ask"].clicked.connect(
+                lambda: self.return_message(self.action_button["Ask"], "Ask"))
         if "Update" in self.actions:
-            self.action_button["Update"].clicked.connect(lambda: self.return_message(self.action_button["Update"], "Update"))
+            self.action_button["Update"].clicked.connect(
+                lambda: self.return_message(self.action_button["Update"], "Update"))
         if "Delete" in self.actions:
-            self.action_button["Delete"].clicked.connect(lambda: self.return_message(self.action_button["Delete"], "Delete"))
+            self.action_button["Delete"].clicked.connect(
+                lambda: self.return_message(self.action_button["Delete"], "Delete"))
         if "Launch" in self.actions:
-            self.action_button["Launch"].clicked.connect(lambda: self.return_message(self.action_button["Launch"], "Launch"))
+            self.action_button["Launch"].clicked.connect(
+                lambda: self.return_message(self.action_button["Launch"], "Launch"))
 
     def return_message(self, button, action):
         """
