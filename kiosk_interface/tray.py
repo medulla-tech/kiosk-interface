@@ -44,12 +44,14 @@ class Tray(QWidget):
         self.main_window = None
         self.parent_app = app
         self.first_open = True
+        self.tray = None
 
         # Call the view for the System Tray
         self.send('{"action":"kioskLog","type":"info","message":"Call the tray main view"}')
         tray_main_view(self)
 
         # Bind the actions
+        self.tray.activated.connect(lambda: self.open(""))  # left click action
         self.open_action.triggered.connect(self.open)
 
         if hasattr(self, 'input_search'):
