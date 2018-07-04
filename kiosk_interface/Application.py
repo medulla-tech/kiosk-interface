@@ -55,7 +55,7 @@ class Application(object):
 
         message = '{"action": "kioskinterface", "subaction": "initialization"}'
         self.send(message, parallel=False)
-        self.send('{"action":"kioskLog","type":"info","message":"Call Application.send(%s)"}' %(message))
+        self.send('{"action":"kioskLog","type":"info","message":"Call Application.send function"}')
         self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
         # Bind the socket to the port
