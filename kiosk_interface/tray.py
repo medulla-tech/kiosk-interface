@@ -24,6 +24,7 @@
 import sys
 
 from PyQt5.QtWidgets import QWidget,QErrorMessage
+from PyQt5.QtGui import QCursor
 from kiosk import Kiosk
 from server import get_datakiosk
 from views.tray import tray_main_view
@@ -51,7 +52,7 @@ class Tray(QWidget):
         tray_main_view(self)
 
         # Bind the actions
-        self.tray.activated.connect(lambda: self.open(""))  # left click action
+        self.tray.activated.connect(lambda: self.open_menu())  # left click action
         self.open_action.triggered.connect(self.open)
 
         if hasattr(self, 'input_search'):
@@ -60,6 +61,7 @@ class Tray(QWidget):
 
     def open(self, criterion=""):
         """This method is called if the event 'open' is launched"""
+
         self.send('{"action":"kioskLog","type":"info",\
         "message":"Tray <open action> pressed : try to open the kiosk main window"}')
 
@@ -101,3 +103,8 @@ class Tray(QWidget):
             thread.start()
         else:
             client.send(message.encode('utf-8'))
+
+    def open_menu(self):
+        """Method used to open the menu from the tray with left click"""
+        cursor = QCursor()
+        self.menu.popup(cursor.pos())
