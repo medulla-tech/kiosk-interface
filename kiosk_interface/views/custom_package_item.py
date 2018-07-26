@@ -24,8 +24,8 @@
 from PyQt5.QtGui import QPixmap
 from PyQt5.QtWidgets import QWidget, QGridLayout, QPushButton, QLabel, QHBoxLayout
 from models import send_message_to_am
-import os
 from views.date_picker import DatePickerWidget
+import os
 
 
 class CustomPackageWidget(QWidget):
@@ -122,7 +122,9 @@ class CustomPackageWidget(QWidget):
         """
         if action == "Install":
             button.setEnabled(False)
-            self.scheduler_wrapper = DatePickerWidget(self)
+            self.scheduler_wrapper = DatePickerWidget(self, button)
+            self.scheduler_wrapper.show()
+
         elif action == "Delete":
             os.system("appwiz.cpl")
         self._message = """{"uuid": "%s", "action": "kioskinterface%s", "subaction": "%s"}""" % (self.uuid, \
