@@ -25,11 +25,12 @@ from PyQt5.QtGui import QPixmap
 from PyQt5.QtWidgets import QWidget, QGridLayout, QPushButton, QLabel, QHBoxLayout
 from models import send_message_to_am
 import os
+from views.date_picker import DatePickerWidget
 
 
 class CustomPackageWidget(QWidget):
     """This class create specialized widget for the package list."""
-    def __init__(self, package, type="grid"):
+    def __init__(self, package, type="grid", ref=None):
         """
         Initialize the list-element object
         Params:
@@ -37,9 +38,12 @@ class CustomPackageWidget(QWidget):
             type: string used originally to generate to kind of displaying : grid or list
         """
         super().__init__()
+        self.ref = ref
         self.type = type
         self.icon = QLabel("")
         self._message = ""
+        self.scheduler_wrapper = None
+
         icon = QPixmap("datas/" + package.icon)
         if self.type == "list":
             icon = icon.scaled(24, 24)
@@ -118,9 +122,10 @@ class CustomPackageWidget(QWidget):
         """
         if action == "Install":
             button.setEnabled(False)
-        elif action =="Delete":
+            self.scheduler_wrapper = DatePickerWidget(self)
+        elif action == "Delete":
             os.system("appwiz.cpl")
-        self._message = """{"uuid": "%s", "action": "kioskinterface%s", "subaction": "%s"}"""% (self.uuid, \
+        self._message = """{"uuid": "%s", "action": "kioskinterface%s", "subaction": "%s"}""" % (self.uuid, \
                                                                                                  action, action)
         send_message_to_am(self._message)
 

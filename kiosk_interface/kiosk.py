@@ -97,7 +97,7 @@ class Kiosk(QWidget):
         for package in self.result_list:
             package_names.append(package.getname())
             tmp = QListWidgetItem(self.list)
-            tmp1 = CustomPackageWidget(package, "list")
+            tmp1 = CustomPackageWidget(package, "list", self)
             tmp.setSizeHint(tmp1.sizeHint())
 
             self.list.addItem(tmp)
@@ -141,7 +141,7 @@ class Kiosk(QWidget):
             self.packages_list.append(package_object)
             self.result_list.append(package_object)
             tmp = QListWidgetItem(self.list)
-            tmp1 = CustomPackageWidget(package_object, "list")
+            tmp1 = CustomPackageWidget(package_object, "list", self)
             tmp.setSizeHint(tmp1.sizeHint())
             self.list.addItem(tmp)
             self.list.setItemWidget(tmp, tmp1)
