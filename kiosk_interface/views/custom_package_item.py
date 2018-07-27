@@ -39,6 +39,7 @@ class CustomPackageWidget(QWidget):
         """
         super().__init__()
         self.ref = ref
+        self.package = package
         self.type = type
         self.icon = QLabel("")
         self._message = ""
@@ -121,7 +122,6 @@ class CustomPackageWidget(QWidget):
                 "Install" | "Delete" | "Launch" | "Ask" | "Update"
         """
         if action == "Install":
-            button.setEnabled(False)
             self.scheduler_wrapper = DatePickerWidget(self, button)
             self.scheduler_wrapper.show()
 
