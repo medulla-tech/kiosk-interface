@@ -39,6 +39,7 @@ class CustomPackageWidget(QWidget):
         """
         super().__init__()
         self.ref = ref
+        self.package = package
         self.type = type
         self.icon = QLabel("")
         self._message = ""
@@ -121,15 +122,15 @@ class CustomPackageWidget(QWidget):
                 "Install" | "Delete" | "Launch" | "Ask" | "Update"
         """
         if action == "Install":
-            button.setEnabled(False)
             self.scheduler_wrapper = DatePickerWidget(self, button)
             self.scheduler_wrapper.show()
+            wait= True
 
         elif action == "Delete":
             os.system("appwiz.cpl")
         self._message = """{"uuid": "%s", "action": "kioskinterface%s", "subaction": "%s"}""" % (self.uuid, \
                                                                                                  action, action)
-        send_message_to_am(self._message)
+        # send_message_to_am(self._message)
 
     def getname(self):
         """

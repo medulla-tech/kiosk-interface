@@ -21,9 +21,9 @@
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
 # MA 02110-1301, USA.
 
-from PyQt5.QtWidgets import QWidget, QMessageBox, QGridLayout, QPushButton, QLabel, QCalendarWidget
+from PyQt5.QtWidgets import QWidget, QMessageBox, QGridLayout, QPushButton, QLabel, QCalendarWidget, QComboBox
 from PyQt5.QtCore import QDate, Qt
-
+from datetime import datetime
 
 class DatePickerWidget(QWidget):
     """The class DatePickerWidget give a view of calendar elements"""
@@ -35,28 +35,48 @@ class DatePickerWidget(QWidget):
         """
 
         super().__init__()
-        self.selected_date = None
         self.ref = ref
         self.ref_button = button
+        self.date_selected = None
+        self.date_today = None
+        self.hour_current = None
+        self.hour_selected = None
         self.label_ask = None
+        self.label_hour = None
         self.button_now = None
         self.button_later = None
         self.button_cancel = None
-        self.toto = None
+        self.combo_hours = None
+        self.combo_minutes = None
         self.calendar = None
         self.layout = None
         self.messagebox_confirm = None
-
+        self.returned_message = None
         self.init_ui()
 
     def init_ui(self):
         """Set the UI Elements for each attributes"""
-        print(Qt.WindowMinimizeButtonHint)
+
+        #
+        # UI
+        #
+        self.ref_button.setEnabled(False)
         self.setWindowFlags(
             Qt.CustomizeWindowHint |
             Qt.WindowTitleHint |
             Qt.WindowStaysOnTopHint
         )
+
+        #
+        # Dates  and hour
+        #
+        self.date_today = QDate.currentDate()
+        self.hour_current = datetime.now()
+        self.hour_selected = self.hour_current = [self.hour_current.hour, self.hour_current.minute]
+        
+        #
+        # Labels
+        #
         if self.ref is None:
             self.label_ask = QLabel("When do you want to install this package ? ")
         else:
@@ -64,42 +84,115 @@ class DatePickerWidget(QWidget):
             self.label_ask = QLabel("When do you want to install the <span style=\" "
                                     "font-size:10pt; font-weight:800; color:#000000;\" >%s</span> package ?"
                                     % package_name)
+        self.label_hour = QLabel("Select the installation hour :")
+        sep_widget = QLabel("")
 
+        #
+        # Buttons
+        #
         self.button_now = QPushButton("Now")
         self.button_later = QPushButton("Later")
         self.button_cancel = QPushButton("Cancel")
 
+        #
+        # Calendar
+        #
         self.calendar = QCalendarWidget()
         # Define minimum and maximum dates to launch the installation
         self.calendar.setMinimumDate(QDate.currentDate())
         self.calendar.setMaximumDate(QDate.currentDate().addDays(2))
-        self.calendar.resize(300, 200)
+        self.calendar.resize(250, 200)
 
+        #
+        # Combobox
+        #
+        self.combo_hours = QComboBox()
+        self.combo_minutes = QComboBox()
+        self.get_date()
+
+        #
+        # Layout
+        #
         self.layout = QGridLayout()
-        self.layout.addWidget(self.label_ask, 0, 0, 1, 3)
-        self.layout.addWidget(self.calendar, 1, 0, 1, 3)
-        self.layout.addWidget(self.button_now, 2, 0)
-        self.layout.addWidget(self.button_now, 2, 0)
-        self.layout.addWidget(self.button_later, 2, 1)
-        self.layout.addWidget(self.button_cancel, 2, 2)
+        self.layout.addWidget(self.label_ask, 0, 0, 1, 4)
+        self.layout.addWidget(self.calendar, 1, 0, 1, 4)
+        self.layout.addWidget(self.label_hour, 2, 0, 1, 4)
+        self.layout.addWidget(self.combo_hours, 3, 0)
+        self.layout.addWidget(QLabel("h"), 3, 1)
+        self.layout.addWidget(self.combo_minutes, 3, 2)
+        self.layout.addWidget(QLabel("min"), 3, 3)
+
+        self.layout.addWidget(sep_widget, 4, 0, 1, 4)
+        self.layout.addWidget(self.button_now, 6, 0)
+        self.layout.addWidget(self.button_later, 6, 1)
+        self.layout.addWidget(sep_widget, 6, 2)
+        self.layout.addWidget(self.button_cancel, 6, 3)
 
         self.setLayout(self.layout)
 
+        #
+        # Events
+        #
         self.get_date()
         # Event managment
         self.calendar.selectionChanged.connect(self.get_date)
         self.button_cancel.clicked.connect(self.close)
 
+    #
+    # Events actions
+    #
     def show(self):
         """Bind the QWidget.show method for this one"""
         super().show()
 
     def get_date(self):
         """Method called when the date is updated"""
-        self.selected_date = self.calendar.selectedDate()
 
+        self.date_selected = self.calendar.selectedDate()
+
+        # Refresh the selection of the hour if today is selected
+        if self.date_selected == self.date_today:
+            self.hour_current = datetime.now()
+            self.hour_selected = self.hour_current = [self.hour_current.hour, self.hour_current.minute]
+
+            hours_list = generate_list(self.hour_current[0], 24)
+            minutes_list = generate_list(self.hour_current[1], 60)
+        else:
+            hours_list = generate_list(0, 24)
+            minutes_list = generate_list(0, 60)
+
+        self.combo_hours.clear()
+        self.combo_minutes.clear()
+
+        self.combo_hours.addItems(hours_list)
+        self.combo_minutes.addItems(minutes_list)
     def close(self):
         """Method called when the Cancel button is called"""
         super().close()
         if self.ref_button is not None:
             self.ref_button.setEnabled(True)
+
+
+def generate_list(min, max):
+    """Generate a list of int stringified in the range of min to max
+    Params:
+        min int minimum included
+        max int maximum excluded
+    """
+    min = int(min)
+    max = int(max)
+
+    tmp = []
+    _tmp = []
+
+    if min > max:
+        min, max = max, min
+
+    tmp = list(range(min,max))
+
+    for element in tmp:
+        _tmp.append(str(element))
+
+    return _tmp
+
+    return tmp
