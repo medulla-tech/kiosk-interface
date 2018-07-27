@@ -24,7 +24,7 @@ import sys
 
 import os
 import configparser
-import socket
+
 
 def conffilename(agenttype):
     """
@@ -77,7 +77,11 @@ def conffilename(agenttype):
 class ConfParameter:
     """ConfParameter create an interface to make easier the use of config files."""
     def __init__(self, typeconf='machine'):
-        """Initialization of ConfParameter object """
+        """
+        Initialization of ConfParameter object
+        Param:
+            typeconf: string representing the type of the machine
+        """
         config = configparser.ConfigParser()
         namefileconfig = conffilename(typeconf)
         config.read(namefileconfig)

@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 # coding: utf-8
+"""This file initialize the views module"""
 #
 # (c) 2018 Siveo, http://www.siveo.net
 #

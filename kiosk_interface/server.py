@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 # coding: utf-8
-"""Manage the configuration of the kiosk"""
+"""Manage the communication between the kiosk and the agent machine."""
 #
 # (c) 2018 Siveo, http://www.siveo.net
 #
@@ -24,38 +24,49 @@ import threading
 import socket
 import json
 from config import ConfParameter
+import logging
 
 global datakiosk
+datakiosk=None
+
 
 def get_datakiosk():
+    """Getter for the datas sent by the agent-machine
+    Returns:
+        List of packages info
+    """
     global datakiosk
+    logging.info("Get datas : %s" %datakiosk)
     return datakiosk
 
+
 def set_datakiosk(data):
+    """
+    Modify the actual packages datas by the newly received datas
+    Params:
+        data is a list of packages info
+    """
+    logging.info("Set the datas with %s"%data)
     global datakiosk
     datakiosk = data
 
 
-    
 def tcpserver(sock, eventkill):
         """
-        this function is the listening function of the tcp server of the machine agent, to serve the request of the kiosk
-        Args:
-            no arguments
-
-        Returns:
-            no return value
+        This function is the listening function of the tcp server of the machine agent, to serve the request of the kiosk
+        Params:
+            sock socket object which receives the message form agent-machine
+            eventkill threading event object used to signal the end of the standby
         """
-        print("Server Kiosk Start")
+        logging.info("Server Kiosk launched")
         while not eventkill.wait(1):
             # Wait for a connection
-            print('waiting for a connection kiosk service')
             connection, client_address = sock.accept()
             client_handler = threading.Thread(
                                                 target=handle_client_connection,
                                                 args=(connection,))
             client_handler.start()
-        print("Stopping Kiosk")
+        logging.info("Stopping Kiosk server")
 
 
 def handle_client_connection(client_socket):
@@ -70,18 +81,27 @@ def handle_client_connection(client_socket):
     """
     try:
         # request the recv message
-        recv_msg_from_AM = client_socket.recv(1024)
+        recv_msg_from_AM = client_socket.recv(5000)
         recv_msg_from_AM = recv_msg_from_AM.decode("utf-8")
-        print (recv_msg_from_AM)
-        print ("initialise la data")
-        set_datakiosk(json.loads(recv_msg_from_AM))
-        print (get_datakiosk())
-        client_socket.send(recv_msg_from_AM.encode("utf-8"))
+        logging.info("Datas received from AM : %s"%(recv_msg_from_AM))
+
+        recv_msg_from_AM = json.loads(recv_msg_from_AM)
+
+        if "action" in recv_msg_from_AM:
+            if recv_msg_from_AM["action"] == "update":
+                logging.info("Call set_datakiosk("+recv_msg_from_AM+")")
+                set_datakiosk(recv_msg_from_AM['data'])
+        else:
+            set_datakiosk(recv_msg_from_AM)
+
+        thread = threading.Thread(target=client_socket.send, args=(json.dumps(recv_msg_from_AM).encode('utf-8'),))
+        thread.start()
     finally:
         client_socket.close()
 
 
 class MessengerToAM(object):
+    """MessengerToAM is a client socket class"""
     def __init__(self):
         """Initialization of the MessagerToAM object"""
 
@@ -97,7 +117,9 @@ class MessengerToAM(object):
             self.active = True
         except socket.error:
             self.active = False
-            print("The communication with the agent machine can't be established")
+            self.send('{"action":"kioskLog","type":"warning","message":\
+"The communication with the agent machine can\'t be established"}'.encode('utf-8'))
+
 
     def send(self, msg):
         """Send the specified message to the agent machine.
@@ -106,7 +128,6 @@ class MessengerToAM(object):
             '{"uuid" : "45d4-3124c21-3123", "action": "kioskinterfaceinstall", "subaction" : "install"}'
         """
         if self.active:
-            print('msg = '+str(msg))
             self.sock.sendall(msg)
             self.handle()
         else:
@@ -120,6 +141,5 @@ class MessengerToAM(object):
             str: The return back message
         """
         data = self.sock.recv(1024).strip()
-        print('received "%s"' % data)
         self.sock.close()
         return data

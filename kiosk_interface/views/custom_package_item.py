@@ -22,17 +22,28 @@
 # MA 02110-1301, USA.
 
 from PyQt5.QtGui import QPixmap
-from PyQt5.QtWidgets import QVBoxLayout, QTabWidget, QWidget, QLineEdit, QGridLayout, QPushButton, \
-    QListWidget, QLabel, QHBoxLayout
+from PyQt5.QtWidgets import QWidget, QGridLayout, QPushButton, QLabel, QHBoxLayout
 from models import send_message_to_am
+from views.date_picker import DatePickerWidget
+import os
 
 
 class CustomPackageWidget(QWidget):
-    def __init__(self, package, type="grid"):
+    """This class create specialized widget for the package list."""
+    def __init__(self, package, type="grid", ref=None):
+        """
+        Initialize the list-element object
+        Params:
+            package: Package object is the package we want to represent into the UI.
+            type: string used originally to generate to kind of displaying : grid or list
+        """
         super().__init__()
+        self.ref = ref
         self.type = type
         self.icon = QLabel("")
         self._message = ""
+        self.scheduler_wrapper = None
+
         icon = QPixmap("datas/" + package.icon)
         if self.type == "list":
             icon = icon.scaled(24, 24)
@@ -80,27 +91,49 @@ class CustomPackageWidget(QWidget):
 
             row = 0
             while row < len(self.actions):
-                # self.layout.addWidget(self.action_button[self.actions[row]], row, 3)
                 row += 1
 
         self.setLayout(self.layout)
         self.show()
 
         if "Install" in self.actions:
-            self.action_button["Install"].clicked.connect(lambda: self.return_message("Install"))
+            self.action_button["Install"].clicked.connect(
+                lambda: self.return_message(self.action_button["Install"], "Install"))
         if "Ask" in self.actions:
-            self.action_button["Ask"].clicked.connect(lambda: self.return_message("Ask"))
+            self.action_button["Ask"].clicked.connect(
+                lambda: self.return_message(self.action_button["Ask"], "Ask"))
         if "Update" in self.actions:
-            self.action_button["Update"].clicked.connect(lambda: self.return_message("Update"))
+            self.action_button["Update"].clicked.connect(
+                lambda: self.return_message(self.action_button["Update"], "Update"))
         if "Delete" in self.actions:
-            self.action_button["Delete"].clicked.connect(lambda: self.return_message("Delete"))
+            self.action_button["Delete"].clicked.connect(
+                lambda: self.return_message(self.action_button["Delete"], "Delete"))
         if "Launch" in self.actions:
-            self.action_button["Launch"].clicked.connect(lambda: self.return_message("Launch"))
+            self.action_button["Launch"].clicked.connect(
+                lambda: self.return_message(self.action_button["Launch"], "Launch"))
 
-    def return_message(self, action):
-        self._message = """{"uuid": "%s", "action": "kioskinterface%s", "subaction": "%s"}"""% (self.uuid, \
+    def return_message(self, button, action):
+        """
+        return_message method send a signal to the agent-machine when a button is clicked
+        Params:
+            button : QPushButton is a reference to the clicked button
+            action: string added to the message sent to the agent-machine. The possibilities are:
+                "Install" | "Delete" | "Launch" | "Ask" | "Update"
+        """
+        if action == "Install":
+            button.setEnabled(False)
+            self.scheduler_wrapper = DatePickerWidget(self, button)
+            self.scheduler_wrapper.show()
+
+        elif action == "Delete":
+            os.system("appwiz.cpl")
+        self._message = """{"uuid": "%s", "action": "kioskinterface%s", "subaction": "%s"}""" % (self.uuid, \
                                                                                                  action, action)
         send_message_to_am(self._message)
 
     def getname(self):
+        """
+        getname returns the name of the package
+            return: string representing the name of the package
+        """
         return self.name.text()

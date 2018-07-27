@@ -25,8 +25,9 @@ import sys
 
 from PyQt5.QtCore import QCoreApplication
 from PyQt5.QtGui import QIcon
-from PyQt5.QtWidgets import QSystemTrayIcon, QMenu, QAction, QLineEdit, QWidgetAction, QPushButton, QHBoxLayout
+from PyQt5.QtWidgets import QSystemTrayIcon, QMenu, QAction, QWidgetAction
 from views.custom_search_bar import CustomSearchBar
+
 
 def tray_main_view(ref):
     """
@@ -56,8 +57,6 @@ def tray_main_view(ref):
 
     # Add the open option to the menu
     ref.open_action = QAction(QCoreApplication.translate("TrayIcon", "Open"))
-    # The quit option is not added : the kiosk has to run endlessly
-
     if hasattr(ref, 'search_action'):
         ref.menu.addAction(ref.search_action)
     ref.menu.addAction(ref.open_action)

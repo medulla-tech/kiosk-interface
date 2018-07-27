@@ -25,6 +25,7 @@
 
 from server import MessengerToAM
 from server import get_datakiosk, set_datakiosk
+import os
 
 
 class Package(object):
@@ -48,43 +49,63 @@ class Package(object):
         if 'action' in row_datas.keys():
             self.actions = row_datas['action']
         if 'icon' in row_datas.keys():
-            self.icon = row_datas['icon']
+            # Test if the icon exists
+            if os.path.isfile(os.path.join("datas", row_datas['icon'])):
+                self.icon = row_datas['icon']
+            else:
+                if os.path.isfile(os.path.join("datas", row_datas['name']+".png")):
+                    self.icon = row_datas['name']+".png"
+                else:
+                    self.icon = 'kiosk.png'
         else:
             self.icon = 'kiosk.png'
         if 'uuid' in row_datas.keys():
             self.uuid = row_datas['uuid']
 
-    
     def get_all(self):
+        """Generage and returns the list of package
+        Returns : the list of packages
+        """
         datainitialisation = get_datakiosk()
-        print ("___________chang struct__________________________")
-        print (datainitialisation)
-        print ("_____________________________________")
-        d=[]
-        for z in datainitialisation:
-            d.append(Package(z))
-        return d
-
-##        return [Package({'name': 'Firefox', 'version': '61.0', 'description': 'Best browser ever',
-##                         'uuid': "45d4-3124c21-3123",
-##                         'icon': 'kiosk.png',
-##                         'actions': ['Install']}),
-##                Package({'name': 'Thunderbird', 'version': '52.7', 'description': 'If you need to read your mails',
-##                         'uuid': "45d4-3124c21-3134",
-##                         'icon': 'kiosk.png',
-##                         'actions': ['Ask']}),
-##                Package({'name': 'Vlc', 'icon': 'vlc.png', 'description': 'Video player',
-##                         'uuid': "45d4-3124c21-3145",
-##                         'actions': ['Update', 'Launch', 'Delete']}),
-##                Package({'name': '7zip', 'icon': 'kiosk.png',
-##                         'uuid': "45d4-3124c21-3156",
-##                         'actions': ['Launch', 'Delete']})
-##                ]
+        send_message_to_am('{"action":"kioskLog","type":"info","message":"Generate the package list"}')
+        print("___________chang struct______________")
+        print(datainitialisation)
+        print("_____________________________________")
+        list=[]
+        for element in datainitialisation:
+            list.append(Package(element))
+        return list
 
     def getname(self):
+        """getter for the name property
+            Returns: string of the package name"""
         return self.name
+
+    def getuuid(self):
+        """getter for the name property
+            Returns: string of the package uuid"""
+        return self.uuid
+
+    def package_in_list(self, uuid):
+        """package_in_list search the package from the package list by it's uuid
+            Param:
+                uuid: string of the uuid of the package
+            Returns: boolean true if the package is existing in the list or false in the opposite"""
+        list = self.getname()
+        is_present = False
+        for package in list:
+            if package.getuuid == uuid:
+                is_present = True
+        return is_present
 
 
 def send_message_to_am(message):
+    """This function the message to the agent-machine.
+    Params:
+        message: formated string is the message send to the agent. The message have to look like :
+        '{"action":"kioskLog","type":"info","message":"Generate the package list"}'
+    """
     client = MessengerToAM()
     client.send(message.encode('utf-8'))
+    get_datakiosk()
+
