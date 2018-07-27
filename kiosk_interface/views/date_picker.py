@@ -22,8 +22,9 @@
 # MA 02110-1301, USA.
 
 from PyQt5.QtWidgets import QWidget, QMessageBox, QGridLayout, QPushButton, QLabel, QCalendarWidget, QComboBox
-from PyQt5.QtCore import QDate, Qt
+from PyQt5.QtCore import QDate, QDateTime, QTime, QTimeZone, Qt
 from datetime import datetime
+
 
 class DatePickerWidget(QWidget):
     """The class DatePickerWidget give a view of calendar elements"""
@@ -33,7 +34,6 @@ class DatePickerWidget(QWidget):
         Params;
             ref QWidget object which is calling this one
         """
-
         super().__init__()
         self.ref = ref
         self.ref_button = button
@@ -41,6 +41,8 @@ class DatePickerWidget(QWidget):
         self.date_today = None
         self.hour_current = None
         self.hour_selected = None
+        self.datetime_selected = None
+        self.timestamp_selected = None
         self.label_ask = None
         self.label_hour = None
         self.button_now = None
@@ -67,13 +69,6 @@ class DatePickerWidget(QWidget):
             Qt.WindowStaysOnTopHint
         )
 
-        #
-        # Dates  and hour
-        #
-        self.date_today = QDate.currentDate()
-        self.hour_current = datetime.now()
-        self.hour_selected = self.hour_current = [self.hour_current.hour, self.hour_current.minute]
-        
         #
         # Labels
         #
@@ -108,7 +103,16 @@ class DatePickerWidget(QWidget):
         #
         self.combo_hours = QComboBox()
         self.combo_minutes = QComboBox()
+
+        #
+        # Dates  and hour
+        #
+        self.date_today = QDate.currentDate()
         self.get_date()
+        self.hour_current = datetime.now()
+        self.hour_selected = self.hour_current = [self.hour_current.hour, self.hour_current.minute]
+        self.get_hour("hour")
+        self.get_hour("minute")
 
         #
         # Layout
@@ -133,10 +137,11 @@ class DatePickerWidget(QWidget):
         #
         # Events
         #
-        self.get_date()
-        # Event managment
         self.calendar.selectionChanged.connect(self.get_date)
         self.button_cancel.clicked.connect(self.close)
+        self.button_later.clicked.connect(self.later)
+        self.combo_hours.currentIndexChanged.connect(lambda: self.get_hour('hour'))
+        self.combo_minutes.currentIndexChanged.connect(lambda: self.get_hour('minute'))
 
     #
     # Events actions
@@ -166,11 +171,54 @@ class DatePickerWidget(QWidget):
 
         self.combo_hours.addItems(hours_list)
         self.combo_minutes.addItems(minutes_list)
+
+    def get_hour(self, type="hour"):
+        """set the selected hour into hour_selected
+        Param:
+            type: string indicate if it is the hour or the minute combobox which has changed the string can have this
+                values:
+                    type = "hour" | "minute"
+        """
+
+        if type == "hour":
+            self.hour_selected[0] = self.combo_hours.currentText()
+        elif type == "minute":
+            self.hour_selected[1] = self.combo_minutes.currentText()
+
+        # Generate the final datetime into utc format
+        self.datetime_selected = QDateTime(self.date_selected,
+                                           QTime(int(self.hour_selected[0]),int(self.hour_selected[1])),
+                                           Qt.LocalTime).toUTC()
+        self.timestamp_selected = self.datetime_selected.toTime_t()
+
+    def get_timestamp(self):
+        """Getter for the timestamp selected
+        Returns:
+            int representing the timestamp
+        """
+        return self.timestamp_selected
+
+    def get_utc_datetime(self):
+        """Getter for the the selected date
+        Returns:
+            QDateTime formated in utc
+        """
+        print("Call get_utc_datetime")
+        return self.datetime_selected
+
+    def later(self):
+        """Method called when the Later button is called"""
+        print("Call later")
+        self.close()
+
     def close(self):
         """Method called when the Cancel button is called"""
         super().close()
         if self.ref_button is not None:
             self.ref_button.setEnabled(True)
+
+        print(self.get_timestamp())
+        print(self.get_utc_datetime())
 
 
 def generate_list(min, max):
@@ -178,6 +226,8 @@ def generate_list(min, max):
     Params:
         min int minimum included
         max int maximum excluded
+    Returns:
+        list of string
     """
     min = int(min)
     max = int(max)
@@ -194,5 +244,3 @@ def generate_list(min, max):
         _tmp.append(str(element))
 
     return _tmp
-
-    return tmp

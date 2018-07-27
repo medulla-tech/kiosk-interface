@@ -124,13 +124,12 @@ class CustomPackageWidget(QWidget):
         if action == "Install":
             self.scheduler_wrapper = DatePickerWidget(self, button)
             self.scheduler_wrapper.show()
-            wait= True
 
         elif action == "Delete":
             os.system("appwiz.cpl")
         self._message = """{"uuid": "%s", "action": "kioskinterface%s", "subaction": "%s"}""" % (self.uuid, \
                                                                                                  action, action)
-        # send_message_to_am(self._message)
+        send_message_to_am(self._message)
 
     def getname(self):
         """
