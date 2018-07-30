@@ -21,13 +21,14 @@
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
 # MA 02110-1301, USA.
 
-from PyQt5.QtWidgets import QWidget, QMessageBox, QGridLayout, QPushButton, QLabel, QCalendarWidget, QComboBox
-from PyQt5.QtCore import QDate, QDateTime, QTime, QTimeZone, Qt
+from PyQt5.QtWidgets import QWidget, QGridLayout, QPushButton, QLabel, QCalendarWidget, QComboBox
+from PyQt5.QtCore import QDate, QDateTime, QTime, Qt, pyqtSignal
 from datetime import datetime
 
 
 class DatePickerWidget(QWidget):
     """The class DatePickerWidget give a view of calendar elements"""
+    has_to_send = pyqtSignal(name="has_to_send")
 
     def __init__(self, ref=None, button=None):
         """Initialize the widget
@@ -42,7 +43,9 @@ class DatePickerWidget(QWidget):
         self.hour_current = None
         self.hour_selected = None
         self.datetime_selected = None
+        self.datetime_current = None
         self.timestamp_selected = None
+        self.timestamp_current = None
         self.label_ask = None
         self.label_hour = None
         self.button_now = None
@@ -104,15 +107,22 @@ class DatePickerWidget(QWidget):
         self.combo_hours = QComboBox()
         self.combo_minutes = QComboBox()
 
+        hours_list = generate_list(0, 24)
+        minutes_list = generate_list(0, 60)
+
+        self.combo_hours.addItems(hours_list)
+        self.combo_minutes.addItems(minutes_list)
+
         #
         # Dates  and hour
         #
         self.date_today = QDate.currentDate()
-        self.get_date()
         self.hour_current = datetime.now()
-        self.hour_selected = self.hour_current = [self.hour_current.hour, self.hour_current.minute]
-        self.get_hour("hour")
-        self.get_hour("minute")
+        self.hour_current = [self.hour_current.hour, self.hour_current.minute]
+        self.hour_selected = [0,0]
+        self.get_selected_date()
+        self.get_selected_hour("hour")
+        self.get_selected_hour("minute")
 
         #
         # Layout
@@ -137,11 +147,12 @@ class DatePickerWidget(QWidget):
         #
         # Events
         #
-        self.calendar.selectionChanged.connect(self.get_date)
+        self.calendar.selectionChanged.connect(self.get_selected_date)
+        self.button_now.clicked.connect(self.now)
         self.button_cancel.clicked.connect(self.close)
         self.button_later.clicked.connect(self.later)
-        self.combo_hours.currentIndexChanged.connect(lambda: self.get_hour('hour'))
-        self.combo_minutes.currentIndexChanged.connect(lambda: self.get_hour('minute'))
+        self.combo_hours.currentIndexChanged.connect(lambda: self.get_selected_hour('hour'))
+        self.combo_minutes.currentIndexChanged.connect(lambda: self.get_selected_hour('minute'))
 
     #
     # Events actions
@@ -150,29 +161,11 @@ class DatePickerWidget(QWidget):
         """Bind the QWidget.show method for this one"""
         super().show()
 
-    def get_date(self):
+    def get_selected_date(self):
         """Method called when the date is updated"""
-
         self.date_selected = self.calendar.selectedDate()
 
-        # Refresh the selection of the hour if today is selected
-        if self.date_selected == self.date_today:
-            self.hour_current = datetime.now()
-            self.hour_selected = self.hour_current = [self.hour_current.hour, self.hour_current.minute]
-
-            hours_list = generate_list(self.hour_current[0], 24)
-            minutes_list = generate_list(self.hour_current[1], 60)
-        else:
-            hours_list = generate_list(0, 24)
-            minutes_list = generate_list(0, 60)
-
-        self.combo_hours.clear()
-        self.combo_minutes.clear()
-
-        self.combo_hours.addItems(hours_list)
-        self.combo_minutes.addItems(minutes_list)
-
-    def get_hour(self, type="hour"):
+    def get_selected_hour(self, type="hour"):
         """set the selected hour into hour_selected
         Param:
             type: string indicate if it is the hour or the minute combobox which has changed the string can have this
@@ -184,31 +177,53 @@ class DatePickerWidget(QWidget):
             self.hour_selected[0] = self.combo_hours.currentText()
         elif type == "minute":
             self.hour_selected[1] = self.combo_minutes.currentText()
-
         # Generate the final datetime into utc format
         self.datetime_selected = QDateTime(self.date_selected,
                                            QTime(int(self.hour_selected[0]),int(self.hour_selected[1])),
                                            Qt.LocalTime).toUTC()
         self.timestamp_selected = self.datetime_selected.toTime_t()
+        self.datetime_current = QDateTime().currentDateTime()
+        self.timestamp_current = self.datetime_current.toTime_t()
 
-    def get_timestamp(self):
+
+    def get_selected_timestamp(self):
         """Getter for the timestamp selected
         Returns:
             int representing the timestamp
         """
         return self.timestamp_selected
 
-    def get_utc_datetime(self):
-        """Getter for the the selected date
+    def get_selected_utc_datetime(self):
+        """Getter for the the selected date in UTC standard
         Returns:
-            QDateTime formated in utc
+            QDateTime formated in utc standard
         """
-        print("Call get_utc_datetime")
         return self.datetime_selected
+
+    def get_current_utc_datetime(self):
+        """Getter for the current date in UTC standard
+        Return:
+            QDateTime formated in utc standard
+        """
+
+        self.hour_current = datetime.now()
+        self.hour_current = [self.hour_current.hour, self.hour_current.minute]
+
+        temp = QDateTime(self.date_today,
+                         QTime(int(self.hour_current[0]),int(self.hour_current[1])),
+                         Qt.LocalTime).toUTC()
+        return temp
+
+    def now(self):
+        """Method called when the Now button is called"""
+        #self.timestamp_selected = self.timestamp_current
+        #self.datetime_selected = self.timestamp_current
+        self.has_to_send.emit()
+        self.close()
 
     def later(self):
         """Method called when the Later button is called"""
-        print("Call later")
+        self.has_to_send.emit()
         self.close()
 
     def close(self):
@@ -216,9 +231,6 @@ class DatePickerWidget(QWidget):
         super().close()
         if self.ref_button is not None:
             self.ref_button.setEnabled(True)
-
-        print(self.get_timestamp())
-        print(self.get_utc_datetime())
 
 
 def generate_list(min, max):
