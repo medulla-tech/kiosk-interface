@@ -56,7 +56,6 @@ class Tray(QWidget):
         self.open_action.triggered.connect(self.open)
 
         if hasattr(self, 'input_search'):
-            # self.input_search.textChanged.connect(self.criterion_modified)
             self.input_search.clicked.connect(self.criterion_modified)
 
     def open(self, criterion=""):
