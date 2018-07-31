@@ -127,11 +127,12 @@ class CustomPackageWidget(QWidget):
             self._message = """{"uuid": "%s", "action": "kioskinterface%s", "subaction": "%s", "utcdatetime": "%s"}"""\
                             % (self.uuid, action, action, self.scheduler_wrapper.timestamp_selected)
             self.scheduler_wrapper.has_to_send.connect(lambda: send_message_to_am(self._message))
+
         elif action == "Delete":
             os.system("appwiz.cpl")
             self._message = """{"uuid": "%s", "action": "kioskinterface%s", "subaction": "%s"}""" % (self.uuid, \
                                                                                                  action, action)
-        send_message_to_am(self._message)
+            send_message_to_am(self._message)
 
     def getname(self):
         """

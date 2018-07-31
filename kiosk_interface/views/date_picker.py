@@ -183,6 +183,7 @@ class DatePickerWidget(QWidget):
                                            Qt.LocalTime).toUTC()
         self.timestamp_selected = self.datetime_selected.toTime_t()
         self.datetime_current = QDateTime().currentDateTime()
+
         self.timestamp_current = self.datetime_current.toTime_t()
 
 
@@ -216,8 +217,7 @@ class DatePickerWidget(QWidget):
 
     def now(self):
         """Method called when the Now button is called"""
-        #self.timestamp_selected = self.timestamp_current
-        #self.datetime_selected = self.timestamp_current
+        self.timestamp_selected = self.timestamp_current
         self.has_to_send.emit()
         self.close()
 
