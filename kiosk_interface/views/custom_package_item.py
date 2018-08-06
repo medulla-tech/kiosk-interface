@@ -25,7 +25,6 @@ from PyQt5.QtGui import QPixmap
 from PyQt5.QtWidgets import QWidget, QGridLayout, QPushButton, QLabel, QHBoxLayout
 from models import send_message_to_am
 from views.date_picker import DatePickerWidget
-import os
 
 
 class CustomPackageWidget(QWidget):
@@ -130,9 +129,13 @@ class CustomPackageWidget(QWidget):
                 % (self.uuid, action, action, self.scheduler_wrapper.tuple_selected)))
 
         elif action == "Delete":
-            os.system("appwiz.cpl")
-            self._message = """{"uuid": "%s", "action": "kioskinterface%s", "subaction": "%s"}""" % (self.uuid, \
-                                                                                                 action, action)
+            self._message = """{"uuid": "%s", "action": "kioskinterface%s", "subaction": "%s"}""" % (self.uuid,
+                                                                                                     action, action)
+            send_message_to_am(self._message)
+
+        elif action == "Launch":
+            self._message = """{"uuid": "%s", "action": "kioskinterface%s", "subaction": "%s"}""" % (self.uuid,
+                                                                                                     action, action)
             send_message_to_am(self._message)
 
     def getname(self):
