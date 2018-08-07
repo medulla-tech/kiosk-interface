@@ -122,10 +122,11 @@ class Kiosk(QWidget):
         # Link the tray search criterion with the main search bar
         self.searchbar.setText(self.criterion)
         self.filter_packages(self.criterion)
-        self.searchbar.textChanged.connect(self.filter_packages)
 
+        self.searchbar.textChanged.connect(self.filter_packages)
         self.list.itemSelectionChanged.connect(self.select_row)
-        self.updated.connect(self.datas_update)
+        self.parent_app.notifier.message_received_from_am.connect(self.datas_update)
+        self.parent_app.notifier.message_update_received_from_am.connect(self.datas_update)
 
     def datas_update(self):
         """This method get the list of all packages and generate the main window"""

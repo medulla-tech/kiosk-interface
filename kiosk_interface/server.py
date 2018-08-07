@@ -40,7 +40,7 @@ def get_datakiosk():
     return datakiosk
 
 
-def set_datakiosk(data):
+def set_datakiosk(ref, data):
     """
     Modify the actual packages datas by the newly received datas
     Params:
@@ -51,7 +51,7 @@ def set_datakiosk(data):
     datakiosk = data
 
 
-def tcpserver(sock, eventkill):
+def tcpserver(ref, sock, eventkill):
         """
         This function is the listening function of the tcp server of the machine agent, to serve the request of the kiosk
         Params:
@@ -64,12 +64,12 @@ def tcpserver(sock, eventkill):
             connection, client_address = sock.accept()
             client_handler = threading.Thread(
                                                 target=handle_client_connection,
-                                                args=(connection,))
+                                                args=(ref, connection,))
             client_handler.start()
         logging.info("Stopping Kiosk server")
 
 
-def handle_client_connection(client_socket):
+def handle_client_connection(ref, client_socket):
     """
         this function handles the message received from kiosk
         the function must provide a response to an acknowledgment kiosk or a result
@@ -83,16 +83,20 @@ def handle_client_connection(client_socket):
         # request the recv message
         recv_msg_from_AM = client_socket.recv(5000)
         recv_msg_from_AM = recv_msg_from_AM.decode("utf-8")
+        ref.notifier.message_received_from_am.emit()
         logging.info("Datas received from AM : %s"%(recv_msg_from_AM))
 
         recv_msg_from_AM = json.loads(recv_msg_from_AM)
-
         if "action" in recv_msg_from_AM:
             if recv_msg_from_AM["action"] == "update":
                 logging.info("Call set_datakiosk("+recv_msg_from_AM+")")
-                set_datakiosk(recv_msg_from_AM['data'])
+                if recv_msg_from_AM != "":
+                    ref.notifier.message_update_received_from_am.emit()
+                set_datakiosk(ref, recv_msg_from_AM['data'])
         else:
-            set_datakiosk(recv_msg_from_AM)
+            if recv_msg_from_AM != "":
+                ref.notifier.message_received_from_am.emit()
+            set_datakiosk(ref, recv_msg_from_AM)
 
         thread = threading.Thread(target=client_socket.send, args=(json.dumps(recv_msg_from_AM).encode('utf-8'),))
         thread.start()
