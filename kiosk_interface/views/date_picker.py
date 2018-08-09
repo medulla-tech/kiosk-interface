@@ -44,8 +44,8 @@ class DatePickerWidget(QWidget):
         self.hour_selected = None
         self.datetime_selected = None
         self.datetime_current = None
-        self.timestamp_selected = None
-        self.timestamp_current = None
+        self.tuple_current = None
+        self.tuple_selected = None
         self.label_ask = None
         self.label_hour = None
         self.button_now = None
@@ -178,46 +178,32 @@ class DatePickerWidget(QWidget):
         elif type == "minute":
             self.hour_selected[1] = self.combo_minutes.currentText()
         # Generate the final datetime into utc format
-        self.datetime_selected = QDateTime(self.date_selected,
-                                           QTime(int(self.hour_selected[0]),int(self.hour_selected[1])),
+        self.datetime_current = QDateTime(self.date_today,
+                                           QTime(
+                                               int(self.hour_current[0]),
+                                               int(self.hour_current[1])),
                                            Qt.LocalTime).toUTC()
-        self.timestamp_selected = self.datetime_selected.toTime_t()
-        self.datetime_current = QDateTime().currentDateTime()
-
-        self.timestamp_current = self.datetime_current.toTime_t()
-
-
-    def get_selected_timestamp(self):
-        """Getter for the timestamp selected
-        Returns:
-            int representing the timestamp
-        """
-        return self.timestamp_selected
-
-    def get_selected_utc_datetime(self):
-        """Getter for the the selected date in UTC standard
-        Returns:
-            QDateTime formated in utc standard
-        """
-        return self.datetime_selected
-
-    def get_current_utc_datetime(self):
-        """Getter for the current date in UTC standard
-        Return:
-            QDateTime formated in utc standard
-        """
-
-        self.hour_current = datetime.now()
-        self.hour_current = [self.hour_current.hour, self.hour_current.minute]
-
-        temp = QDateTime(self.date_today,
-                         QTime(int(self.hour_current[0]),int(self.hour_current[1])),
-                         Qt.LocalTime).toUTC()
-        return temp
+        self.datetime_selected = QDateTime(self.date_selected,
+                                           QTime(int(self.hour_selected[0]),
+                                                 int(self.hour_selected[1])),
+                                           Qt.LocalTime).toUTC()
+        self.tuple_current = (
+            self.datetime_current.date().year(),
+            self.datetime_current.date().month(),
+            self.datetime_current.date().day(),
+            self.datetime_current.time().hour(),
+            self.datetime_current.time().minute())
+        self.tuple_selected = (
+            self.datetime_selected.date().year(),
+            self.datetime_selected.date().month(),
+            self.datetime_selected.date().day(),
+            self.datetime_selected.time().hour(),
+            self.datetime_selected.time().minute())
 
     def now(self):
         """Method called when the Now button is called"""
-        self.timestamp_selected = self.timestamp_current
+        self.datetime_selected = self.datetime_current
+        self.tuple_selected = self.tuple_current
         self.has_to_send.emit()
         self.close()
 

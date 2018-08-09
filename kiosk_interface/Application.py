@@ -30,6 +30,7 @@ import socket
 from server import tcpserver
 from tray import Tray
 from server import MessengerToAM
+from notifier import Notifier
 
 
 class Application(object):
@@ -38,8 +39,9 @@ class Application(object):
 
     def __init__(self):
         """Initialize the object"""
-        self.send("""{"action": "kioskLog","type":"info","message":"Kiosk Initialization"}""")
+        self.notifier = None
         self.app = None
+        self.send("""{"action": "kioskLog","type":"info","message":"Kiosk Initialization"}""")
         self.eventkill = None
         self.sock = None
         self.client_handlertcp = None
@@ -53,6 +55,7 @@ class Application(object):
         self.app.setWindowIcon(QIcon("datas/kiosk.png"))
         self.app.setApplicationName("Kiosk")
 
+        self.notifier = Notifier()
         message = '{"action": "kioskinterface", "subaction": "initialization"}'
         self.send(message, parallel=False)
         self.send('{"action":"kioskLog","type":"info","message":"Call Application.send function"}')
@@ -68,15 +71,20 @@ class Application(object):
         # Listen for incoming connections
         self.sock.listen(5)
         self.eventkill = threading.Event()
-        self.client_handlertcp = threading.Thread(target=tcpserver, args=(self.sock, self.eventkill,))
+        self.client_handlertcp = threading.Thread(target=tcpserver, args=(self, self.sock, self.eventkill,))
         # run server tcpserver for kiosk
         self.client_handlertcp.start()
 
         # When the window is closed, the process is not killed
         self.app.setQuitOnLastWindowClosed(False)
 
+        # Notifications
+        self.notifier.message_sent_to_am.connect(lambda:print("message sent"))
+        self.notifier.message_update_received_from_am.connect(lambda:print("update received"))
+        self.notifier.message_received_from_am.connect(lambda:print("message received"))
         self.send('{"action":"kioskLog", "type":"info", "message":"Call tray controller"}')
         self.tray = Tray(self)
+
 
         self.app.exec_()
         # using event eventkill for signal stop thread
@@ -97,7 +105,8 @@ class Application(object):
                     message: string which represent the commande launched into the agent machine.
                     parallel: boolean representing a flag if the message will be send in a thread or not
                 """
-
+        if self.notifier is not None:
+            self.notifier.message_sent_to_am.emit()
         client = MessengerToAM()
         if parallel:
             thread = threading.Thread(target=client.send, args=(message.encode('utf-8'),))
