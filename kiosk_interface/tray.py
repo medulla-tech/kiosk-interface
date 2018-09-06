@@ -69,7 +69,8 @@ class Tray(QWidget):
         if datas is not None:
             self.send('{"action":"kioskLog","type":"info","message":"Initialize the kiosk main window"}')
 
-            self.main_window.close()
+            if self.main_window is not None:
+                self.main_window.close()
             self.main_window = Kiosk(criterion, self.parent_app, self)
 
             if self.first_open is False:
