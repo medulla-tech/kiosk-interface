@@ -25,6 +25,9 @@ from PyQt5.QtGui import QPixmap
 from PyQt5.QtWidgets import QWidget, QGridLayout, QPushButton, QLabel, QHBoxLayout
 from models import send_message_to_am
 from views.date_picker import DatePickerWidget
+import base64
+import os
+import subprocess
 
 
 class CustomPackageWidget(QWidget):
@@ -134,9 +137,16 @@ class CustomPackageWidget(QWidget):
             send_message_to_am(self._message)
 
         elif action == "Launch":
-            self._message = """{"uuid": "%s", "action": "kioskinterface%s", "subaction": "%s"}""" % (self.uuid,
-                                                                                                     action, action)
-            send_message_to_am(self._message)
+            launcher = base64.b64decode(self.package.launcher).decode("utf-8")
+            if os.path.isfile(launcher):
+
+                try:
+                    subprocess.Popen(launcher)
+                except Exception as e:
+                    send_message_to_am('{"action":"kioskLog","type":"error","message":"%s"}' % e)
+            else:
+                send_message_to_am('{"action":"kioskLog","type":"error","message":"The file %s doesnt exists"}' % launcher)
+                print("The file %s doesnt exists" %launcher)
 
     def getname(self):
         """

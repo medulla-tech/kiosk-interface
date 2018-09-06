@@ -61,6 +61,8 @@ class Package(object):
             self.icon = 'kiosk.png'
         if 'uuid' in row_datas.keys():
             self.uuid = row_datas['uuid']
+        if 'launcher' in row_datas.keys():
+            self.launcher = row_datas['launcher']
 
     def get_all(self):
         """Generage and returns the list of package
