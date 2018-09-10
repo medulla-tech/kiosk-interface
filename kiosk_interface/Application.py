@@ -82,6 +82,7 @@ class Application(object):
         self.notifier.message_sent_to_am.connect(lambda:print("message sent"))
         self.notifier.message_update_received_from_am.connect(lambda:print("update received"))
         self.notifier.message_received_from_am.connect(lambda:print("message received"))
+        self.notifier.launcher_updated.connect(lambda:print("Launcher updated"))
         self.send('{"action":"kioskLog", "type":"info", "message":"Call tray controller"}')
         self.tray = Tray(self)
 

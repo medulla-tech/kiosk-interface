@@ -34,6 +34,7 @@ class Notifier(QWidget):
     message_received_from_am = pyqtSignal()
     message_update_received_from_am = pyqtSignal()
     message_sent_to_am = pyqtSignal()
+    launcher_updated = pyqtSignal()
 
     def __init__(self):
         super().__init__()

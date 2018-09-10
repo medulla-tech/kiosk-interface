@@ -137,10 +137,14 @@ class CustomPackageWidget(QWidget):
             send_message_to_am(self._message)
 
         elif action == "Launch":
+            launcher=""
             try:
                 launcher = base64.b64decode(self.package.launcher).decode("utf-8")
             except Exception as e:
-                launcher = self.package.launcher
+                if hasattr(self.package, "launcher"):
+                    launcher = self.package.launcher
+                else:
+                    self.package['action'].remove("Launch")
             finally:
                 if os.path.isfile(launcher):
                     try:

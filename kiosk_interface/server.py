@@ -88,11 +88,17 @@ def handle_client_connection(ref, client_socket):
 
         recv_msg_from_AM = json.loads(recv_msg_from_AM)
         if "action" in recv_msg_from_AM:
-            if recv_msg_from_AM["action"] == "update":
+            if recv_msg_from_AM["action"] == "update_profile":
                 logging.info("Call set_datakiosk("+recv_msg_from_AM+")")
                 if recv_msg_from_AM != "":
                     ref.notifier.message_update_received_from_am.emit()
                 set_datakiosk(ref, recv_msg_from_AM['data'])
+
+            elif recv_msg_from_AM["action"] == "update_launcher":
+                for package in datakiosk:
+                    if package['uuid'] == recv_msg_from_AM['uuid']:
+                        package['launcher'] = recv_msg_from_AM['launcher']
+                ref.notifier.launcher_updated.emit()
         else:
             if recv_msg_from_AM != "":
                 ref.notifier.message_received_from_am.emit()
