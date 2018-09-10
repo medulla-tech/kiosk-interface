@@ -63,6 +63,10 @@ class Package(object):
             self.uuid = row_datas['uuid']
         if 'launcher' in row_datas.keys():
             self.launcher = row_datas['launcher']
+        if 'status' in row_datas.keys():
+            self.status = row_datas["status"]
+        if 'stat' in row_datas.keys():
+            self.status = row_datas["stat"]
 
     def get_all(self):
         """Generage and returns the list of package
