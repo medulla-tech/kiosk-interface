@@ -46,11 +46,11 @@ class CustomPackageWidget(QWidget):
         self.icon = QLabel("")
         self._message = ""
         self.scheduler_wrapper = None
+
         icon = QPixmap("datas/" + package.icon)
-
         icon = icon.scaled(24, 24)
-
         self.icon.setPixmap(icon)
+
         self.name = QLabel(package.name)
         self.description = QLabel(package.description)
         self.version = QLabel(package.version)
@@ -59,6 +59,7 @@ class CustomPackageWidget(QWidget):
         self.layout = QGridLayout(self)
         self.actions = []
         self.action_button = {}
+
         for action in package.actions:
             self.actions.append(action)
             self.action_button[action] = QPushButton(action, self)
@@ -73,9 +74,7 @@ class CustomPackageWidget(QWidget):
         for action in self.actions:
             layout_action.addWidget(self.action_button[action])
 
-        package.status = "Install"
-
-        # Displays a progressbar only if the package has a status
+        # Displays a progressbar only if the package has a status and a stat of progression
         if hasattr(package, "status") and hasattr(package, "stat"):
             self.statusbar = QProgressBar(self)
             self.statusbar.setMinimum(0)
@@ -90,14 +89,15 @@ class CustomPackageWidget(QWidget):
                 else:
                     pass
             else:
+                self.statusbar.setVisible(False)
                 if package.status in self.action_button:
                     self.action_button[package.status].setEnabled(True)
                 else:
                     pass
-            self.layout.addWidget(self.statusbar, 2,0,1,1)
-        self.layout.addLayout(layout_info, 0, 0, 1,1)
-        self.layout.addLayout(layout_action, 1, 0, 1,1)
+            self.layout.addWidget(self.statusbar, 2, 0, 1, 1)
 
+        self.layout.addLayout(layout_info, 0, 0, 1, 1)
+        self.layout.addLayout(layout_action, 1, 0, 1, 1)
         self.setLayout(self.layout)
         self.show()
 
@@ -116,6 +116,7 @@ class CustomPackageWidget(QWidget):
         if "Launch" in self.actions:
             self.action_button["Launch"].clicked.connect(
                 lambda: self.return_message(self.action_button["Launch"], "Launch"))
+
     def return_message(self, button, action):
         """
         return_message method send a signal to the agent-machine when a button is clicked
