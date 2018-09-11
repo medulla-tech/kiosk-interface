@@ -26,7 +26,7 @@ import sys
 from PyQt5.QtCore import QCoreApplication
 from PyQt5.QtGui import QIcon
 from PyQt5.QtWidgets import QSystemTrayIcon, QMenu, QAction, QWidgetAction
-from views.custom_search_bar import CustomSearchBar
+from kiosk_interface.views.custom_search_bar import CustomSearchBar
 
 
 def tray_main_view(ref):

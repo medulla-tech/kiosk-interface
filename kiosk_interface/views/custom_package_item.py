@@ -23,8 +23,8 @@
 
 from PyQt5.QtGui import QPixmap
 from PyQt5.QtWidgets import QWidget, QGridLayout, QPushButton, QLabel, QHBoxLayout, QProgressBar
-from models import send_message_to_am
-from views.date_picker import DatePickerWidget
+from kiosk_interface.models import send_message_to_am
+from kiosk_interface.views.date_picker import DatePickerWidget
 
 import base64
 import os

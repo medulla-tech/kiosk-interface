@@ -23,8 +23,8 @@
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
 # MA 02110-1301, USA.
 
-from server import MessengerToAM
-from server import get_datakiosk, set_datakiosk
+from kiosk_interface.server import MessengerToAM
+from kiosk_interface.server import get_datakiosk, set_datakiosk
 import os
 
 

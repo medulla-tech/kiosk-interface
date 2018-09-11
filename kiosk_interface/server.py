@@ -23,7 +23,7 @@
 import threading
 import socket
 import json
-from config import ConfParameter
+from kiosk_interface.config import ConfParameter
 import logging
 
 global datakiosk

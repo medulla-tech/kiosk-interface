@@ -24,7 +24,7 @@
 from PyQt5.QtWidgets import QVBoxLayout, QTabWidget, QWidget, QLineEdit, QGridLayout, \
     QListWidget, QHBoxLayout, QScrollArea
 from PyQt5.QtWidgets import QListWidgetItem
-from views.custom_package_item import CustomPackageWidget
+from kiosk_interface.views.custom_package_item import CustomPackageWidget
 from PyQt5.QtCore import QCoreApplication
 
 

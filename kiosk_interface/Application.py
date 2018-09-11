@@ -21,16 +21,16 @@
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
 # MA 02110-1301, USA.
 
-from config import ConfParameter
+from kiosk_interface.config import ConfParameter
 import sys
 from PyQt5.QtWidgets import QApplication
 from PyQt5.QtGui import QIcon
 import threading
 import socket
-from server import tcpserver
-from tray import Tray
-from server import MessengerToAM
-from notifier import Notifier
+from kiosk_interface.server import tcpserver
+from kiosk_interface.tray import Tray
+from kiosk_interface.server import MessengerToAM
+from kiosk_interface.notifier import Notifier
 
 
 class Application(object):

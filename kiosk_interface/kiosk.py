@@ -24,10 +24,10 @@
 from PyQt5.QtWidgets import QWidget, QMessageBox
 from PyQt5.QtWidgets import QListWidgetItem
 from PyQt5.QtCore import pyqtSignal
-from models import Package, get_datakiosk
-from views.custom_package_item import CustomPackageWidget
-from views.kiosk import kiosk_main_view
-from server import MessengerToAM
+from kiosk_interface.models import Package
+from kiosk_interface.views.custom_package_item import CustomPackageWidget
+from kiosk_interface.views.kiosk import kiosk_main_view
+from kiosk_interface.server import MessengerToAM, get_datakiosk
 import threading
 import re
 

@@ -25,12 +25,12 @@ import sys
 
 from PyQt5.QtWidgets import QWidget,QErrorMessage
 from PyQt5.QtGui import QCursor
-from kiosk import Kiosk
-from server import get_datakiosk
-from views.tray import tray_main_view
+from kiosk_interface.kiosk import Kiosk
+from kiosk_interface.server import get_datakiosk
+from kiosk_interface.views.tray import tray_main_view
 from PyQt5.QtCore import pyqtSignal
 import threading
-from server import MessengerToAM
+from kiosk_interface.server import MessengerToAM
 
 
 class Tray(QWidget):
