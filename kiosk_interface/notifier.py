@@ -29,12 +29,17 @@ class Notifier(QWidget):
     """This class allows to create some signals for the application"""
     app_launched = pyqtSignal()
     app_claused = pyqtSignal()
+
     tray_loaded = pyqtSignal()
+    tray_action_open = pyqtSignal((str,))
+
     kiosk_loaded = pyqtSignal()
-    message_received_from_am = pyqtSignal()
-    message_update_received_from_am = pyqtSignal()
-    message_sent_to_am = pyqtSignal()
 
-    def __init__(self):
-        super().__init__()
+    server_tcp_start = pyqtSignal()
+    server_tcp_stop = pyqtSignal()
+    server_cant_send_message_to_am = pyqtSignal((str,))
 
+    message_received_from_am = pyqtSignal((str,))
+    message_sent_to_am = pyqtSignal((str,))
+
+    updated = pyqtSignal((str,dict,))

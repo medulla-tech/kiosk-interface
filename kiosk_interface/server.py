@@ -23,97 +23,67 @@
 import threading
 import socket
 import json
-from config import ConfParameter
-import logging
-
-global datakiosk
-datakiosk=None
 
 
-def get_datakiosk():
-    """Getter for the datas sent by the agent-machine
-    Returns:
-        List of packages info
-    """
-    global datakiosk
-    logging.info("Get datas : %s" %datakiosk)
-    return datakiosk
+class MessengerFromAM(object):
+    def __init__(self, appObject):
+        self.app = appObject
+        self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        self.server_address = (self.app.parameters.am_server, 8766)
+        self.sock.bind(self.server_address)
+        self.sock.listen(5)
+        self.eventkill = threading.Event()
+        self.client_handlertcp = threading.Thread(target=self.tcpserver, args=(self.app, self.sock, self.eventkill,))
+        # run server tcpserver for kiosk
+        self.client_handlertcp.start()
 
+    def tcpserver(self, ref, sock, eventkill):
+            """
+            This function is the listening function of the tcp server of the machine agent, to serve the request of the kiosk
+            Params:
+                sock socket object which receives the message form agent-machine
+                eventkill threading event object used to signal the end of the standby
+            """
+            while not eventkill.wait(1):
+                # Wait for a connection
+                connection, client_address = sock.accept()
+                client_handler = threading.Thread(
+                                                    target=self.handle_client_connection,
+                                                    args=(ref, connection,))
+                client_handler.start()
 
-def set_datakiosk(ref, data):
-    """
-    Modify the actual packages datas by the newly received datas
-    Params:
-        data is a list of packages info
-    """
-    logging.info("Set the datas with %s"%data)
-    global datakiosk
-    datakiosk = data
-
-
-def tcpserver(ref, sock, eventkill):
+    def handle_client_connection(self, ref, client_socket):
         """
-        This function is the listening function of the tcp server of the machine agent, to serve the request of the kiosk
-        Params:
-            sock socket object which receives the message form agent-machine
-            eventkill threading event object used to signal the end of the standby
+            this function handles the message received from kiosk
+            the function must provide a response to an acknowledgment kiosk or a result
+            Args:
+                client_socket: socket for exchanges between AM and Kiosk
+
+            Returns:
+                no return value
         """
-        logging.info("Server Kiosk launched")
-        while not eventkill.wait(1):
-            # Wait for a connection
-            connection, client_address = sock.accept()
-            client_handler = threading.Thread(
-                                                target=handle_client_connection,
-                                                args=(ref, connection,))
-            client_handler.start()
-        logging.info("Stopping Kiosk server")
+        try:
+            # request the recv message
+            recv_msg_from_AM = client_socket.recv(5000).decode("utf-8")
+            ref.message = recv_msg_from_AM
+            ref.notifier.message_received_from_am.emit(recv_msg_from_AM)
 
-
-def handle_client_connection(ref, client_socket):
-    """
-        this function handles the message received from kiosk
-        the function must provide a response to an acknowledgment kiosk or a result
-        Args:
-            client_socket: socket for exchanges between AM and Kiosk
-
-        Returns:
-            no return value
-    """
-    try:
-        # request the recv message
-        recv_msg_from_AM = client_socket.recv(5000)
-        recv_msg_from_AM = recv_msg_from_AM.decode("utf-8")
-        ref.notifier.message_received_from_am.emit()
-        logging.info("Datas received from AM : %s"%(recv_msg_from_AM))
-
-        recv_msg_from_AM = json.loads(recv_msg_from_AM)
-        if "action" in recv_msg_from_AM:
-            if recv_msg_from_AM["action"] == "update":
-                logging.info("Call set_datakiosk("+recv_msg_from_AM+")")
-                if recv_msg_from_AM != "":
-                    ref.notifier.message_update_received_from_am.emit()
-                set_datakiosk(ref, recv_msg_from_AM['data'])
-        else:
-            if recv_msg_from_AM != "":
-                ref.notifier.message_received_from_am.emit()
-            set_datakiosk(ref, recv_msg_from_AM)
-
-        thread = threading.Thread(target=client_socket.send, args=(json.dumps(recv_msg_from_AM).encode('utf-8'),))
-        thread.start()
-    finally:
-        client_socket.close()
+            thread = threading.Thread(target=client_socket.send, args=(json.dumps(recv_msg_from_AM).encode('utf-8'),))
+            thread.start()
+        finally:
+            client_socket.close()
 
 
 class MessengerToAM(object):
     """MessengerToAM is a client socket class"""
-    def __init__(self):
+    def __init__(self, appObject):
         """Initialization of the MessagerToAM object"""
 
-        parameters = ConfParameter()
+        self.app = appObject
         # Next we create a TCP/IP socket
         self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         # Connect the socket to the port where the server is listening
-        server_address = (parameters.am_server, parameters.am_local_port)
+        server_address = (self.app.parameters.am_server, self.app.parameters.am_local_port)
         self.active = False
 
         try:
@@ -121,9 +91,6 @@ class MessengerToAM(object):
             self.active = True
         except socket.error:
             self.active = False
-            self.send('{"action":"kioskLog","type":"warning","message":\
-"The communication with the agent machine can\'t be established"}'.encode('utf-8'))
-
 
     def send(self, msg):
         """Send the specified message to the agent machine.
@@ -132,8 +99,13 @@ class MessengerToAM(object):
             '{"uuid" : "45d4-3124c21-3123", "action": "kioskinterfaceinstall", "subaction" : "install"}'
         """
         if self.active:
-            self.sock.sendall(msg)
-            self.handle()
+            if type(msg) is not bytes:
+                self.sock.sendall(msg.encode('utf-8'))
+                self.app.notifier.message_sent_to_am.emit(msg)
+            else:
+                self.sock.sendall(msg)
+                self.app.notifier.message_sent_to_am.emit(msg.decode("utf-8"))
+            # self.handle()
         else:
             self.sock.close()
 
