@@ -23,7 +23,7 @@ class EventController(object):
             the action will reacts differently."""
 
         self.app.message = message
-        self.app.logger("info", self.app.translate("Server","Received message from AM"))
+        self.app.logger("info", self.app.translate("Server","Received message %s from AM" % message))
 
         try:
             decoded = json.loads(self.app.message)
@@ -40,8 +40,19 @@ class EventController(object):
                         if package['uuid'] == decoded['uuid']:
                             package['launcher'] = decoded['launcher']
                     self.app.packages = packages
-                self.app.kiosk.search()
 
+                elif decoded["action"] == "presence":
+                    # If the AM send a ping to the kiosk, it answers by a pong
+                    if decoded["type"] == "ping":
+                        self.app.pong()
+
+                    # The AM sendback a pong
+                    elif decoded["type"] == "pong":
+                        self.app.connected = True
+
+                        print("Connected to the AM")
+
+                self.app.kiosk.search()
         except Exception as error:
             # If the message can't be decoded as json
             print(self.app.translate("Action", "Error when trying to load datas"))

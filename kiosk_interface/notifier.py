@@ -38,6 +38,7 @@ class Notifier(QWidget):
     server_tcp_start = pyqtSignal()
     server_tcp_stop = pyqtSignal()
     server_cant_send_message_to_am = pyqtSignal((str,))
+    server_ping_presence = pyqtSignal()
 
     message_received_from_am = pyqtSignal((str,))
     message_sent_to_am = pyqtSignal((str,))

@@ -59,6 +59,7 @@ class Application(QApplication):
         # Action launched when the kiosk emit a notification
         self.eventCtrl = EventController(self)
 
+        self.connected = False
         self.message = None  # Contains the last received message interpreted as dict
         self.packages = []  # Contains the packages of the application
 
@@ -98,7 +99,16 @@ class Application(QApplication):
         message = '{"action": "kioskLog","type": "%s", "message": "%s"}' % (type, self.translate("Log", msg))
         self.send(message)
 
+    def ping(self):
+        signal_presence = '{"action": "presence", "type":"ping"}'
+        self.send(signal_presence)
+
+    def pong(self):
+        signal_presence = '{"action": "presence", "type":"pong"}'
+        self.send(signal_presence)
+
 
 if __name__ == "__main__":
     app = Application()
+    app.ping()
     app.run()
