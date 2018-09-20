@@ -23,7 +23,7 @@
 
 import re
 from PyQt5.QtGui import QPixmap
-from PyQt5.QtWidgets import QWidget, QGridLayout, QPushButton, QLabel, QHBoxLayout, QProgressBar
+from PyQt5.QtWidgets import QWidget, QGridLayout, QPushButton, QLabel, QHBoxLayout, QProgressBar, QMessageBox
 from kiosk_interface.views.date_picker import DatePickerWidget
 
 import base64
@@ -117,6 +117,18 @@ class CustomPackageWidget(QWidget):
                     else:
                         pass
                 else:
+
+                    if self.statusbar.value() == 100:
+                        notify = QMessageBox(self)
+                        notify.setIcon(QMessageBox.Information)
+                        notify.addButton("Ok", 0)
+                        notify.setText(self.app.translate('Action', "%s for package %s Done" %
+                                                          (package["status"], package["name"])))
+                        notify.exec()
+                        for pkg_ref in self.app.packages:
+                            if pkg_ref == package:
+                                pkg_ref["stat"] = 0
+
                     self.statusbar.setVisible(False)
                     if package["status"] in self.action_button:
                         self.action_button[package["status"]].setEnabled(True)
