@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 # coding: utf-8
-""" Define a partial view for the package in list mode"""
+""" Define a partial view to display packages in the list"""
 #
 # (c) 2018 Siveo, http://www.siveo.net
 #
@@ -21,9 +21,9 @@
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
 # MA 02110-1301, USA.
 
+import re
 from PyQt5.QtGui import QPixmap
 from PyQt5.QtWidgets import QWidget, QGridLayout, QPushButton, QLabel, QHBoxLayout, QProgressBar
-from kiosk_interface.models import send_message_to_am
 from kiosk_interface.views.date_picker import DatePickerWidget
 
 import base64
@@ -33,73 +33,100 @@ import subprocess
 
 class CustomPackageWidget(QWidget):
     """This class create specialized widget for the package list."""
-    def __init__(self, package, ref=None):
+    def __init__(self, app, package):
         """
         Initialize the list-element object
         Params:
+            app: is a reference to the root app
             package: Package object is the package we want to represent into the UI.
-            ref: is a reference to the root app
         """
         super().__init__()
-        self.ref = ref
+        self.app = app
         self.package = package
-        self.icon = QLabel("")
+        self.icon = QLabel("", self)
         self._message = ""
         self.scheduler_wrapper = None
 
-        icon = QPixmap("datas/" + package.icon)
+        self.name = QLabel(package['name'])
+
+        if 'icon' in package and package["icon"] != "kiosk.png":
+            icon = QPixmap("datas/" + package['icon'])
+        else:
+            icon_name = search_icon_by_name(package['name'])
+
+            if icon_name is False:
+                icon = QPixmap("datas/kiosk.png")
+            else:
+                icon = QPixmap("datas/"+icon_name)
         icon = icon.scaled(24, 24)
         self.icon.setPixmap(icon)
 
-        self.name = QLabel(package.name)
-        self.description = QLabel(package.description)
-        self.version = QLabel(package.version)
-        self.uuid = package.uuid
+        if 'description' in package:
+            self.description = QLabel(package['description'], self)
+        else:
+            self.description = QLabel('')
 
-        self.layout = QGridLayout(self)
+        self.description.setWordWrap(True);
+
+        if "version" in package:
+            self.version = QLabel(package["version"], self)
+        else:
+            self.version = QLabel("")
+
+        self.uuid = package["uuid"]
+
         self.actions = []
         self.action_button = {}
 
-        for action in package.actions:
-            self.actions.append(action)
-            self.action_button[action] = QPushButton(action, self)
+        for action in package["actions"]:
+            if action == "Launch":
+                if "launcher" in package:
+                    self.actions.append(action)
+                    self.action_button[action] = QPushButton(action)
+                else:
+                    pass
+            else:
+                self.actions.append(action)
+                self.action_button[action] = QPushButton(action)
 
-        layout_info = QHBoxLayout(self)
+        self.layout = QGridLayout()
+
+        layout_info = QHBoxLayout()
         layout_info.addWidget(self.icon)
         layout_info.addWidget(self.name)
         layout_info.addWidget(self.version)
         layout_info.addWidget(self.description)
 
-        layout_action = QHBoxLayout(self)
+        layout_action = QHBoxLayout()
         for action in self.actions:
             layout_action.addWidget(self.action_button[action])
 
         # Displays a progressbar only if the package has a status and a stat of progression
-        if hasattr(package, "status") and hasattr(package, "stat"):
-            self.statusbar = QProgressBar(self)
+        if "status" in package and "stat" in package:
+            self.statusbar = QProgressBar()
             self.statusbar.setMinimum(0)
             self.statusbar.setMaximum(100)
 
-            self.statusbar.setValue(package.stat)
+            self.statusbar.setValue(package["stat"])
 
             # Enable / disable the button if the progressbar is not completed
-            if 0 < self.statusbar.value() < 100:
-                if package.status in self.action_button:
-                    self.action_button[package.status].setEnabled(False)
+            if package["status"] in package["actions"]:
+                if 0 < self.statusbar.value() < 100:
+                    if package["status"] in self.action_button:
+                        self.action_button[package["status"]].setEnabled(False)
+                    else:
+                        pass
                 else:
-                    pass
-            else:
-                self.statusbar.setVisible(False)
-                if package.status in self.action_button:
-                    self.action_button[package.status].setEnabled(True)
-                else:
-                    pass
-            self.layout.addWidget(self.statusbar, 2, 0, 1, 1)
+                    self.statusbar.setVisible(False)
+                    if package["status"] in self.action_button:
+                        self.action_button[package["status"]].setEnabled(True)
+                    else:
+                        pass
+                self.layout.addWidget(self.statusbar, 2, 0, 1, 1)
 
         self.layout.addLayout(layout_info, 0, 0, 1, 1)
         self.layout.addLayout(layout_action, 1, 0, 1, 1)
         self.setLayout(self.layout)
-        self.show()
 
         if "Install" in self.actions:
             self.action_button["Install"].clicked.connect(
@@ -128,7 +155,7 @@ class CustomPackageWidget(QWidget):
         if action == "Install":
             self.scheduler_wrapper = DatePickerWidget(self, button)
             self.scheduler_wrapper.show()
-            self.scheduler_wrapper.has_to_send.connect(lambda: send_message_to_am(
+            self.scheduler_wrapper.has_to_send.connect(lambda: self.app.send(
                 """{"uuid": "%s", "action":
                 "kioskinterface%s", "subaction": "%s", "utcdatetime": "%s"}"""
                 % (self.uuid, action, action, self.scheduler_wrapper.tuple_selected)))
@@ -136,30 +163,45 @@ class CustomPackageWidget(QWidget):
         elif action == "Delete":
             self._message = """{"uuid": "%s", "action": "kioskinterface%s", "subaction": "%s"}""" % (self.uuid,
                                                                                                      action, action)
-            send_message_to_am(self._message)
+            self.app.send(self._message)
 
         elif action == "Launch":
             launcher=""
             try:
                 launcher = base64.b64decode(self.package.launcher).decode("utf-8")
             except Exception as e:
-                if hasattr(self.package, "launcher"):
-                    launcher = self.package.launcher
+                if "launcher" in self.package:
+                    launcher = self.package['launcher']
                 else:
-                    self.package['action'].remove("Launch")
+                    self.package['actions'].remove("Launch")
             finally:
                 if os.path.isfile(launcher):
                     try:
                         subprocess.Popen(launcher)
                     except Exception as e:
-                        send_message_to_am('{"action":"kioskLog","type":"error","message":"%s"}' % e)
+                        self.app.send('{"action":"kioskLog","type":"error","message":"%s"}' % e)
                 else:
-                    send_message_to_am('{"action":"kioskLog","type":"error","message":"The file %s doesnt exists"}'
+                    self.app.send('{"action":"kioskLog","type":"error","message":"The file %s doesnt exists"}'
                                        % launcher)
 
-    def getname(self):
-        """
-        getname returns the name of the package
-            return: string representing the name of the package
-        """
-        return self.name.text()
+
+def search_icon_by_name(name):
+    """ Search the icon by association with the package name
+
+    Param:
+        str : the name of the icon we are looking for
+    Returns:
+        str: if a name is found
+        False if no name is found
+    """
+    prefix = name.split(".")[0]
+
+    datas_dir = os.path.join(os.getcwd(), "datas")
+    icon_list = os.listdir(datas_dir)
+    icon_list = [{"name": icon.split(".")[0],"ext":icon.split(".")[1]} for icon in icon_list]
+
+    # Research the prefix in name value of icon_list
+    for icon in icon_list:
+        if re.match(prefix, icon["name"], re.I):
+            return icon["name"]+"."+icon["ext"]
+    return False
