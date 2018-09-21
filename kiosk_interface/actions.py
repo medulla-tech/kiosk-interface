@@ -44,7 +44,7 @@ class EventController(object):
                 elif decoded["action"] == "presence":
                     # If the AM send a ping to the kiosk, it answers by a pong
                     if decoded["type"] == "ping":
-                        self.app.pong()
+                        self.app.send_pong()
 
                     # The AM sendback a pong
                     elif decoded["type"] == "pong":

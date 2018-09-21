@@ -106,12 +106,12 @@ class Application(QApplication):
         message = '{"action": "kioskLog","type": "%s", "message": "%s"}' % (type, self.translate("Log", msg))
         self.send(message)
 
-    def ping(self):
+    def send_ping(self):
         """Send a ping signal to the AM"""
         signal_presence = '{"action": "presence", "type":"ping"}'
         self.send(signal_presence)
 
-    def pong(self):
+    def send_pong(self):
         """Send a pong signal to the AM"""
         signal_presence = '{"action": "presence", "type":"pong"}'
         self.send(signal_presence)
@@ -119,5 +119,5 @@ class Application(QApplication):
 
 if __name__ == "__main__":
     app = Application()
-    app.ping()
+    app.send_ping()
     app.run()
