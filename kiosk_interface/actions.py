@@ -72,6 +72,8 @@ class EventController(object):
         """Action launched when a message is received from the Agent Machine"""
         msg = self.app.translate("Server", "Message can't be sent to AM ")
         print(msg + ": %s" % message)
+        self.app.connected = False
+
 
     # Launch the kiosk main window
     def action_tray_action_open(self, criterion):

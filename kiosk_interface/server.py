@@ -107,6 +107,7 @@ class MessengerToAM(object):
                 self.app.notifier.message_sent_to_am.emit(msg.decode("utf-8"))
             # self.handle()
         else:
+            self.app.notifier.server_cant_send_message_to_am.emit(msg)
             self.sock.close()
 
     def handle(self):
