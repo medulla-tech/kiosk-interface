@@ -96,14 +96,23 @@ class Application(QApplication):
         messenger.send(message)
 
     def logger(self, type, msg):
+        """Send log message to Agent Machine.
+        Params:
+            type: str corresponds to the type of log we want add to the xmpp logs. The types can be :
+                - "info"
+                - "error"
+                - "debug"
+            msg: str of the message we want add to log xmpp"""
         message = '{"action": "kioskLog","type": "%s", "message": "%s"}' % (type, self.translate("Log", msg))
         self.send(message)
 
     def ping(self):
+        """Send a ping signal to the AM"""
         signal_presence = '{"action": "presence", "type":"ping"}'
         self.send(signal_presence)
 
     def pong(self):
+        """Send a pong signal to the AM"""
         signal_presence = '{"action": "presence", "type":"pong"}'
         self.send(signal_presence)
 
