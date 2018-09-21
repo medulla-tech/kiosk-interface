@@ -72,8 +72,6 @@ class Application(QApplication):
         # Socket server. It is always running. This module listen and wait the messages from AM
         self.receiver = MessengerFromAM(self)
 
-        # Contains the tray app
-        self.tray = Tray(self)
         self.logger('info', 'Initialization')
         # The mechanics are launched here
         self.notifier.app_launched.emit()
@@ -82,6 +80,9 @@ class Application(QApplication):
         self.setApplicationName("Kiosk")
         # When the window is closed, the process is not killed
         self.setQuitOnLastWindowClosed(False)
+
+        # Contains the tray app
+        self.tray = Tray(self)
 
         # Contains the kiosk app
         self.kiosk = Kiosk(self)

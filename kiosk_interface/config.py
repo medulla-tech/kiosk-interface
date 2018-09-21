@@ -101,3 +101,6 @@ class ConfParameter:
             self.kiosk_local_port = config.getint('kiosk', 'kiosk_local_port')
         if config.has_option('kiosk', 'am_server'):
             self.am_server = config.get('kiosk', 'am_server')
+
+        self.width = 650
+        self.height = 550

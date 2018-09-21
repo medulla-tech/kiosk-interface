@@ -54,7 +54,10 @@ class EventController(object):
                         self.app.notifier.server_status_changed.emit()
                         print("Connected to the AM")
 
-                self.app.kiosk.search()
+                elif decoded["action"] == "notification":
+                    print(decoded["message"])
+
+                self.app.kiosk.tab_kiosk.search()
         except Exception as error:
             # If the message can't be decoded as json
             print(self.app.translate("Action", "Error when trying to load datas"))
@@ -83,6 +86,6 @@ class EventController(object):
         """Action launched when the open action is pressed in the tray menu"""
         self.app.logger('info', self.app.translate("Kiosk","Initialize the kiosk main window"))
         self.app.send_ping()
-        self.app.kiosk.input_search.setText(criterion)
-        self.app.kiosk.search()
+        self.app.kiosk.tab_kiosk.input_search.setText(criterion)
+        self.app.kiosk.tab_kiosk.search()
         self.app.kiosk.show()

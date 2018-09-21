@@ -119,12 +119,19 @@ class CustomPackageWidget(QWidget):
                 else:
 
                     if self.statusbar.value() == 100:
-                        notify = QMessageBox(self)
-                        notify.setIcon(QMessageBox.Information)
-                        notify.addButton("Ok", 0)
-                        notify.setText(self.app.translate('Action', "%s for package %s Done" %
-                                                          (package["status"], package["name"])))
-                        notify.exec()
+                        actual_notif = self.app.kiosk.tab_notification.text_logs.toPlainText() + "\n" +\
+                        self.app.translate('Action', "%s for package %s Done" %
+                                                          (package["status"], package["name"]))
+
+                        print(actual_notif)
+                        self.app.kiosk.tab_notification.text_logs.setText(actual_notif)
+
+                    #    notify = QMessageBox(self)
+                    #    notify.setIcon(QMessageBox.Information)
+                    #    notify.addButton("Ok", 0)
+                    #    notify.setText(self.app.translate('Action', "%s for package %s Done" %
+                    #                                      (package["status"], package["name"])))
+                    #    notify.exec()
                         for pkg_ref in self.app.packages:
                             if pkg_ref == package:
                                 pkg_ref["stat"] = 0
