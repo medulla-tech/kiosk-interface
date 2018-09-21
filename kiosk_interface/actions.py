@@ -44,12 +44,14 @@ class EventController(object):
                 elif decoded["action"] == "presence":
                     # If the AM send a ping to the kiosk, it answers by a pong
                     if decoded["type"] == "ping":
+                        self.app.connected = True
+                        self.app.notifier.server_status_changed.emit()
                         self.app.send_pong()
 
                     # The AM sendback a pong
                     elif decoded["type"] == "pong":
                         self.app.connected = True
-
+                        self.app.notifier.server_status_changed.emit()
                         print("Connected to the AM")
 
                 self.app.kiosk.search()
@@ -65,15 +67,16 @@ class EventController(object):
     def action_message_sent_to_am(self, message):
         """Action launched when a message is sent to the Agent Machine"""
         msg = self.app.translate("Server", "Message sent to AM : ")
-
         print("info", msg + message)
+        self.app.connected = True
+        self.app.notifier.server_status_changed.emit()
 
     def action_server_cant_send_message_to_am(self, message):
         """Action launched when a message is received from the Agent Machine"""
         msg = self.app.translate("Server", "Message can't be sent to AM ")
         print(msg + ": %s" % message)
         self.app.connected = False
-
+        self.app.notifier.server_status_changed.emit()
 
     # Launch the kiosk main window
     def action_tray_action_open(self, criterion):

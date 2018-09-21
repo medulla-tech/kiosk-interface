@@ -21,7 +21,7 @@
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
 # MA 02110-1301, USA.
 
-from PyQt5.QtWidgets import QListWidgetItem, QWidget, QVBoxLayout, QListWidget, QLineEdit
+from PyQt5.QtWidgets import QListWidgetItem, QWidget, QVBoxLayout, QListWidget, QLineEdit, QLabel
 from kiosk_interface.views.custom_package_item import CustomPackageWidget
 
 import re
@@ -43,6 +43,7 @@ class Kiosk(QWidget):
 
         self.resize(650, 550)
 
+        self.label_status = QLabel(self.app.translate("Kiosk","Status : Disconnected"))
         self.input_search = QLineEdit(self.app.tray.criterion, self)
         self.input_search.setPlaceholderText("Search a package by name")
 
@@ -51,6 +52,7 @@ class Kiosk(QWidget):
         self.list_wrapper = QListWidget()
         self.list_wrapper.resize(self.width(), self.height())
         self.lay = QVBoxLayout()
+        self.lay.addWidget(self.label_status)
         self.lay.addWidget(self.input_search)
         self.lay.addWidget(self.list_wrapper)
         self.setLayout(self.lay)
@@ -93,3 +95,11 @@ class Kiosk(QWidget):
                 self.list_wrapper.addItem(item_widget)
                 self.list_wrapper.setItemWidget(item_widget, custom_package)
 
+        self.app.notifier.server_status_changed.connect(self.status_changed)
+
+
+    def status_changed(self):
+        if self.app.connected is True:
+            self.app.kiosk.label_status.setText(self.app.translate("Kiosk","Status : Connected"))
+        else:
+            self.app.kiosk.label_status.setText(self.app.translate("Kiosk","Status : Connected"))

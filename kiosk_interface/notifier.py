@@ -39,8 +39,8 @@ class Notifier(QWidget):
     server_tcp_stop = pyqtSignal()
     server_cant_send_message_to_am = pyqtSignal((str,))
     server_ping_presence = pyqtSignal()
-
+    server_status_changed = pyqtSignal()
     message_received_from_am = pyqtSignal((str,))
     message_sent_to_am = pyqtSignal((str,))
 
-    updated = pyqtSignal((str,dict,))
+    updated = pyqtSignal((str, dict,))
