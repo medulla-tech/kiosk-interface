@@ -97,8 +97,8 @@ class Kiosk(QWidget):
 
         self.app.notifier.server_status_changed.connect(self.status_changed)
 
-
     def status_changed(self):
+        """Modify the status in the kiosk view"""
         if self.app.connected is True:
             self.app.kiosk.label_status.setText(self.app.translate("Kiosk","Status : Connected"))
         else:
