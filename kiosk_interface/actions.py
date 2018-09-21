@@ -82,7 +82,7 @@ class EventController(object):
     def action_tray_action_open(self, criterion):
         """Action launched when the open action is pressed in the tray menu"""
         self.app.logger('info', self.app.translate("Kiosk","Initialize the kiosk main window"))
-
+        self.app.send_ping()
         self.app.kiosk.input_search.setText(criterion)
         self.app.kiosk.search()
         self.app.kiosk.show()

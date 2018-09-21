@@ -102,4 +102,4 @@ class Kiosk(QWidget):
         if self.app.connected is True:
             self.app.kiosk.label_status.setText(self.app.translate("Kiosk","Status : Connected"))
         else:
-            self.app.kiosk.label_status.setText(self.app.translate("Kiosk","Status : Connected"))
+            self.app.kiosk.label_status.setText(self.app.translate("Kiosk","Status : Disonnected"))
