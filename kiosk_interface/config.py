@@ -87,7 +87,6 @@ class ConfParameter:
         config.read(namefileconfig)
         if os.path.exists(namefileconfig + ".local"):
             config.read(namefileconfig + ".local")
-        self.packageserver = {}
 
         # Default parameters if no conf is found
         self.am_local_port = 8765
