@@ -22,7 +22,8 @@
 # MA 02110-1301, USA.
 
 
-from PyQt5.QtWidgets import QTextEdit, QWidget
+from PyQt5.QtWidgets import QTextEdit, QWidget, QVBoxLayout
+from datetime import datetime
 
 
 class TabNotification(QWidget):
@@ -32,6 +33,25 @@ class TabNotification(QWidget):
         self.app = app
         self.app.kiosk = kiosk
 
+        self.lay = QVBoxLayout()
+
         self.text_logs = QTextEdit(self)
         self.text_logs.setReadOnly(True)
-        self.text_logs.resize(self.app.parameters.width, self.app.parameters.height)
+        self.text_logs.setEnabled(True)
+
+        self.lay.addWidget(self.text_logs)
+
+        self.setLayout(self.lay)
+
+    def add_notification(self, message):
+        date_str = str(datetime.now().year) + "/" + str(datetime.now().month) + "/" + str(str(datetime.now().day)) + \
+            " "+ str(datetime.now().hour) + ":" + str(datetime.now().minute)
+
+        msg = "\n"+ date_str + " -- " + message
+
+        logs = self.text_logs.toPlainText()
+        logs = logs + "\n"
+        logs = logs + msg
+
+        self.text_logs.setText("")
+        self.text_logs.setText(logs)

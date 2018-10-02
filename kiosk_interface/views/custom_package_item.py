@@ -123,15 +123,8 @@ class CustomPackageWidget(QWidget):
                         self.app.translate('Action', "%s for package %s Done" %
                                                           (package["status"], package["name"]))
 
-                        print(actual_notif)
-                        self.app.kiosk.tab_notification.text_logs.setText(actual_notif)
+                        self.app.kiosk.tab_notification.add_notification(actual_notif)
 
-                    #    notify = QMessageBox(self)
-                    #    notify.setIcon(QMessageBox.Information)
-                    #    notify.addButton("Ok", 0)
-                    #    notify.setText(self.app.translate('Action', "%s for package %s Done" %
-                    #                                      (package["status"], package["name"])))
-                    #    notify.exec()
                         for pkg_ref in self.app.packages:
                             if pkg_ref == package:
                                 pkg_ref["stat"] = 0

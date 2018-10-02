@@ -100,6 +100,8 @@ class TabKiosk(QWidget):
     def status_changed(self):
         """Modify the status in the kiosk view"""
         if self.app.connected is True:
-            self.app.kiosk.tab_kiosk.label_status.setText(self.app.translate("Kiosk", "Status : Connected"))
+            # self.app.kiosk.tab_kiosk.label_status.setText(self.app.translate("Kiosk", "Status : Connected"))
+            self.app.kiosk.tab_notification.add_notification(self.app.translate("kiosk","Status : Conncted"))
         else:
-            self.app.kiosk.tab_kiosk.label_status.setText(self.app.translate("Kiosk", "Status : Disonnected"))
+            #self.app.kiosk.tab_kiosk.label_status.setText(self.app.translate("Kiosk", "Status : Disonnected"))
+            self.app.kiosk.tab_notification.add_notification(self.app.translate("kiosk","Status : Disconncted"))

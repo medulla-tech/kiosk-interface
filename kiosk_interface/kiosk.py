@@ -21,7 +21,8 @@
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
 # MA 02110-1301, USA.
 
-from PyQt5.QtWidgets import QListWidgetItem, QWidget, QVBoxLayout, QListWidget, QLineEdit, QLabel, QTabWidget
+from PyQt5.QtWidgets import QListWidgetItem, QWidget, QVBoxLayout, QListWidget, QLineEdit, QLabel, QTabWidget, \
+    QGridLayout
 from kiosk_interface.views.custom_package_item import CustomPackageWidget
 from kiosk_interface.views.tab_kiosk import TabKiosk
 from kiosk_interface.views.tab_notification import TabNotification
@@ -41,15 +42,22 @@ class Kiosk(QWidget):
         """
         super().__init__()
         self.app = app
-        self.app.logger("info", "Kiosk main view initialization")
 
+        self.resize(self.app.parameters.width, self.app.parameters.height)
+
+        self.app.logger("info", self.app.translate("Application", "Kiosk main view initialization"))
         self.tab_kiosk = TabKiosk(self.app, self)
         self.tab_notification = TabNotification(self.app, self)
 
-        self.tabs = QTabWidget(self)
-        self.tabs.resize(650, 550)
+        self.tabs = QTabWidget(self.app.kiosk)
         self.tabs.addTab(self.tab_kiosk, "Packages")
         self.tabs.addTab(self.tab_notification, "Notifications")
+        self.tab_notification.add_notification("Kiosk main view initialization")
 
+        grid = QGridLayout(self.app.kiosk)
+        grid.addWidget(self.tabs, 1,1,1,1)
+
+
+        self.setLayout(grid)
     def show(self):
         super().show()

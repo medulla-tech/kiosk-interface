@@ -52,15 +52,25 @@ class EventController(object):
                     elif decoded["type"] == "pong":
                         self.app.connected = True
                         self.app.notifier.server_status_changed.emit()
-                        print("Connected to the AM")
+                        if self.app.kiosk.tab_notification is not None:
+                            self.app.kiosk.tab_notification.add_notification("Connected to the AM")
+                        else:
+                            print("Connected to the AM")
 
                 elif decoded["action"] == "notification":
-                    print(decoded["message"])
+                    if self.app.kiosk.tab_notification is not None:
+                        self.app.kiosk.tab_notification.add_notification(decoded["message"])
+                    else:
+                        print(decoded["message"])
 
                 self.app.kiosk.tab_kiosk.search()
         except Exception as error:
             # If the message can't be decoded as json
-            print(self.app.translate("Action", "Error when trying to load datas"))
+            if self.app.kiosk.tab_notification is not None:
+                self.app.kiosk.tab_notification.add_notification(self.app.translate("Action",
+                                                                                    "Error when trying to load datas"))
+            else:
+                print(self.app.translate("Action", "Error when trying to load datas"))
             self.app.logger("error", self.app.translate("Action", "Error when trying to load datas"))
 
     def action_app_launched(self):
@@ -70,14 +80,20 @@ class EventController(object):
     def action_message_sent_to_am(self, message):
         """Action launched when a message is sent to the Agent Machine"""
         msg = self.app.translate("Server", "Message sent to AM : ")
-        print("info", msg + message)
+
+        if hasattr(self.app, "kiosk") and hasattr(self.app.kiosk, "tab_notification"):
+            self.app.kiosk.tab_notification.add_notification(msg + message)
+        else:
+            print(msg + message)
+
         self.app.connected = True
-        self.app.notifier.server_status_changed.emit()
+        # self.app.notifier.server_status_changed.emit()
 
     def action_server_cant_send_message_to_am(self, message):
         """Action launched when a message is received from the Agent Machine"""
         msg = self.app.translate("Server", "Message can't be sent to AM ")
         print(msg + ": %s" % message)
+
         self.app.connected = False
         self.app.notifier.server_status_changed.emit()
 
