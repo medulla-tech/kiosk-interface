@@ -45,11 +45,11 @@ def test_config_file():
         else:
             assert conffilename("") == "relayconf.ini"
 
-    elif sys.platform.startwith("darwin"):
-        assert conffilename("machine") == "/LibraryApplication Support/Pulse/etc/agentconf.ini"
-        assert conffilename("cluster") == "/LibraryApplication Support/Pulse/etc/cluster.ini"
-        if os.path.isfile("/LibraryApplication Support/Pulse/etc/relayconf.ini"):
-            assert conffilename("") == "/LibraryApplication Support/Pulse/etc/relayconf.ini"
+    elif sys.platform.startswith("darwin"):
+        assert conffilename("machine") == "agentconf.ini"
+        assert conffilename("cluster") == "/Library/Application Support/Pulse/etc/cluster.ini"
+        if os.path.isfile("/Library/Application Support/Pulse/etc/relayconf.ini"):
+            assert conffilename("") == "/Library/Application Support/Pulse/etc/relayconf.ini"
         else:
             assert conffilename("") == "relayconf.ini"
 
