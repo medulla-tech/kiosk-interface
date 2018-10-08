@@ -78,7 +78,7 @@ class CustomPackageWidget(QWidget):
         self.actions = []
         self.action_button = {}
 
-        for action in package["actions"]:
+        for action in package["action"]:
             if action == "Launch":
                 if "launcher" in package:
                     self.actions.append(action)
@@ -110,7 +110,7 @@ class CustomPackageWidget(QWidget):
             self.statusbar.setValue(package["stat"])
 
             # Enable / disable the button if the progressbar is not completed
-            if package["status"] in package["actions"]:
+            if package["status"] in package["action"]:
                 if 0 < self.statusbar.value() < 100:
                     if package["status"] in self.action_button:
                         self.action_button[package["status"]].setEnabled(False)
