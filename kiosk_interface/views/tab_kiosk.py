@@ -22,7 +22,7 @@
 # MA 02110-1301, USA.
 
 from PyQt5.QtWidgets import QListWidgetItem, QWidget, QVBoxLayout, QListWidget, QLineEdit, QLabel, QTabWidget
-from kiosk_interface.views.custom_package_item import CustomPackageWidget
+from views.custom_package_item import CustomPackageWidget
 
 import re
 
@@ -100,8 +100,9 @@ class TabKiosk(QWidget):
     def status_changed(self):
         """Modify the status in the kiosk view"""
         if self.app.connected is True:
-            # self.app.kiosk.tab_kiosk.label_status.setText(self.app.translate("Kiosk", "Status : Connected"))
-            self.app.kiosk.tab_notification.add_notification(self.app.translate("kiosk","Status : Conncted"))
+            msg = self.app.translate("kiosk","Status : Connected")
+
         else:
-            #self.app.kiosk.tab_kiosk.label_status.setText(self.app.translate("Kiosk", "Status : Disonnected"))
-            self.app.kiosk.tab_notification.add_notification(self.app.translate("kiosk","Status : Disconncted"))
+            msg = self.app.translate("Kiosk", "Status : Disconnected")
+        self.app.kiosk.tab_notification.add_notification(msg)
+        self.label_status.setText(msg)
