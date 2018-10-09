@@ -47,7 +47,7 @@ class EventController(object):
             the action will reacts differently."""
 
         self.app.message = message
-        self.app.logger("info", self.app.translate("Server","Received message %s from AM" % message))
+        self.app.logger("info", self.app.translate("Server","Received message from AM"))
 
         try:
             decoded = json.loads(self.app.message)
