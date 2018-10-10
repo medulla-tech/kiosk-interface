@@ -68,8 +68,6 @@ class MessengerFromAM(object):
             ref.message = recv_msg_from_AM
             ref.notifier.message_received_from_am.emit(recv_msg_from_AM)
 
-            thread = threading.Thread(target=client_socket.send, args=(json.dumps(recv_msg_from_AM).encode('utf-8'),))
-            thread.start()
         finally:
             client_socket.close()
 
