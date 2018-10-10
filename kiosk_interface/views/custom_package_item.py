@@ -178,23 +178,22 @@ class CustomPackageWidget(QWidget):
             self.app.send(self._message)
 
         elif action == "Launch":
-            launcher=""
-            try:
-                launcher = base64.b64decode(self.package.launcher).decode("utf-8")
-            except Exception as e:
-                if "launcher" in self.package:
-                    launcher = self.package['launcher']
-                else:
-                    self.package['actions'].remove("Launch")
-            finally:
+            if "launcher" in self.package:
+                try:
+                    launcher = base64.b64decode(self.package['launcher']).decode("utf-8")
+                except:
+                    launcher = self.package["launcher"]
+
+                launcher = inject_env_into_str(launcher)
                 if os.path.isfile(launcher):
-                    try:
-                        subprocess.Popen(launcher)
-                    except Exception as e:
-                        self.app.send('{"action":"kioskLog","type":"error","message":"%s"}' % e)
+                    subprocess.Popen(launcher)
+
                 else:
-                    self.app.send('{"action":"kioskLog","type":"error","message":"The file %s doesnt exists"}'
-                                       % launcher)
+                    self.app.kiosk.tab_notification.add_notification(launcher + "not found")
+
+            else:
+                if "Launch" in self.package["action"]:
+                    self.package["action"].remove("Launch")
 
 
 def search_icon_by_name(name):
@@ -217,3 +216,20 @@ def search_icon_by_name(name):
         if re.match(prefix, icon["name"], re.I):
             return icon["name"]+"."+icon["ext"]
     return False
+
+
+def inject_env_into_str(mesg):
+    """Replace all the @_@variable@_@ by the env variable into the string.
+        Param:
+            str which contains the @_@variable@_@
+        Returns:
+            str with the env variables replaced
+    """
+    for t in re.findall("@_@.*?@_@", mesg):
+        z = t.replace("@_@", "")
+        try:
+            mesg = mesg.replace(t, os.environ[z])
+        except:
+            pass
+        print(mesg)
+    return mesg
