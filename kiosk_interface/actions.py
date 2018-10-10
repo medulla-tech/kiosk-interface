@@ -99,6 +99,7 @@ class EventController(object):
 
     def action_app_launched(self):
         """Action launched when the kiosk is launched"""
+        self.app.send('{"action":"kioskinterface", "subaction":"initialization"}')
         self.app.logger("info", self.app.translate("Application", "Application launched"))
 
     def action_message_sent_to_am(self, message):
