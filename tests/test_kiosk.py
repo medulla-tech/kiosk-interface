@@ -23,8 +23,10 @@
 
 from PyQt5.QtWidgets import QApplication
 import sys
-from kiosk_interface.kiosk import Kiosk
-
+try:
+    from kiosk_interface.kiosk import Kiosk
+except:
+    from kiosk import Kiosk
 
 class TestKiosk():
     app = QApplication(sys.argv)

@@ -21,15 +21,23 @@
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
 # MA 02110-1301, USA.
 
-from kiosk_interface.config import ConfParameter
 import sys
 from PyQt5.QtWidgets import QApplication
 from PyQt5.QtGui import QIcon
-from kiosk_interface.tray import Tray
-from kiosk_interface.kiosk import Kiosk
-from kiosk_interface.notifier import Notifier
-from kiosk_interface.actions import EventController
-from kiosk_interface.server import MessengerToAM, MessengerFromAM
+try:
+    from kiosk_interface.config import ConfParameter
+    from kiosk_interface.tray import Tray
+    from kiosk_interface.kiosk import Kiosk
+    from kiosk_interface.notifier import Notifier
+    from kiosk_interface.actions import EventController
+    from kiosk_interface.server import MessengerToAM, MessengerFromAM
+except:
+    from config import ConfParameter
+    from tray import Tray
+    from kiosk import Kiosk
+    from notifier import Notifier
+    from actions import EventController
+    from server import MessengerToAM, MessengerFromAM
 from PyQt5.QtCore import QCoreApplication
 
 

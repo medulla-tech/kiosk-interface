@@ -22,7 +22,10 @@
 # MA 02110-1301, USA.
 
 from PyQt5.QtWidgets import QListWidgetItem, QWidget, QVBoxLayout, QListWidget, QLineEdit, QLabel, QTabWidget
-from views.custom_package_item import CustomPackageWidget
+try:
+    from kiosk_interface.views.custom_package_item import CustomPackageWidget
+except:
+    from views.custom_package_item import CustomPackageWidget
 
 import re
 

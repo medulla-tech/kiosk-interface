@@ -24,7 +24,10 @@
 import re
 from PyQt5.QtGui import QPixmap
 from PyQt5.QtWidgets import QWidget, QGridLayout, QPushButton, QLabel, QHBoxLayout, QProgressBar, QMessageBox
-from kiosk_interface.views.date_picker import DatePickerWidget
+try:
+    from kiosk_interface.views.date_picker import DatePickerWidget
+except:
+    from views.date_picker import DatePickerWidget
 
 import base64
 import os

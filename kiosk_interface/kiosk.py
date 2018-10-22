@@ -23,10 +23,14 @@
 
 from PyQt5.QtWidgets import QListWidgetItem, QWidget, QVBoxLayout, QListWidget, QLineEdit, QLabel, QTabWidget, \
     QGridLayout
-from kiosk_interface.views.custom_package_item import CustomPackageWidget
-from kiosk_interface.views.tab_kiosk import TabKiosk
-from kiosk_interface.views.tab_notification import TabNotification
-
+try:
+    from kiosk_interface.views.custom_package_item import CustomPackageWidget
+    from kiosk_interface.views.tab_kiosk import TabKiosk
+    from kiosk_interface.views.tab_notification import TabNotification
+except:
+    from views.custom_package_item import CustomPackageWidget
+    from views.tab_kiosk import TabKiosk
+    from views.tab_notification import TabNotification
 import re
 
 
