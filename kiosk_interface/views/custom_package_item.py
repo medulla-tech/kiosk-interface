@@ -174,11 +174,14 @@ class CustomPackageWidget(QWidget):
                 """{"uuid": "%s", "action":
                 "kioskinterface%s", "subaction": "%s", "utcdatetime": "%s"}"""
                 % (self.uuid, action, action, self.scheduler_wrapper.tuple_selected)))
-
+            msg = self.app.translate("Action", "The app %s is installing" % self.name.text())
+            self.app.kiosk.tab_notification.add_notification(msg)
         elif action == "Delete":
             self._message = """{"uuid": "%s", "action": "kioskinterface%s", "subaction": "%s"}""" % (self.uuid,
                                                                                                      action, action)
             self.app.send(self._message)
+            msg = self.app.translate("Action", "The app %s is deleting" % self.name.text())
+            self.app.kiosk.tab_notification.add_notification(msg)
 
         elif action == "Launch":
             if "launcher" in self.package:
@@ -190,7 +193,8 @@ class CustomPackageWidget(QWidget):
                 launcher = inject_env_into_str(launcher)
                 if os.path.isfile(launcher):
                     subprocess.Popen(launcher)
-
+                    msg = self.app.translate("Action", "The app %s is launched" % self.name.text())
+                    self.app.kiosk.tab_notification.add_notification(msg)
                 else:
                     self.app.kiosk.tab_notification.add_notification(launcher + "not found")
 
