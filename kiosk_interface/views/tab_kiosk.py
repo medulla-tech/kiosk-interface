@@ -81,6 +81,7 @@ class TabKiosk(QWidget):
         self.list_wrapper.clear()
         self.item_custom_packages = []
         self.custom_packages = []
+        flag = False
         for package in self.app.packages:
             if self.input_search.text() != "":
                 if re.search(self.input_search.text(), package["name"], flags=re.IGNORECASE):
@@ -92,6 +93,14 @@ class TabKiosk(QWidget):
 
                     self.list_wrapper.addItem(item_widget)
                     self.list_wrapper.setItemWidget(item_widget, custom_package)
+
+                if not flag:
+                    mesg = self.app.translate("Interface","Research launched with % as criterion"%self.input_search.text())
+                    if self.app.kiosk.tab_notification is not None:
+                        self.app.kiosk.tab_notification.add_notification(mesg)
+                    else:
+                        print(mesg)
+                    flag = True
             else:
                 item_widget = QListWidgetItem(self.list_wrapper)
                 custom_package = CustomPackageWidget(self.app, package)
