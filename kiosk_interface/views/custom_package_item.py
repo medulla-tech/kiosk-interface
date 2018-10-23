@@ -202,6 +202,25 @@ class CustomPackageWidget(QWidget):
                 if "Launch" in self.package["action"]:
                     self.package["action"].remove("Launch")
 
+        elif action == "Ask":
+            self._message = """{"uuid": "%s", "action": "kioskinterface%s", "subaction": "%s"}""" % (self.uuid,
+                                                                                                     action, action)
+            self.app.send(self._message)
+            msg = self.app.translate("Action", "The access to the app %s is asked to admin" % self.name.text())
+            self.app.kiosk.tab_notification.add_notification(msg)
+
+        elif action == "Update":
+            self._message = """{"uuid": "%s", "action": "kioskinterface%s", "subaction": "%s"}""" % (self.uuid,
+                                                                                                     action, action)
+            self.app.send(self._message)
+            msg = self.app.translate("Action", "The app %s is updating" % self.name.text())
+            self.app.kiosk.tab_notification.add_notification(msg)
+
+        else:
+            self._message = """{"uuid": "%s", "action": "kioskinterface%s", "subaction": "%s"}""" % (self.uuid,
+                                                                                             action, action)
+            self.app.send(self._message)
+
 
 def search_icon_by_name(name):
     """ Search the icon by association with the package name
