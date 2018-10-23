@@ -59,6 +59,11 @@ class EventController(object):
                 if decoded["action"] == "packages" or decoded["action"] == "update_profile":
                     if "packages_list" in decoded:
                         self.app.packages = decoded["packages_list"]
+                        message = self.app.translate("Interface", "The package list is updated")
+                        if self.app.kiosk.tab_notification is not None:
+                            self.app.kiosk.tab_notification.add_notification(message)
+                        else:
+                            print(message)
 
                 elif decoded["action"] == "update_launcher":
 
