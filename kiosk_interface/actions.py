@@ -48,6 +48,9 @@ class EventController(object):
 
         self.app.message = message
         self.app.logger("info", self.app.translate("Server","Received message from AM"))
+        if self.app.connected is False:
+            self.app.connected = True
+            self.app.notifier.server_status_changed.emit()
 
         try:
             decoded = json.loads(self.app.message)
@@ -69,13 +72,10 @@ class EventController(object):
                     # If the AM send a ping to the kiosk, it answers by a pong
                     if decoded["type"] == "ping":
                         self.app.connected = True
-                        self.app.notifier.server_status_changed.emit()
                         self.app.send_pong()
 
                     # The AM sendback a pong
                     elif decoded["type"] == "pong":
-                        self.app.connected = True
-                        self.app.notifier.server_status_changed.emit()
                         if self.app.kiosk.tab_notification is not None:
                             self.app.kiosk.tab_notification.add_notification("Connected to the AM")
                         else:
@@ -111,16 +111,18 @@ class EventController(object):
         else:
             print(msg + message)
 
-        self.app.connected = True
-        # self.app.notifier.server_status_changed.emit()
+        if self.app.connected is False:
+            self.app.connected = True
+            self.app.notifier.server_status_changed.emit()
 
     def action_server_cant_send_message_to_am(self, message):
         """Action launched when a message is received from the Agent Machine"""
         msg = self.app.translate("Server", "Message can't be sent to AM ")
         print(msg + ": %s" % message)
 
-        self.app.connected = False
-        self.app.notifier.server_status_changed.emit()
+        if self.app.connected is True:
+            self.app.connected = False
+            self.app.notifier.server_status_changed.emit()
 
     # Launch the kiosk main window
     def action_tray_action_open(self, criterion):
