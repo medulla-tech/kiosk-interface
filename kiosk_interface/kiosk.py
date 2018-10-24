@@ -56,6 +56,7 @@ class Kiosk(QWidget):
         self.tabs = QTabWidget(self.app.kiosk)
         self.tabs.addTab(self.tab_kiosk, "Packages")
         self.tabs.addTab(self.tab_notification, "Notifications")
+        # TODO : Add chat tab
         self.tab_notification.add_notification("Kiosk main view initialization")
 
         grid = QGridLayout(self.app.kiosk)

@@ -65,6 +65,10 @@ class TabKiosk(QWidget):
         self.lay.addWidget(self.list_wrapper)
         self.setLayout(self.lay)
 
+        # TODO : Show list as grid
+        # TODO : give the possibility to choose between grid and list (preference saved in config file)
+        # https://stackoverflow.com/questions/37331270/how-to-create-grid-style-qlistwidget
+
         self.input_search.textChanged.connect(self.search)
 
     def show(self):
