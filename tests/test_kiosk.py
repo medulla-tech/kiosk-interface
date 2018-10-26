@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 # coding: utf-8
-"""Declare some notifier for the app"""
+"""Test the kiosk module"""
 #
 # (c) 2018 Siveo, http://www.siveo.net
 #
@@ -21,26 +21,13 @@
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
 # MA 02110-1301, USA.
 
-from PyQt5.QtWidgets import QWidget
-from PyQt5.Qt import pyqtSignal
+from PyQt5.QtWidgets import QApplication
+import sys
+try:
+    from kiosk_interface.kiosk import Kiosk
+except:
+    from kiosk import Kiosk
 
-
-class Notifier(QWidget):
-    """This class allows to create some signals for the application"""
-    app_launched = pyqtSignal()
-    app_claused = pyqtSignal()
-
-    tray_loaded = pyqtSignal()
-    tray_action_open = pyqtSignal((str,))
-
-    kiosk_loaded = pyqtSignal()
-
-    server_tcp_start = pyqtSignal()
-    server_tcp_stop = pyqtSignal()
-    server_cant_send_message_to_am = pyqtSignal((str,))
-    server_ping_presence = pyqtSignal()
-    server_status_changed = pyqtSignal()
-    message_received_from_am = pyqtSignal((str,))
-    message_sent_to_am = pyqtSignal((str,))
-
-    updated = pyqtSignal((str, dict,))
+class TestKiosk():
+    app = QApplication(sys.argv)
+    kiosk = Kiosk(app)

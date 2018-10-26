@@ -68,8 +68,6 @@ class MessengerFromAM(object):
             ref.message = recv_msg_from_AM
             ref.notifier.message_received_from_am.emit(recv_msg_from_AM)
 
-            thread = threading.Thread(target=client_socket.send, args=(json.dumps(recv_msg_from_AM).encode('utf-8'),))
-            thread.start()
         finally:
             client_socket.close()
 
@@ -107,6 +105,7 @@ class MessengerToAM(object):
                 self.app.notifier.message_sent_to_am.emit(msg.decode("utf-8"))
             # self.handle()
         else:
+            self.app.notifier.server_cant_send_message_to_am.emit(msg)
             self.sock.close()
 
     def handle(self):

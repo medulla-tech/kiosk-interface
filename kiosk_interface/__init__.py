@@ -21,15 +21,23 @@
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
 # MA 02110-1301, USA.
 
-from kiosk_interface.config import ConfParameter
 import sys
 from PyQt5.QtWidgets import QApplication
 from PyQt5.QtGui import QIcon
-from kiosk_interface.tray import Tray
-from kiosk_interface.kiosk import Kiosk
-from kiosk_interface.notifier import Notifier
-from kiosk_interface.actions import EventController
-from kiosk_interface.server import MessengerToAM, MessengerFromAM
+try:
+    from kiosk_interface.config import ConfParameter
+    from kiosk_interface.tray import Tray
+    from kiosk_interface.kiosk import Kiosk
+    from kiosk_interface.notifier import Notifier
+    from kiosk_interface.actions import EventController
+    from kiosk_interface.server import MessengerToAM, MessengerFromAM
+except:
+    from config import ConfParameter
+    from tray import Tray
+    from kiosk import Kiosk
+    from notifier import Notifier
+    from actions import EventController
+    from server import MessengerToAM, MessengerFromAM
 from PyQt5.QtCore import QCoreApplication
 
 
@@ -59,6 +67,7 @@ class Application(QApplication):
         # Action launched when the kiosk emit a notification
         self.eventCtrl = EventController(self)
 
+        self.connected = False
         self.message = None  # Contains the last received message interpreted as dict
         self.packages = []  # Contains the packages of the application
 
@@ -71,8 +80,6 @@ class Application(QApplication):
         # Socket server. It is always running. This module listen and wait the messages from AM
         self.receiver = MessengerFromAM(self)
 
-        # Contains the tray app
-        self.tray = Tray(self)
         self.logger('info', 'Initialization')
         # The mechanics are launched here
         self.notifier.app_launched.emit()
@@ -81,6 +88,9 @@ class Application(QApplication):
         self.setApplicationName("Kiosk")
         # When the window is closed, the process is not killed
         self.setQuitOnLastWindowClosed(False)
+
+        # Contains the tray app
+        self.tray = Tray(self)
 
         # Contains the kiosk app
         self.kiosk = Kiosk(self)
@@ -95,10 +105,28 @@ class Application(QApplication):
         messenger.send(message)
 
     def logger(self, type, msg):
+        """Send log message to Agent Machine.
+        Params:
+            type: str corresponds to the type of log we want add to the xmpp logs. The types can be :
+                - "info"
+                - "error"
+                - "debug"
+            msg: str of the message we want add to log xmpp"""
         message = '{"action": "kioskLog","type": "%s", "message": "%s"}' % (type, self.translate("Log", msg))
         self.send(message)
+
+    def send_ping(self):
+        """Send a ping signal to the AM"""
+        signal_presence = '{"action": "presence", "type":"ping"}'
+        self.send(signal_presence)
+
+    def send_pong(self):
+        """Send a pong signal to the AM"""
+        signal_presence = '{"action": "presence", "type":"pong"}'
+        self.send(signal_presence)
 
 
 if __name__ == "__main__":
     app = Application()
+    app.send_ping()
     app.run()

@@ -100,6 +100,8 @@ class DatePickerWidget(QWidget):
         self.calendar.setMinimumDate(QDate.currentDate())
         self.calendar.setMaximumDate(QDate.currentDate().addDays(2))
         self.calendar.resize(250, 200)
+        # TODO : If the today date is selected, select automatically the current hour.
+        # TODO : Else if a datetime is selected, save temporarily the selected date
 
         #
         # Combobox

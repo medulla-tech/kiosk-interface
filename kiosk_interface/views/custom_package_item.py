@@ -24,7 +24,10 @@
 import re
 from PyQt5.QtGui import QPixmap
 from PyQt5.QtWidgets import QWidget, QGridLayout, QPushButton, QLabel, QHBoxLayout, QProgressBar, QMessageBox
-from kiosk_interface.views.date_picker import DatePickerWidget
+try:
+    from kiosk_interface.views.date_picker import DatePickerWidget
+except:
+    from views.date_picker import DatePickerWidget
 
 import base64
 import os
@@ -78,7 +81,7 @@ class CustomPackageWidget(QWidget):
         self.actions = []
         self.action_button = {}
 
-        for action in package["actions"]:
+        for action in package["action"]:
             if action == "Launch":
                 if "launcher" in package:
                     self.actions.append(action)
@@ -110,7 +113,7 @@ class CustomPackageWidget(QWidget):
             self.statusbar.setValue(package["stat"])
 
             # Enable / disable the button if the progressbar is not completed
-            if package["status"] in package["actions"]:
+            if package["status"] in package["action"]:
                 if 0 < self.statusbar.value() < 100:
                     if package["status"] in self.action_button:
                         self.action_button[package["status"]].setEnabled(False)
@@ -119,12 +122,12 @@ class CustomPackageWidget(QWidget):
                 else:
 
                     if self.statusbar.value() == 100:
-                        notify = QMessageBox(self)
-                        notify.setIcon(QMessageBox.Information)
-                        notify.addButton("Ok", 0)
-                        notify.setText(self.app.translate('Action', "%s for package %s Done" %
-                                                          (package["status"], package["name"])))
-                        notify.exec()
+                        actual_notif = self.app.kiosk.tab_notification.text_logs.toPlainText() + "\n" +\
+                        self.app.translate('Action', "%s for package %s Done" %
+                                                          (package["status"], package["name"]))
+
+                        self.app.kiosk.tab_notification.add_notification(actual_notif)
+
                         for pkg_ref in self.app.packages:
                             if pkg_ref == package:
                                 pkg_ref["stat"] = 0
@@ -171,30 +174,52 @@ class CustomPackageWidget(QWidget):
                 """{"uuid": "%s", "action":
                 "kioskinterface%s", "subaction": "%s", "utcdatetime": "%s"}"""
                 % (self.uuid, action, action, self.scheduler_wrapper.tuple_selected)))
-
+            msg = self.app.translate("Action", "The app %s is installing" % self.name.text())
+            self.app.kiosk.tab_notification.add_notification(msg)
         elif action == "Delete":
             self._message = """{"uuid": "%s", "action": "kioskinterface%s", "subaction": "%s"}""" % (self.uuid,
                                                                                                      action, action)
             self.app.send(self._message)
+            msg = self.app.translate("Action", "The app %s is deleting" % self.name.text())
+            self.app.kiosk.tab_notification.add_notification(msg)
 
         elif action == "Launch":
-            launcher=""
-            try:
-                launcher = base64.b64decode(self.package.launcher).decode("utf-8")
-            except Exception as e:
-                if "launcher" in self.package:
-                    launcher = self.package['launcher']
-                else:
-                    self.package['actions'].remove("Launch")
-            finally:
+            if "launcher" in self.package:
+                try:
+                    launcher = base64.b64decode(self.package['launcher']).decode("utf-8")
+                except:
+                    launcher = self.package["launcher"]
+
+                launcher = inject_env_into_str(launcher)
                 if os.path.isfile(launcher):
-                    try:
-                        subprocess.Popen(launcher)
-                    except Exception as e:
-                        self.app.send('{"action":"kioskLog","type":"error","message":"%s"}' % e)
+                    subprocess.Popen(launcher)
+                    msg = self.app.translate("Action", "The app %s is launched" % self.name.text())
+                    self.app.kiosk.tab_notification.add_notification(msg)
                 else:
-                    self.app.send('{"action":"kioskLog","type":"error","message":"The file %s doesnt exists"}'
-                                       % launcher)
+                    self.app.kiosk.tab_notification.add_notification(launcher + "not found")
+
+            else:
+                if "Launch" in self.package["action"]:
+                    self.package["action"].remove("Launch")
+
+        elif action == "Ask":
+            self._message = """{"uuid": "%s", "action": "kioskinterface%s", "subaction": "%s"}""" % (self.uuid,
+                                                                                                     action, action)
+            self.app.send(self._message)
+            msg = self.app.translate("Action", "The access to the app %s is asked to admin" % self.name.text())
+            self.app.kiosk.tab_notification.add_notification(msg)
+
+        elif action == "Update":
+            self._message = """{"uuid": "%s", "action": "kioskinterface%s", "subaction": "%s"}""" % (self.uuid,
+                                                                                                     action, action)
+            self.app.send(self._message)
+            msg = self.app.translate("Action", "The app %s is updating" % self.name.text())
+            self.app.kiosk.tab_notification.add_notification(msg)
+
+        else:
+            self._message = """{"uuid": "%s", "action": "kioskinterface%s", "subaction": "%s"}""" % (self.uuid,
+                                                                                             action, action)
+            self.app.send(self._message)
 
 
 def search_icon_by_name(name):
@@ -217,3 +242,20 @@ def search_icon_by_name(name):
         if re.match(prefix, icon["name"], re.I):
             return icon["name"]+"."+icon["ext"]
     return False
+
+
+def inject_env_into_str(mesg):
+    """Replace all the @_@variable@_@ by the env variable into the string.
+        Param:
+            str which contains the @_@variable@_@
+        Returns:
+            str with the env variables replaced
+    """
+    for t in re.findall("@_@.*?@_@", mesg):
+        z = t.replace("@_@", "")
+        try:
+            mesg = mesg.replace(t, os.environ[z])
+        except:
+            pass
+        print(mesg)
+    return mesg

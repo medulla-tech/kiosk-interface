@@ -1,3 +1,29 @@
 kiosk-interface 0.2
 =============
-* [BUGFIX] Fix install of images into data/ folder
+* [FEATURE] Add unit test for the kiosk module
+* [FEATURE] Add unit test for the notifier module
+* [FEATURE] Add unit test for the config module
+* [FEATURE] Displays the Agent Machine TCP server status
+* [FEATURE] Send presence message when the Agent Machine ask the kiosk presence
+* [FEATURE] Add a notification when a deployment status is finished (100%)
+* [FEATURE] Add notification tab to display log messages locally
+* [FEATURE] Disable Action button if a status is specified
+* [FEATURE] Displays deployment status if specified in the received message
+* [FEATURE] Displays the launch action if it is specified into the package
+* [FEATURE] Delete action send the delete message to the Agent Machine
+* [FEATURE] Update action send the update message to the Agent Machine
+* [FEATURE] Add date picker to launch install NOW or LATER
+* [FEATURE] Install action send the install message to the Agent Machine
+* [FEATURE] Displays packages with the appropriates actions (Install, Ask, Update, Delete, Launch)
+* [FEATURE] Displays packages info (Name, Version, Description)
+* [FEATURE] Displays packages into a specific tab
+* [FEATURE] Try to associate the package name with an icon. If no icon is found, the default icon is selected.
+* [FEATURE] The received messages are now accessible for all the app modules
+* [FEATURE] Interprets received messages from Agent Machine
+* [FEATURE] Receive messages from Agent Machine
+* [FEATURE] All the modules are accessible from everywhere
+* [FEATURE] A notifier is added to the app
+* [FEATURE] Restructures the app architecture as modules (server, sender, config, notifier, tray, kiosk etc.)
+
+* [BUGFIX]  Fix icon assignation to a package.
+* [BUGFIX]  Fix install of images into data/ folder

@@ -26,7 +26,10 @@ import sys
 
 from PyQt5.QtGui import QIcon
 from PyQt5.QtWidgets import QSystemTrayIcon, QMenu, QAction, QWidgetAction
-from kiosk_interface.views.custom_search_bar import CustomSearchBar
+try:
+    from kiosk_interface.views.custom_search_bar import CustomSearchBar
+except:
+    from views.custom_search_bar import CustomSearchBar
 from PyQt5.QtGui import QCursor
 
 
