@@ -174,7 +174,7 @@ class CustomPackageWidget(QWidget):
                 """{"uuid": "%s", "action":
                 "kioskinterface%s", "subaction": "%s", "utcdatetime": "%s"}"""
                 % (self.uuid, action, action, self.scheduler_wrapper.tuple_selected)))
-            msg = self.app.translate("Action", "The app %s is installing" % self.name.text())
+            msg = self.app.translate("Action", "The application %s is installing" % self.name.text())
             self.app.kiosk.tab_notification.add_notification(msg)
         elif action == "Delete":
             self._message = """{"uuid": "%s", "action": "kioskinterface%s", "subaction": "%s"}""" % (self.uuid,

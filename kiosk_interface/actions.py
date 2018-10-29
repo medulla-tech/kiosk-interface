@@ -40,7 +40,7 @@ class EventController(object):
         self.app.notifier.message_received_from_am.connect(self.action_message_received_from_am)
         self.app.notifier.tray_action_open.connect(self.action_tray_action_open)
 
-    def action_message_received_from_am(self, message=""):
+    def action_message_received_from_am(self, message="{}"):
         """Action launched when the kiosk receive a message from Agent Master.
         Param:
             message: str this message is normally a json stringified. In function of the elements contained in the message,
@@ -52,6 +52,8 @@ class EventController(object):
             self.app.connected = True
             self.app.notifier.server_status_changed.emit()
 
+        print("message reçu :")
+        print(message)
         try:
             decoded = json.loads(self.app.message)
 
@@ -86,11 +88,26 @@ class EventController(object):
                         else:
                             print("Connected to the AM")
 
-                elif decoded["action"] == "notification":
+                elif decoded["action"] == "action_notification":
                     if self.app.kiosk.tab_notification is not None:
-                        self.app.kiosk.tab_notification.add_notification(decoded["message"])
+                        self.app.kiosk.tab_notification.add_notification(decoded['data']["message"])
                     else:
                         print(decoded["message"])
+
+                    if 'status' in decoded['data'] and 'stat' in decoded['data']:
+                        uuid = decoded['data']['path'].split("/")
+                        uuid = uuid[-1]
+
+                        _package = {}
+                        index = 0
+                        for package in self.app.packages:
+                            if package['uuid'] == uuid:
+                                index = self.app.packages.index(package)
+                                _package = package
+                                _package['status'] = decoded['data']['status']
+                                _package['stat'] = int(decoded['data']['stat'])
+
+                        self.app.packages[index] = _package
 
                 self.app.kiosk.tab_kiosk.search()
         except Exception as error:
