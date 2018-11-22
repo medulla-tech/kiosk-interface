@@ -31,7 +31,7 @@ try:
 except:
     from views.custom_search_bar import CustomSearchBar
 from PyQt5.QtGui import QCursor
-
+import threading
 
 class Tray(QSystemTrayIcon):
     """This class define the system tray object. This is the first controller called by the app."""
@@ -85,6 +85,9 @@ class Tray(QSystemTrayIcon):
 
     def open(self):
         """This method is called if the event 'open' is launched. Use it as midddleware"""
+        initialize = threading.Thread(target=self.app.send, args=('{"action":"kioskinterface",\
+                                                                  "subaction":"initialization"}',))
+        initialize.start()
         if hasattr(self, 'input_search'):
             self.app.notifier.tray_action_open.emit(self.input_search.text)
         else:
