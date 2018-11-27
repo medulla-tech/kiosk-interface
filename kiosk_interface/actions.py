@@ -61,11 +61,6 @@ class EventController(object):
                 if decoded["action"] == "packages" or decoded["action"] == "update_profile":
                     if "packages_list" in decoded:
                         self.app.packages = decoded["packages_list"]
-                        message = self.app.translate("Interface", "The package list is updated")
-                        if self.app.kiosk.tab_notification is not None:
-                            self.app.kiosk.tab_notification.add_notification(message)
-                        else:
-                            print(message)
 
                 elif decoded["action"] == "update_launcher":
 
@@ -80,13 +75,6 @@ class EventController(object):
                     if decoded["type"] == "ping":
                         self.app.connected = True
                         self.app.send_pong()
-
-                    # The AM sendback a pong
-                    elif decoded["type"] == "pong":
-                        if self.app.kiosk.tab_notification is not None:
-                            self.app.kiosk.tab_notification.add_notification("Connected to the AM")
-                        else:
-                            print("Connected to the AM")
 
                 elif decoded["action"] == "action_notification":
                     if self.app.kiosk.tab_notification is not None:
@@ -111,12 +99,6 @@ class EventController(object):
 
                 self.app.kiosk.tab_kiosk.search()
         except Exception as error:
-            # If the message can't be decoded as json
-            if self.app.kiosk.tab_notification is not None:
-                self.app.kiosk.tab_notification.add_notification(self.app.translate("Action",
-                                                                                    "Error when trying to load datas"))
-            else:
-                print(self.app.translate("Action", "Error when trying to load datas"))
             self.app.logger("error", self.app.translate("Action", "Error when trying to load datas"))
 
     def action_app_launched(self):
@@ -126,12 +108,6 @@ class EventController(object):
 
     def action_message_sent_to_am(self, message):
         """Action launched when a message is sent to the Agent Machine"""
-        msg = self.app.translate("Server", "Message sent to AM : ")
-
-        if hasattr(self.app, "kiosk") and hasattr(self.app.kiosk, "tab_notification"):
-            self.app.kiosk.tab_notification.add_notification(msg + message)
-        else:
-            print(msg + message)
 
         if self.app.connected is False:
             self.app.connected = True

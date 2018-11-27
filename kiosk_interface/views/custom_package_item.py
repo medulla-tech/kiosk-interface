@@ -180,7 +180,7 @@ class CustomPackageWidget(QWidget):
             self._message = """{"uuid": "%s", "action": "kioskinterface%s", "subaction": "%s"}""" % (self.uuid,
                                                                                                      action, action)
             self.app.send(self._message)
-            msg = self.app.translate("Action", "The app %s is deleting" % self.name.text())
+            msg = self.app.translate("Action", "The application %s is deleting" % self.name.text())
             self.app.kiosk.tab_notification.add_notification(msg)
 
         elif action == "Launch":
@@ -206,14 +206,14 @@ class CustomPackageWidget(QWidget):
             self._message = """{"uuid": "%s", "action": "kioskinterface%s", "subaction": "%s"}""" % (self.uuid,
                                                                                                      action, action)
             self.app.send(self._message)
-            msg = self.app.translate("Action", "The access to the app %s is asked to admin" % self.name.text())
-            self.app.kiosk.tab_notification.add_notification(msg)
+            msg = self.app.translate("Action", "The access to the application %s is asked to admin" % self.name.text())
+            # self.app.kiosk.tab_notification.add_notification(msg)
 
         elif action == "Update":
             self._message = """{"uuid": "%s", "action": "kioskinterface%s", "subaction": "%s"}""" % (self.uuid,
                                                                                                      action, action)
             self.app.send(self._message)
-            msg = self.app.translate("Action", "The app %s is updating" % self.name.text())
+            msg = self.app.translate("Action", "The application %s is updating" % self.name.text())
             self.app.kiosk.tab_notification.add_notification(msg)
 
         else:

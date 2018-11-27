@@ -99,11 +99,6 @@ class TabKiosk(QWidget):
                     self.list_wrapper.setItemWidget(item_widget, custom_package)
 
                 if not flag:
-                    mesg = self.app.translate("Interface","Research launched with % as criterion"%self.input_search.text())
-                    if self.app.kiosk.tab_notification is not None:
-                        self.app.kiosk.tab_notification.add_notification(mesg)
-                    else:
-                        print(mesg)
                     flag = True
             else:
                 item_widget = QListWidgetItem(self.list_wrapper)
@@ -117,10 +112,4 @@ class TabKiosk(QWidget):
 
     def status_changed(self):
         """Modify the status in the kiosk view"""
-        if self.app.connected is True:
-            msg = self.app.translate("kiosk","Status : Connected")
-
-        else:
-            msg = self.app.translate("Kiosk", "Status : Disconnected")
-        self.app.kiosk.tab_notification.add_notification(msg)
         self.label_status.setText(msg)
