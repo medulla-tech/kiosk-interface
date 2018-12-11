@@ -29,7 +29,7 @@ class MessengerFromAM(object):
     def __init__(self, appObject):
         self.app = appObject
         self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        self.server_address = (self.app.parameters.am_server, 8766)
+        self.server_address = (self.app.parameters.am_server, self.app.parameters.kiosk_local_port)
         self.sock.bind(self.server_address)
         self.sock.listen(5)
         self.eventkill = threading.Event()

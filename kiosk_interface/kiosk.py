@@ -39,7 +39,7 @@ class Kiosk(QWidget):
 
     def __init__(self, app):
         """
-            Initialize the kiosk object. 
+            Initialize the kiosk object.
             This object set up the mechanism to control the kiosk window
             Params:
                 app: QApplication is a reference of the main application
@@ -56,8 +56,6 @@ class Kiosk(QWidget):
         self.tabs = QTabWidget(self.app.kiosk)
         self.tabs.addTab(self.tab_kiosk, "Packages")
         self.tabs.addTab(self.tab_notification, "Notifications")
-        # TODO : Add chat tab
-        self.tab_notification.add_notification("Kiosk main view initialization")
 
         grid = QGridLayout(self.app.kiosk)
         grid.addWidget(self.tabs, 1,1,1,1)

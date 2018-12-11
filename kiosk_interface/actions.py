@@ -40,7 +40,7 @@ class EventController(object):
         self.app.notifier.message_received_from_am.connect(self.action_message_received_from_am)
         self.app.notifier.tray_action_open.connect(self.action_tray_action_open)
 
-    def action_message_received_from_am(self, message=""):
+    def action_message_received_from_am(self, message="{}"):
         """Action launched when the kiosk receive a message from Agent Master.
         Param:
             message: str this message is normally a json stringified. In function of the elements contained in the message,
@@ -52,6 +52,8 @@ class EventController(object):
             self.app.connected = True
             self.app.notifier.server_status_changed.emit()
 
+        print("message reçu :")
+        print(message)
         try:
             decoded = json.loads(self.app.message)
 
@@ -59,11 +61,6 @@ class EventController(object):
                 if decoded["action"] == "packages" or decoded["action"] == "update_profile":
                     if "packages_list" in decoded:
                         self.app.packages = decoded["packages_list"]
-                        message = self.app.translate("Interface", "The package list is updated")
-                        if self.app.kiosk.tab_notification is not None:
-                            self.app.kiosk.tab_notification.add_notification(message)
-                        else:
-                            print(message)
 
                 elif decoded["action"] == "update_launcher":
 
@@ -79,27 +76,29 @@ class EventController(object):
                         self.app.connected = True
                         self.app.send_pong()
 
-                    # The AM sendback a pong
-                    elif decoded["type"] == "pong":
-                        if self.app.kiosk.tab_notification is not None:
-                            self.app.kiosk.tab_notification.add_notification("Connected to the AM")
-                        else:
-                            print("Connected to the AM")
-
-                elif decoded["action"] == "notification":
+                elif decoded["action"] == "action_notification":
                     if self.app.kiosk.tab_notification is not None:
-                        self.app.kiosk.tab_notification.add_notification(decoded["message"])
+                        self.app.kiosk.tab_notification.add_notification(decoded['data']["message"])
                     else:
                         print(decoded["message"])
 
+                    if 'status' in decoded['data'] and 'stat' in decoded['data']:
+                        uuid = decoded['data']['path'].split("/")
+                        uuid = uuid[-1]
+
+                        _package = {}
+                        index = 0
+                        for package in self.app.packages:
+                            if package['uuid'] == uuid:
+                                index = self.app.packages.index(package)
+                                _package = package
+                                _package['status'] = decoded['data']['status']
+                                _package['stat'] = int(decoded['data']['stat'])
+
+                        self.app.packages[index] = _package
+
                 self.app.kiosk.tab_kiosk.search()
         except Exception as error:
-            # If the message can't be decoded as json
-            if self.app.kiosk.tab_notification is not None:
-                self.app.kiosk.tab_notification.add_notification(self.app.translate("Action",
-                                                                                    "Error when trying to load datas"))
-            else:
-                print(self.app.translate("Action", "Error when trying to load datas"))
             self.app.logger("error", self.app.translate("Action", "Error when trying to load datas"))
 
     def action_app_launched(self):
@@ -109,12 +108,6 @@ class EventController(object):
 
     def action_message_sent_to_am(self, message):
         """Action launched when a message is sent to the Agent Machine"""
-        msg = self.app.translate("Server", "Message sent to AM : ")
-
-        if hasattr(self.app, "kiosk") and hasattr(self.app.kiosk, "tab_notification"):
-            self.app.kiosk.tab_notification.add_notification(msg + message)
-        else:
-            print(msg + message)
 
         if self.app.connected is False:
             self.app.connected = True
