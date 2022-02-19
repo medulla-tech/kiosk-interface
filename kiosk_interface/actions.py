@@ -35,10 +35,14 @@ class EventController(object):
         self.app = appObject
 
         self.app.notifier.app_launched.connect(self.action_app_launched)
-        self.app.notifier.message_sent_to_am.connect(self.action_message_sent_to_am)
-        self.app.notifier.server_cant_send_message_to_am.connect(self.action_server_cant_send_message_to_am)
-        self.app.notifier.message_received_from_am.connect(self.action_message_received_from_am)
-        self.app.notifier.tray_action_open.connect(self.action_tray_action_open)
+        self.app.notifier.message_sent_to_am.connect(
+            self.action_message_sent_to_am)
+        self.app.notifier.server_cant_send_message_to_am.connect(
+            self.action_server_cant_send_message_to_am)
+        self.app.notifier.message_received_from_am.connect(
+            self.action_message_received_from_am)
+        self.app.notifier.tray_action_open.connect(
+            self.action_tray_action_open)
 
     def action_message_received_from_am(self, message="{}"):
         """Action launched when the kiosk receive a message from Agent Master.
@@ -47,7 +51,9 @@ class EventController(object):
             the action will reacts differently."""
 
         self.app.message = message
-        self.app.logger("info", self.app.translate("Server","Received message from AM"))
+        self.app.logger(
+            "info", self.app.translate(
+                "Server", "Received message from AM"))
         if self.app.connected is False:
             self.app.connected = True
             self.app.notifier.server_status_changed.emit()
@@ -78,7 +84,8 @@ class EventController(object):
 
                 elif decoded["action"] == "action_notification":
                     if self.app.kiosk.tab_notification is not None:
-                        self.app.kiosk.tab_notification.add_notification(decoded['data']["message"])
+                        self.app.kiosk.tab_notification.add_notification(
+                            decoded['data']["message"])
                     else:
                         print(decoded["message"])
 
@@ -99,12 +106,19 @@ class EventController(object):
 
                 self.app.kiosk.tab_kiosk.search()
         except Exception as error:
-            self.app.logger("error", self.app.translate("Action", "Error when trying to load datas"))
+            self.app.logger(
+                "error", self.app.translate(
+                    "Action", "Error when trying to load datas"))
 
     def action_app_launched(self):
         """Action launched when the kiosk is launched"""
-        self.app.send('{"action":"kioskinterface", "subaction":"initialization"}')
-        self.app.logger("info", self.app.translate("Application", "Application launched"))
+        self.app.send(
+            '{"action":"kioskinterface", "subaction":"initialization"}')
+        self.app.logger(
+            "info",
+            self.app.translate(
+                "Application",
+                "Application launched"))
 
     def action_message_sent_to_am(self, message):
         """Action launched when a message is sent to the Agent Machine"""
@@ -125,7 +139,9 @@ class EventController(object):
     # Launch the kiosk main window
     def action_tray_action_open(self, criterion):
         """Action launched when the open action is pressed in the tray menu"""
-        self.app.logger('info', self.app.translate("Kiosk","Initialize the kiosk main window"))
+        self.app.logger(
+            'info', self.app.translate(
+                "Kiosk", "Initialize the kiosk main window"))
         self.app.send_ping()
         self.app.kiosk.tab_kiosk.input_search.setText(criterion)
         self.app.kiosk.tab_kiosk.search()

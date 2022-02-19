@@ -76,6 +76,7 @@ def conffilename(agenttype):
 
 class ConfParameter:
     """ConfParameter create an interface to make easier the use of config files."""
+
     def __init__(self, typeconf='machine'):
         """
         Initialization of ConfParameter object

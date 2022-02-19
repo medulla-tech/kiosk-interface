@@ -26,6 +26,7 @@ from PyQt5.QtWidgets import QWidget, QLineEdit, QPushButton, QHBoxLayout
 
 class CustomSearchBar(QWidget):
     """This object is the specialized menu action which contains the searchbar."""
+
     def __init__(self, app, ref):
         """Initialize the object"""
         super().__init__()
@@ -36,9 +37,11 @@ class CustomSearchBar(QWidget):
         self.setParent(ref.menu)
         self.layout = QHBoxLayout()
         self.input = QLineEdit()
-        self.input.setPlaceholderText(self.app.translate("Tray", "Search Package"))
-        self.btn_launch_search = QPushButton(self.app.translate("Tray","search"))
-
+        self.input.setPlaceholderText(
+            self.app.translate(
+                "Tray", "Search Package"))
+        self.btn_launch_search = QPushButton(
+            self.app.translate("Tray", "search"))
 
         self.layout.addWidget(self.input)
         self.layout.addWidget(self.btn_launch_search)

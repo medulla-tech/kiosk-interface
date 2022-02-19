@@ -31,7 +31,7 @@ try:
     from kiosk_interface.notifier import Notifier
     from kiosk_interface.actions import EventController
     from kiosk_interface.server import MessengerToAM, MessengerFromAM
-except:
+except BaseException:
     from config import ConfParameter
     from tray import Tray
     from kiosk import Kiosk
@@ -77,7 +77,8 @@ class Application(QApplication):
         # Keep the config parameters in memory
         self.parameters = ConfParameter()
 
-        # Socket server. It is always running. This module listen and wait the messages from AM
+        # Socket server. It is always running. This module listen and wait the
+        # messages from AM
         self.receiver = MessengerFromAM(self)
 
         self.logger('info', 'Initialization')
@@ -112,7 +113,8 @@ class Application(QApplication):
                 - "error"
                 - "debug"
             msg: str of the message we want add to log xmpp"""
-        message = '{"action": "kioskLog","type": "%s", "message": "%s"}' % (type, self.translate("Log", msg))
+        message = '{"action": "kioskLog","type": "%s", "message": "%s"}' % (
+            type, self.translate("Log", msg))
         self.send(message)
 
     def send_ping(self):

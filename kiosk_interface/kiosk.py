@@ -27,7 +27,7 @@ try:
     from kiosk_interface.views.custom_package_item import CustomPackageWidget
     from kiosk_interface.views.tab_kiosk import TabKiosk
     from kiosk_interface.views.tab_notification import TabNotification
-except:
+except BaseException:
     from views.custom_package_item import CustomPackageWidget
     from views.tab_kiosk import TabKiosk
     from views.tab_notification import TabNotification
@@ -49,7 +49,11 @@ class Kiosk(QWidget):
 
         self.resize(self.app.parameters.width, self.app.parameters.height)
 
-        self.app.logger("info", self.app.translate("Application", "Kiosk main view initialization"))
+        self.app.logger(
+            "info",
+            self.app.translate(
+                "Application",
+                "Kiosk main view initialization"))
         self.tab_kiosk = TabKiosk(self.app, self)
         self.tab_notification = TabNotification(self.app, self)
 
@@ -58,9 +62,9 @@ class Kiosk(QWidget):
         self.tabs.addTab(self.tab_notification, "Notifications")
 
         grid = QGridLayout(self.app.kiosk)
-        grid.addWidget(self.tabs, 1,1,1,1)
-
+        grid.addWidget(self.tabs, 1, 1, 1, 1)
 
         self.setLayout(grid)
+
     def show(self):
         super().show()

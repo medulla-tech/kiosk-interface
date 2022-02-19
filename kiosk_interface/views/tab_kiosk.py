@@ -24,7 +24,7 @@
 from PyQt5.QtWidgets import QListWidgetItem, QWidget, QVBoxLayout, QListWidget, QLineEdit, QLabel, QTabWidget
 try:
     from kiosk_interface.views.custom_package_item import CustomPackageWidget
-except:
+except BaseException:
     from views.custom_package_item import CustomPackageWidget
 
 import re
@@ -49,9 +49,13 @@ class TabKiosk(QWidget):
         self.resize(self.app.parameters.width, self.app.parameters.height)
 
         if self.app.connected is False:
-            self.label_status = QLabel(self.app.translate("Kiosk", "Status : Disconnected"))
+            self.label_status = QLabel(
+                self.app.translate(
+                    "Kiosk", "Status : Disconnected"))
         else:
-            self.label_status = QLabel(self.app.translate("Kiosk", "Status : Connected"))
+            self.label_status = QLabel(
+                self.app.translate(
+                    "Kiosk", "Status : Connected"))
         self.input_search = QLineEdit(self.app.tray.criterion, self)
         self.input_search.setPlaceholderText("Search a package by name")
 
@@ -75,7 +79,8 @@ class TabKiosk(QWidget):
         """ Displays the main window for the kiosk package manager"""
 
         # Firstly the search action is launched because it refresh the UI with the latest packages.
-        # Moreover if a criterion is given, the search method update the package list with corresponding packages
+        # Moreover if a criterion is given, the search method update the
+        # package list with corresponding packages
         self.search()
         super().show()
 
@@ -88,7 +93,10 @@ class TabKiosk(QWidget):
         flag = False
         for package in self.app.packages:
             if self.input_search.text() != "":
-                if re.search(self.input_search.text(), package["name"], flags=re.IGNORECASE):
+                if re.search(
+                        self.input_search.text(),
+                        package["name"],
+                        flags=re.IGNORECASE):
                     item_widget = QListWidgetItem(self.list_wrapper)
                     custom_package = CustomPackageWidget(self.app, package)
                     item_widget.setSizeHint(custom_package.sizeHint())
@@ -96,7 +104,8 @@ class TabKiosk(QWidget):
                     self.item_custom_packages.append(item_widget)
 
                     self.list_wrapper.addItem(item_widget)
-                    self.list_wrapper.setItemWidget(item_widget, custom_package)
+                    self.list_wrapper.setItemWidget(
+                        item_widget, custom_package)
 
                 if not flag:
                     flag = True

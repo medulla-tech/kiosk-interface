@@ -30,10 +30,13 @@ import os
 def test_config_file():
     """Test the config file path function"""
     if sys.platform.startswith('win'):
-        assert conffilename("machine") == "C:\\Program Files\\Pulse\\etc\\agentconf.ini"
-        assert conffilename("cluster") == "C:\\Program Files\\Pulse\\etc\\cluster.ini"
+        assert conffilename(
+            "machine") == "C:\\Program Files\\Pulse\\etc\\agentconf.ini"
+        assert conffilename(
+            "cluster") == "C:\\Program Files\\Pulse\\etc\\cluster.ini"
         if os.path.isfile("C:\\Program Files\\Pulse\\etc\\relayconf.ini"):
-            assert conffilename("") == "C:\\Program Files\\Pulse\\etc\\relayconf.ini"
+            assert conffilename(
+                "") == "C:\\Program Files\\Pulse\\etc\\relayconf.ini"
         else:
             assert conffilename("") == "relayconf.ini"
 
@@ -47,9 +50,12 @@ def test_config_file():
 
     elif sys.platform.startswith("darwin"):
         assert conffilename("machine") == "agentconf.ini"
-        assert conffilename("cluster") == "/Library/Application Support/Pulse/etc/cluster.ini"
-        if os.path.isfile("/Library/Application Support/Pulse/etc/relayconf.ini"):
-            assert conffilename("") == "/Library/Application Support/Pulse/etc/relayconf.ini"
+        assert conffilename(
+            "cluster") == "/Library/Application Support/Pulse/etc/cluster.ini"
+        if os.path.isfile(
+                "/Library/Application Support/Pulse/etc/relayconf.ini"):
+            assert conffilename(
+                "") == "/Library/Application Support/Pulse/etc/relayconf.ini"
         else:
             assert conffilename("") == "relayconf.ini"
 
@@ -61,7 +67,7 @@ class TestConfig():
     def test_init(self):
         """Test the ConfigParameter creation"""
         assert self.conf is not None
-        assert type(self.conf) is ConfParameter
+        assert isinstance(self.conf, ConfParameter)
 
     def test_attr(self):
         """Test the attributes of ConfigParameter class"""

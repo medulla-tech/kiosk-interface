@@ -28,10 +28,11 @@ from PyQt5.QtGui import QIcon
 from PyQt5.QtWidgets import QSystemTrayIcon, QMenu, QAction, QWidgetAction
 try:
     from kiosk_interface.views.custom_search_bar import CustomSearchBar
-except:
+except BaseException:
     from views.custom_search_bar import CustomSearchBar
 from PyQt5.QtGui import QCursor
 import threading
+
 
 class Tray(QSystemTrayIcon):
     """This class define the system tray object. This is the first controller called by the app."""
@@ -46,14 +47,15 @@ class Tray(QSystemTrayIcon):
 
         # Call the view for the System Tray
         msg = self.app.translate("Tray", 'Launch the tray')
-        self.app.logger("info","%s" % msg)
+        self.app.logger("info", "%s" % msg)
 
         self.icon = QIcon("datas/kiosk.png")
 
         self.setToolTip(self.app.translate("Tray", "Kiosk"))
         self.setIcon(self.icon)
 
-        # With this the kiosk is always running even if the main window is closed.
+        # With this the kiosk is always running even if the main window is
+        # closed.
         self.setVisible(True)
 
         self.menu = QMenu()
@@ -75,17 +77,21 @@ class Tray(QSystemTrayIcon):
 
         # Bind the actions
         if sys.platform != "darwin":
-            self.activated.connect(self.open_menu)  # left click action for Windows and Linux
+            # left click action for Windows and Linux
+            self.activated.connect(self.open_menu)
         self.open_action.triggered.connect(self.open)
 
-        # Connect the input_search from the menu with actions, only for Windows and Linux OS
+        # Connect the input_search from the menu with actions, only for Windows
+        # and Linux OS
         if hasattr(self, 'input_search'):
             self.input_search.changed.connect(self.update_criterion)
             self.input_search.clicked.connect(self.open)
 
     def open(self):
         """This method is called if the event 'open' is launched. Use it as midddleware"""
-        initialize = threading.Thread(target=self.app.send, args=('{"action":"kioskinterface",\
+        initialize = threading.Thread(
+            target=self.app.send, args=(
+                '{"action":"kioskinterface",\
                                                                   "subaction":"initialization"}',))
         initialize.start()
         if hasattr(self, 'input_search'):

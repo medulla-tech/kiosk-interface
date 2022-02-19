@@ -29,28 +29,32 @@ class MessengerFromAM(object):
     def __init__(self, appObject):
         self.app = appObject
         self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        self.server_address = (self.app.parameters.am_server, self.app.parameters.kiosk_local_port)
+        self.server_address = (
+            self.app.parameters.am_server,
+            self.app.parameters.kiosk_local_port)
         self.sock.bind(self.server_address)
         self.sock.listen(5)
         self.eventkill = threading.Event()
-        self.client_handlertcp = threading.Thread(target=self.tcpserver, args=(self.app, self.sock, self.eventkill,))
+        self.client_handlertcp = threading.Thread(
+            target=self.tcpserver, args=(
+                self.app, self.sock, self.eventkill,))
         # run server tcpserver for kiosk
         self.client_handlertcp.start()
 
     def tcpserver(self, ref, sock, eventkill):
-            """
-            This function is the listening function of the tcp server of the machine agent, to serve the request of the kiosk
-            Params:
-                sock socket object which receives the message form agent-machine
-                eventkill threading event object used to signal the end of the standby
-            """
-            while not eventkill.wait(1):
-                # Wait for a connection
-                connection, client_address = sock.accept()
-                client_handler = threading.Thread(
-                                                    target=self.handle_client_connection,
-                                                    args=(ref, connection,))
-                client_handler.start()
+        """
+        This function is the listening function of the tcp server of the machine agent, to serve the request of the kiosk
+        Params:
+            sock socket object which receives the message form agent-machine
+            eventkill threading event object used to signal the end of the standby
+        """
+        while not eventkill.wait(1):
+            # Wait for a connection
+            connection, client_address = sock.accept()
+            client_handler = threading.Thread(
+                target=self.handle_client_connection,
+                args=(ref, connection,))
+            client_handler.start()
 
     def handle_client_connection(self, ref, client_socket):
         """
@@ -74,6 +78,7 @@ class MessengerFromAM(object):
 
 class MessengerToAM(object):
     """MessengerToAM is a client socket class"""
+
     def __init__(self, appObject):
         """Initialization of the MessagerToAM object"""
 
@@ -81,7 +86,9 @@ class MessengerToAM(object):
         # Next we create a TCP/IP socket
         self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         # Connect the socket to the port where the server is listening
-        server_address = (self.app.parameters.am_server, self.app.parameters.am_local_port)
+        server_address = (
+            self.app.parameters.am_server,
+            self.app.parameters.am_local_port)
         self.active = False
 
         try:
@@ -97,7 +104,7 @@ class MessengerToAM(object):
             '{"uuid" : "45d4-3124c21-3123", "action": "kioskinterfaceinstall", "subaction" : "install"}'
         """
         if self.active:
-            if type(msg) is not bytes:
+            if not isinstance(msg, bytes):
                 self.sock.sendall(msg.encode('utf-8'))
                 self.app.notifier.message_sent_to_am.emit(msg)
             else:

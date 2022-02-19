@@ -76,12 +76,15 @@ class DatePickerWidget(QWidget):
         # Labels
         #
         if self.ref is None:
-            self.label_ask = QLabel("When do you want to install this package ? ")
+            self.label_ask = QLabel(
+                "When do you want to install this package ? ")
         else:
-            package_name = self.ref.name.text()[0].upper() + self.ref.name.text()[1:]
-            self.label_ask = QLabel("When do you want to install the <span style=\" "
-                                    "font-size:10pt; font-weight:800; color:#000000;\" >%s</span> package ?"
-                                    % package_name)
+            package_name = self.ref.name.text(
+            )[0].upper() + self.ref.name.text()[1:]
+            self.label_ask = QLabel(
+                "When do you want to install the <span style=\" "
+                "font-size:10pt; font-weight:800; color:#000000;\" >%s</span> package ?" %
+                package_name)
         self.label_hour = QLabel("Select the installation hour :")
         sep_widget = QLabel("")
 
@@ -101,7 +104,8 @@ class DatePickerWidget(QWidget):
         self.calendar.setMaximumDate(QDate.currentDate().addDays(2))
         self.calendar.resize(250, 200)
         # TODO : If the today date is selected, select automatically the current hour.
-        # TODO : Else if a datetime is selected, save temporarily the selected date
+        # TODO : Else if a datetime is selected, save temporarily the selected
+        # date
 
         #
         # Combobox
@@ -121,7 +125,7 @@ class DatePickerWidget(QWidget):
         self.date_today = QDate.currentDate()
         self.hour_current = datetime.now()
         self.hour_current = [self.hour_current.hour, self.hour_current.minute]
-        self.hour_selected = [0,0]
+        self.hour_selected = [0, 0]
         self.get_selected_date()
         self.get_selected_hour("hour")
         self.get_selected_hour("minute")
@@ -153,8 +157,10 @@ class DatePickerWidget(QWidget):
         self.button_now.clicked.connect(self.now)
         self.button_cancel.clicked.connect(self.close)
         self.button_later.clicked.connect(self.later)
-        self.combo_hours.currentIndexChanged.connect(lambda: self.get_selected_hour('hour'))
-        self.combo_minutes.currentIndexChanged.connect(lambda: self.get_selected_hour('minute'))
+        self.combo_hours.currentIndexChanged.connect(
+            lambda: self.get_selected_hour('hour'))
+        self.combo_minutes.currentIndexChanged.connect(
+            lambda: self.get_selected_hour('minute'))
 
     #
     # Events actions
@@ -181,10 +187,10 @@ class DatePickerWidget(QWidget):
             self.hour_selected[1] = self.combo_minutes.currentText()
         # Generate the final datetime into utc format
         self.datetime_current = QDateTime(self.date_today,
-                                           QTime(
-                                               int(self.hour_current[0]),
-                                               int(self.hour_current[1])),
-                                           Qt.LocalTime).toUTC()
+                                          QTime(
+                                              int(self.hour_current[0]),
+                                              int(self.hour_current[1])),
+                                          Qt.LocalTime).toUTC()
         self.datetime_selected = QDateTime(self.date_selected,
                                            QTime(int(self.hour_selected[0]),
                                                  int(self.hour_selected[1])),
@@ -238,7 +244,7 @@ def generate_list(min, max):
     if min > max:
         min, max = max, min
 
-    tmp = list(range(min,max))
+    tmp = list(range(min, max))
 
     for element in tmp:
         _tmp.append(str(element))
