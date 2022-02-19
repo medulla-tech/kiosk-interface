@@ -1,5 +1,6 @@
+#!/usr/bin/python3
 #
-# (c) 2016-2017 siveo, http://www.siveo.net
+# (c) 2016-2022 siveo, http://www.siveo.net
 #
 # This file is part of Pulse 2, http://www.siveo.net
 #
