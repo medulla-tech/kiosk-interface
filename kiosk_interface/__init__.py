@@ -24,6 +24,7 @@
 import sys
 from PyQt5.QtWidgets import QApplication
 from PyQt5.QtGui import QIcon
+
 try:
     from kiosk_interface.config import ConfParameter
     from kiosk_interface.tray import Tray
@@ -81,7 +82,7 @@ class Application(QApplication):
         # messages from AM
         self.receiver = MessengerFromAM(self)
 
-        self.logger('info', 'Initialization')
+        self.logger("info", "Initialization")
         # The mechanics are launched here
         self.notifier.app_launched.emit()
 
@@ -114,7 +115,9 @@ class Application(QApplication):
                 - "debug"
             msg: str of the message we want add to log xmpp"""
         message = '{"action": "kioskLog","type": "%s", "message": "%s"}' % (
-            type, self.translate("Log", msg))
+            type,
+            self.translate("Log", msg),
+        )
         self.send(message)
 
     def send_ping(self):

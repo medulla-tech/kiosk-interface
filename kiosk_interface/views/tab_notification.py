@@ -27,7 +27,6 @@ from datetime import datetime
 
 
 class TabNotification(QWidget):
-
     def __init__(self, app, kiosk):
         super().__init__()
         self.app = app
@@ -44,8 +43,17 @@ class TabNotification(QWidget):
         self.setLayout(self.lay)
 
     def add_notification(self, message):
-        date_str = str(datetime.now().year) + "/" + str(datetime.now().month) + "/" + str(str(
-            datetime.now().day)) + " " + str(datetime.now().hour) + ":" + str(datetime.now().minute)
+        date_str = (
+            str(datetime.now().year)
+            + "/"
+            + str(datetime.now().month)
+            + "/"
+            + str(str(datetime.now().day))
+            + " "
+            + str(datetime.now().hour)
+            + ":"
+            + str(datetime.now().minute)
+        )
 
         msg = "\n" + date_str + " -- " + message
 

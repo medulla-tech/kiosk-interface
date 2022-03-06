@@ -25,41 +25,37 @@ from distutils.command.install import INSTALL_SCHEMES
 import os
 import sys
 
-if sys.platform.startswith('linux'):
+if sys.platform.startswith("linux"):
     fileconf = os.path.join("/", "etc", "pulse-xmpp-agent")
-elif sys.platform.startswith('win'):
+elif sys.platform.startswith("win"):
     fileconf = os.path.join(os.environ["ProgramFiles"], "Pulse", "etc")
-elif sys.platform.startswith('darwin'):
-    fileconf = os.path.join(
-        "/",
-        "Library",
-        "Application Support",
-        "Pulse",
-        "etc")
+elif sys.platform.startswith("darwin"):
+    fileconf = os.path.join("/", "Library", "Application Support", "Pulse", "etc")
 
 for scheme in INSTALL_SCHEMES.values():
-    scheme['data'] = os.path.join(scheme['purelib'], "kiosk_interface")
+    scheme["data"] = os.path.join(scheme["purelib"], "kiosk_interface")
 
 setup(
     classifiers=[
-        'Development Status :: 3 - Alpha',
-        'Intended Audience :: Developers',
-        'Topic :: Software Development :: Build Tools',
-        'License :: OSI Approved :: MIT License',
-        'Programming Language :: Python :: 2',
-        'Programming Language :: Python :: 2.6',
-        'Programming Language :: Python :: 2.7',
+        "Development Status :: 3 - Alpha",
+        "Intended Audience :: Developers",
+        "Topic :: Software Development :: Build Tools",
+        "License :: OSI Approved :: MIT License",
+        "Programming Language :: Python :: 2",
+        "Programming Language :: Python :: 2.6",
+        "Programming Language :: Python :: 2.7",
     ],
-
-    keywords='pulse xmpp kiosk interface',
-    name='kiosk_interface',
-    version='0.2',
-    debian_distro='stretch',
-    description='XMPP Agent for pulse',
-    url='https://www.siveo.net/',
-    packages=['kiosk_interface', 'kiosk_interface.views'],
-    data_files=[('datas', ['kiosk_interface/datas/vlc.png', 'kiosk_interface/datas/kiosk.png']), ],
-    test_suite='',
+    keywords="pulse xmpp kiosk interface",
+    name="kiosk_interface",
+    version="0.2",
+    debian_distro="stretch",
+    description="XMPP Agent for pulse",
+    url="https://www.siveo.net/",
+    packages=["kiosk_interface", "kiosk_interface.views"],
+    data_files=[
+        ("datas", ["kiosk_interface/datas/vlc.png", "kiosk_interface/datas/kiosk.png"]),
+    ],
+    test_suite="",
     package_data={},
     entry_points={},
     extras_require={},

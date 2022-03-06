@@ -27,6 +27,7 @@ from PyQt5.Qt import pyqtSignal
 
 class Notifier(QWidget):
     """This class allows to create some signals for the application"""
+
     app_launched = pyqtSignal()
     app_claused = pyqtSignal()
 
@@ -43,4 +44,9 @@ class Notifier(QWidget):
     message_received_from_am = pyqtSignal((str,))
     message_sent_to_am = pyqtSignal((str,))
 
-    updated = pyqtSignal((str, dict,))
+    updated = pyqtSignal(
+        (
+            str,
+            dict,
+        )
+    )

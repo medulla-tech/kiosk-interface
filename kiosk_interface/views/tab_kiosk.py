@@ -21,7 +21,16 @@
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
 # MA 02110-1301, USA.
 
-from PyQt5.QtWidgets import QListWidgetItem, QWidget, QVBoxLayout, QListWidget, QLineEdit, QLabel, QTabWidget
+from PyQt5.QtWidgets import (
+    QListWidgetItem,
+    QWidget,
+    QVBoxLayout,
+    QListWidget,
+    QLineEdit,
+    QLabel,
+    QTabWidget,
+)
+
 try:
     from kiosk_interface.views.custom_package_item import CustomPackageWidget
 except BaseException:
@@ -35,10 +44,10 @@ class TabKiosk(QWidget):
 
     def __init__(self, app, kiosk):
         """
-            Initialize the kiosk object.
-            This object set up the mechanism to control the kiosk window
-            Params:
-                app: QApplication is a reference of the main application
+        Initialize the kiosk object.
+        This object set up the mechanism to control the kiosk window
+        Params:
+            app: QApplication is a reference of the main application
         """
         super().__init__()
         self.app = app
@@ -50,12 +59,12 @@ class TabKiosk(QWidget):
 
         if self.app.connected is False:
             self.label_status = QLabel(
-                self.app.translate(
-                    "Kiosk", "Status : Disconnected"))
+                self.app.translate("Kiosk", "Status : Disconnected")
+            )
         else:
             self.label_status = QLabel(
-                self.app.translate(
-                    "Kiosk", "Status : Connected"))
+                self.app.translate("Kiosk", "Status : Connected")
+            )
         self.input_search = QLineEdit(self.app.tray.criterion, self)
         self.input_search.setPlaceholderText("Search a package by name")
 
@@ -76,7 +85,7 @@ class TabKiosk(QWidget):
         self.input_search.textChanged.connect(self.search)
 
     def show(self):
-        """ Displays the main window for the kiosk package manager"""
+        """Displays the main window for the kiosk package manager"""
 
         # Firstly the search action is launched because it refresh the UI with the latest packages.
         # Moreover if a criterion is given, the search method update the
@@ -94,9 +103,8 @@ class TabKiosk(QWidget):
         for package in self.app.packages:
             if self.input_search.text() != "":
                 if re.search(
-                        self.input_search.text(),
-                        package["name"],
-                        flags=re.IGNORECASE):
+                    self.input_search.text(), package["name"], flags=re.IGNORECASE
+                ):
                     item_widget = QListWidgetItem(self.list_wrapper)
                     custom_package = CustomPackageWidget(self.app, package)
                     item_widget.setSizeHint(custom_package.sizeHint())
@@ -104,8 +112,7 @@ class TabKiosk(QWidget):
                     self.item_custom_packages.append(item_widget)
 
                     self.list_wrapper.addItem(item_widget)
-                    self.list_wrapper.setItemWidget(
-                        item_widget, custom_package)
+                    self.list_wrapper.setItemWidget(item_widget, custom_package)
 
                 if not flag:
                     flag = True

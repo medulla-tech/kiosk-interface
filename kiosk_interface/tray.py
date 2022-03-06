@@ -26,6 +26,7 @@ import sys
 
 from PyQt5.QtGui import QIcon
 from PyQt5.QtWidgets import QSystemTrayIcon, QMenu, QAction, QWidgetAction
+
 try:
     from kiosk_interface.views.custom_search_bar import CustomSearchBar
 except BaseException:
@@ -46,7 +47,7 @@ class Tray(QSystemTrayIcon):
         self.criterion = ""
 
         # Call the view for the System Tray
-        msg = self.app.translate("Tray", 'Launch the tray')
+        msg = self.app.translate("Tray", "Launch the tray")
         self.app.logger("info", "%s" % msg)
 
         self.icon = QIcon("datas/kiosk.png")
@@ -66,7 +67,7 @@ class Tray(QSystemTrayIcon):
             self.search_action.setDefaultWidget(self.input_search)
 
         # Add the open option to the menu
-        if hasattr(self, 'search_action'):
+        if hasattr(self, "search_action"):
             self.menu.addAction(self.search_action)
         self.open_action = QAction(self.app.translate("Tray", "Open"))
         self.open_action.setParent(self.menu)
@@ -83,18 +84,21 @@ class Tray(QSystemTrayIcon):
 
         # Connect the input_search from the menu with actions, only for Windows
         # and Linux OS
-        if hasattr(self, 'input_search'):
+        if hasattr(self, "input_search"):
             self.input_search.changed.connect(self.update_criterion)
             self.input_search.clicked.connect(self.open)
 
     def open(self):
         """This method is called if the event 'open' is launched. Use it as midddleware"""
         initialize = threading.Thread(
-            target=self.app.send, args=(
+            target=self.app.send,
+            args=(
                 '{"action":"kioskinterface",\
-                                                                  "subaction":"initialization"}',))
+                                                                  "subaction":"initialization"}',
+            ),
+        )
         initialize.start()
-        if hasattr(self, 'input_search'):
+        if hasattr(self, "input_search"):
             self.app.notifier.tray_action_open.emit(self.input_search.text)
         else:
             self.app.notifier.tray_action_open.emit("")

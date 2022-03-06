@@ -29,7 +29,7 @@ import PyQt5
 import sys
 
 
-class TestNotifier():
+class TestNotifier:
     """Test the notifier module"""
 
     app = QApplication(sys.argv)
@@ -56,42 +56,28 @@ class TestNotifier():
         assert hasattr(self.notifier, "updated")
 
     def test_type_signals(self):
+        assert isinstance(self.notifier.app_launched, PyQt5.QtCore.pyqtBoundSignal)
+        assert isinstance(self.notifier.app_claused, PyQt5.QtCore.pyqtBoundSignal)
+        assert isinstance(self.notifier.tray_loaded, PyQt5.QtCore.pyqtBoundSignal)
+        assert isinstance(self.notifier.tray_action_open, PyQt5.QtCore.pyqtBoundSignal)
+        assert isinstance(self.notifier.kiosk_loaded, PyQt5.QtCore.pyqtBoundSignal)
+        assert isinstance(self.notifier.server_tcp_start, PyQt5.QtCore.pyqtBoundSignal)
+        assert isinstance(self.notifier.server_tcp_stop, PyQt5.QtCore.pyqtBoundSignal)
         assert isinstance(
-            self.notifier.app_launched,
-            PyQt5.QtCore.pyqtBoundSignal)
+            self.notifier.server_cant_send_message_to_am, PyQt5.QtCore.pyqtBoundSignal
+        )
         assert isinstance(
-            self.notifier.app_claused,
-            PyQt5.QtCore.pyqtBoundSignal)
+            self.notifier.server_ping_presence, PyQt5.QtCore.pyqtBoundSignal
+        )
         assert isinstance(
-            self.notifier.tray_loaded,
-            PyQt5.QtCore.pyqtBoundSignal)
+            self.notifier.server_status_changed, PyQt5.QtCore.pyqtBoundSignal
+        )
         assert isinstance(
-            self.notifier.tray_action_open,
-            PyQt5.QtCore.pyqtBoundSignal)
+            self.notifier.message_received_from_am, PyQt5.QtCore.pyqtBoundSignal
+        )
         assert isinstance(
-            self.notifier.kiosk_loaded,
-            PyQt5.QtCore.pyqtBoundSignal)
-        assert isinstance(
-            self.notifier.server_tcp_start,
-            PyQt5.QtCore.pyqtBoundSignal)
-        assert isinstance(
-            self.notifier.server_tcp_stop,
-            PyQt5.QtCore.pyqtBoundSignal)
-        assert isinstance(
-            self.notifier.server_cant_send_message_to_am,
-            PyQt5.QtCore.pyqtBoundSignal)
-        assert isinstance(
-            self.notifier.server_ping_presence,
-            PyQt5.QtCore.pyqtBoundSignal)
-        assert isinstance(
-            self.notifier.server_status_changed,
-            PyQt5.QtCore.pyqtBoundSignal)
-        assert isinstance(
-            self.notifier.message_received_from_am,
-            PyQt5.QtCore.pyqtBoundSignal)
-        assert isinstance(
-            self.notifier.message_sent_to_am,
-            PyQt5.QtCore.pyqtBoundSignal)
+            self.notifier.message_sent_to_am, PyQt5.QtCore.pyqtBoundSignal
+        )
         assert isinstance(self.notifier.updated, PyQt5.QtCore.pyqtBoundSignal)
 
     def test_connect_signals(self):
@@ -143,13 +129,11 @@ class TestNotifier():
         self.notifier.server_tcp_start.connect(_action_server_tcp_start)
         self.notifier.server_tcp_stop.connect(_action_server_tcp_stop)
         self.notifier.server_cant_send_message_to_am.connect(
-            _action_server_cant_send_message_to_am)
-        self.notifier.server_ping_presence.connect(
-            _action_server_ping_presence)
-        self.notifier.server_status_changed.connect(
-            _action_server_status_changed)
-        self.notifier.message_received_from_am.connect(
-            _action_message_received_from_am)
+            _action_server_cant_send_message_to_am
+        )
+        self.notifier.server_ping_presence.connect(_action_server_ping_presence)
+        self.notifier.server_status_changed.connect(_action_server_status_changed)
+        self.notifier.message_received_from_am.connect(_action_message_received_from_am)
         self.notifier.message_sent_to_am.connect(_action_message_sent_to_am)
         self.notifier.updated.connect(_action_updated)
 
@@ -161,11 +145,11 @@ class TestNotifier():
         assert self.notifier.kiosk_loaded.emit() is None
         assert self.notifier.server_tcp_start.emit() is None
         assert self.notifier.server_tcp_stop.emit() is None
-        assert self.notifier.server_cant_send_message_to_am.emit(
-            "string") is None
+        assert self.notifier.server_cant_send_message_to_am.emit("string") is None
         assert self.notifier.server_ping_presence.emit() is None
         assert self.notifier.server_status_changed.emit() is None
         assert self.notifier.message_received_from_am.emit("string") is None
         assert self.notifier.message_sent_to_am.emit("string") is None
-        assert self.notifier.updated.emit(
-            "string", {"dict": True, "key": "value"}) is None
+        assert (
+            self.notifier.updated.emit("string", {"dict": True, "key": "value"}) is None
+        )

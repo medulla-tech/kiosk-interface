@@ -23,12 +23,13 @@
 
 from PyQt5.QtWidgets import QApplication
 import sys
+
 try:
     from kiosk_interface.kiosk import Kiosk
 except BaseException:
     from kiosk import Kiosk
 
 
-class TestKiosk():
+class TestKiosk:
     app = QApplication(sys.argv)
     kiosk = Kiosk(app)

@@ -29,18 +29,15 @@ import os
 
 def test_config_file():
     """Test the config file path function"""
-    if sys.platform.startswith('win'):
-        assert conffilename(
-            "machine") == "C:\\Program Files\\Pulse\\etc\\agentconf.ini"
-        assert conffilename(
-            "cluster") == "C:\\Program Files\\Pulse\\etc\\cluster.ini"
+    if sys.platform.startswith("win"):
+        assert conffilename("machine") == "C:\\Program Files\\Pulse\\etc\\agentconf.ini"
+        assert conffilename("cluster") == "C:\\Program Files\\Pulse\\etc\\cluster.ini"
         if os.path.isfile("C:\\Program Files\\Pulse\\etc\\relayconf.ini"):
-            assert conffilename(
-                "") == "C:\\Program Files\\Pulse\\etc\\relayconf.ini"
+            assert conffilename("") == "C:\\Program Files\\Pulse\\etc\\relayconf.ini"
         else:
             assert conffilename("") == "relayconf.ini"
 
-    elif sys.platform.startswith('linux'):
+    elif sys.platform.startswith("linux"):
         assert conffilename("machine") == "/etc/pulse-xmpp-agent/agentconf.ini"
         assert conffilename("cluster") == "/etc/pulse-xmpp-agent/cluster.ini"
         if os.path.isfile("/etc/pulse-xmpp-agent/relayconf.ini"):
@@ -50,18 +47,22 @@ def test_config_file():
 
     elif sys.platform.startswith("darwin"):
         assert conffilename("machine") == "agentconf.ini"
-        assert conffilename(
-            "cluster") == "/Library/Application Support/Pulse/etc/cluster.ini"
-        if os.path.isfile(
-                "/Library/Application Support/Pulse/etc/relayconf.ini"):
-            assert conffilename(
-                "") == "/Library/Application Support/Pulse/etc/relayconf.ini"
+        assert (
+            conffilename("cluster")
+            == "/Library/Application Support/Pulse/etc/cluster.ini"
+        )
+        if os.path.isfile("/Library/Application Support/Pulse/etc/relayconf.ini"):
+            assert (
+                conffilename("")
+                == "/Library/Application Support/Pulse/etc/relayconf.ini"
+            )
         else:
             assert conffilename("") == "relayconf.ini"
 
 
-class TestConfig():
+class TestConfig:
     """Test the config module"""
+
     conf = ConfParameter()
 
     def test_init(self):

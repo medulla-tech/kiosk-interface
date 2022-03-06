@@ -21,13 +21,21 @@
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
 # MA 02110-1301, USA.
 
-from PyQt5.QtWidgets import QWidget, QGridLayout, QPushButton, QLabel, QCalendarWidget, QComboBox
+from PyQt5.QtWidgets import (
+    QWidget,
+    QGridLayout,
+    QPushButton,
+    QLabel,
+    QCalendarWidget,
+    QComboBox,
+)
 from PyQt5.QtCore import QDate, QDateTime, QTime, Qt, pyqtSignal
 from datetime import datetime
 
 
 class DatePickerWidget(QWidget):
     """The class DatePickerWidget give a view of calendar elements"""
+
     has_to_send = pyqtSignal(name="has_to_send")
 
     def __init__(self, ref=None, button=None):
@@ -67,24 +75,21 @@ class DatePickerWidget(QWidget):
         #
         self.ref_button.setEnabled(False)
         self.setWindowFlags(
-            Qt.CustomizeWindowHint |
-            Qt.WindowTitleHint |
-            Qt.WindowStaysOnTopHint
+            Qt.CustomizeWindowHint | Qt.WindowTitleHint | Qt.WindowStaysOnTopHint
         )
 
         #
         # Labels
         #
         if self.ref is None:
-            self.label_ask = QLabel(
-                "When do you want to install this package ? ")
+            self.label_ask = QLabel("When do you want to install this package ? ")
         else:
-            package_name = self.ref.name.text(
-            )[0].upper() + self.ref.name.text()[1:]
+            package_name = self.ref.name.text()[0].upper() + self.ref.name.text()[1:]
             self.label_ask = QLabel(
-                "When do you want to install the <span style=\" "
-                "font-size:10pt; font-weight:800; color:#000000;\" >%s</span> package ?" %
-                package_name)
+                'When do you want to install the <span style=" '
+                'font-size:10pt; font-weight:800; color:#000000;" >%s</span> package ?'
+                % package_name
+            )
         self.label_hour = QLabel("Select the installation hour :")
         sep_widget = QLabel("")
 
@@ -158,9 +163,11 @@ class DatePickerWidget(QWidget):
         self.button_cancel.clicked.connect(self.close)
         self.button_later.clicked.connect(self.later)
         self.combo_hours.currentIndexChanged.connect(
-            lambda: self.get_selected_hour('hour'))
+            lambda: self.get_selected_hour("hour")
+        )
         self.combo_minutes.currentIndexChanged.connect(
-            lambda: self.get_selected_hour('minute'))
+            lambda: self.get_selected_hour("minute")
+        )
 
     #
     # Events actions
@@ -186,27 +193,30 @@ class DatePickerWidget(QWidget):
         elif type == "minute":
             self.hour_selected[1] = self.combo_minutes.currentText()
         # Generate the final datetime into utc format
-        self.datetime_current = QDateTime(self.date_today,
-                                          QTime(
-                                              int(self.hour_current[0]),
-                                              int(self.hour_current[1])),
-                                          Qt.LocalTime).toUTC()
-        self.datetime_selected = QDateTime(self.date_selected,
-                                           QTime(int(self.hour_selected[0]),
-                                                 int(self.hour_selected[1])),
-                                           Qt.LocalTime).toUTC()
+        self.datetime_current = QDateTime(
+            self.date_today,
+            QTime(int(self.hour_current[0]), int(self.hour_current[1])),
+            Qt.LocalTime,
+        ).toUTC()
+        self.datetime_selected = QDateTime(
+            self.date_selected,
+            QTime(int(self.hour_selected[0]), int(self.hour_selected[1])),
+            Qt.LocalTime,
+        ).toUTC()
         self.tuple_current = (
             self.datetime_current.date().year(),
             self.datetime_current.date().month(),
             self.datetime_current.date().day(),
             self.datetime_current.time().hour(),
-            self.datetime_current.time().minute())
+            self.datetime_current.time().minute(),
+        )
         self.tuple_selected = (
             self.datetime_selected.date().year(),
             self.datetime_selected.date().month(),
             self.datetime_selected.date().day(),
             self.datetime_selected.time().hour(),
-            self.datetime_selected.time().minute())
+            self.datetime_selected.time().minute(),
+        )
 
     def now(self):
         """Method called when the Now button is called"""

@@ -35,14 +35,14 @@ class EventController(object):
         self.app = appObject
 
         self.app.notifier.app_launched.connect(self.action_app_launched)
-        self.app.notifier.message_sent_to_am.connect(
-            self.action_message_sent_to_am)
+        self.app.notifier.message_sent_to_am.connect(self.action_message_sent_to_am)
         self.app.notifier.server_cant_send_message_to_am.connect(
-            self.action_server_cant_send_message_to_am)
+            self.action_server_cant_send_message_to_am
+        )
         self.app.notifier.message_received_from_am.connect(
-            self.action_message_received_from_am)
-        self.app.notifier.tray_action_open.connect(
-            self.action_tray_action_open)
+            self.action_message_received_from_am
+        )
+        self.app.notifier.tray_action_open.connect(self.action_tray_action_open)
 
     def action_message_received_from_am(self, message="{}"):
         """Action launched when the kiosk receive a message from Agent Master.
@@ -52,8 +52,8 @@ class EventController(object):
 
         self.app.message = message
         self.app.logger(
-            "info", self.app.translate(
-                "Server", "Received message from AM"))
+            "info", self.app.translate("Server", "Received message from AM")
+        )
         if self.app.connected is False:
             self.app.connected = True
             self.app.notifier.server_status_changed.emit()
@@ -64,7 +64,10 @@ class EventController(object):
             decoded = json.loads(self.app.message)
 
             if "action" in decoded:
-                if decoded["action"] == "packages" or decoded["action"] == "update_profile":
+                if (
+                    decoded["action"] == "packages"
+                    or decoded["action"] == "update_profile"
+                ):
                     if "packages_list" in decoded:
                         self.app.packages = decoded["packages_list"]
 
@@ -72,8 +75,8 @@ class EventController(object):
 
                     packages = self.app.packages
                     for package in packages:
-                        if package['uuid'] == decoded['uuid']:
-                            package['launcher'] = decoded['launcher']
+                        if package["uuid"] == decoded["uuid"]:
+                            package["launcher"] = decoded["launcher"]
                     self.app.packages = packages
 
                 elif decoded["action"] == "presence":
@@ -85,40 +88,38 @@ class EventController(object):
                 elif decoded["action"] == "action_notification":
                     if self.app.kiosk.tab_notification is not None:
                         self.app.kiosk.tab_notification.add_notification(
-                            decoded['data']["message"])
+                            decoded["data"]["message"]
+                        )
                     else:
                         print(decoded["message"])
 
-                    if 'status' in decoded['data'] and 'stat' in decoded['data']:
-                        uuid = decoded['data']['path'].split("/")
+                    if "status" in decoded["data"] and "stat" in decoded["data"]:
+                        uuid = decoded["data"]["path"].split("/")
                         uuid = uuid[-1]
 
                         _package = {}
                         index = 0
                         for package in self.app.packages:
-                            if package['uuid'] == uuid:
+                            if package["uuid"] == uuid:
                                 index = self.app.packages.index(package)
                                 _package = package
-                                _package['status'] = decoded['data']['status']
-                                _package['stat'] = int(decoded['data']['stat'])
+                                _package["status"] = decoded["data"]["status"]
+                                _package["stat"] = int(decoded["data"]["stat"])
 
                         self.app.packages[index] = _package
 
                 self.app.kiosk.tab_kiosk.search()
-        except Exception as error:
+        except Exception:
             self.app.logger(
-                "error", self.app.translate(
-                    "Action", "Error when trying to load datas"))
+                "error", self.app.translate("Action", "Error when trying to load datas")
+            )
 
     def action_app_launched(self):
         """Action launched when the kiosk is launched"""
-        self.app.send(
-            '{"action":"kioskinterface", "subaction":"initialization"}')
+        self.app.send('{"action":"kioskinterface", "subaction":"initialization"}')
         self.app.logger(
-            "info",
-            self.app.translate(
-                "Application",
-                "Application launched"))
+            "info", self.app.translate("Application", "Application launched")
+        )
 
     def action_message_sent_to_am(self, message):
         """Action launched when a message is sent to the Agent Machine"""
@@ -140,8 +141,8 @@ class EventController(object):
     def action_tray_action_open(self, criterion):
         """Action launched when the open action is pressed in the tray menu"""
         self.app.logger(
-            'info', self.app.translate(
-                "Kiosk", "Initialize the kiosk main window"))
+            "info", self.app.translate("Kiosk", "Initialize the kiosk main window")
+        )
         self.app.send_ping()
         self.app.kiosk.tab_kiosk.input_search.setText(criterion)
         self.app.kiosk.tab_kiosk.search()

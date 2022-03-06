@@ -31,13 +31,19 @@ class MessengerFromAM(object):
         self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.server_address = (
             self.app.parameters.am_server,
-            self.app.parameters.kiosk_local_port)
+            self.app.parameters.kiosk_local_port,
+        )
         self.sock.bind(self.server_address)
         self.sock.listen(5)
         self.eventkill = threading.Event()
         self.client_handlertcp = threading.Thread(
-            target=self.tcpserver, args=(
-                self.app, self.sock, self.eventkill,))
+            target=self.tcpserver,
+            args=(
+                self.app,
+                self.sock,
+                self.eventkill,
+            ),
+        )
         # run server tcpserver for kiosk
         self.client_handlertcp.start()
 
@@ -53,18 +59,22 @@ class MessengerFromAM(object):
             connection, client_address = sock.accept()
             client_handler = threading.Thread(
                 target=self.handle_client_connection,
-                args=(ref, connection,))
+                args=(
+                    ref,
+                    connection,
+                ),
+            )
             client_handler.start()
 
     def handle_client_connection(self, ref, client_socket):
         """
-            this function handles the message received from kiosk
-            the function must provide a response to an acknowledgment kiosk or a result
-            Args:
-                client_socket: socket for exchanges between AM and Kiosk
+        this function handles the message received from kiosk
+        the function must provide a response to an acknowledgment kiosk or a result
+        Args:
+            client_socket: socket for exchanges between AM and Kiosk
 
-            Returns:
-                no return value
+        Returns:
+            no return value
         """
         try:
             # request the recv message
@@ -88,7 +98,8 @@ class MessengerToAM(object):
         # Connect the socket to the port where the server is listening
         server_address = (
             self.app.parameters.am_server,
-            self.app.parameters.am_local_port)
+            self.app.parameters.am_local_port,
+        )
         self.active = False
 
         try:
@@ -105,7 +116,7 @@ class MessengerToAM(object):
         """
         if self.active:
             if not isinstance(msg, bytes):
-                self.sock.sendall(msg.encode('utf-8'))
+                self.sock.sendall(msg.encode("utf-8"))
                 self.app.notifier.message_sent_to_am.emit(msg)
             else:
                 self.sock.sendall(msg)

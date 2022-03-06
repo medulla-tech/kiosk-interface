@@ -21,8 +21,17 @@
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
 # MA 02110-1301, USA.
 
-from PyQt5.QtWidgets import QListWidgetItem, QWidget, QVBoxLayout, QListWidget, QLineEdit, QLabel, QTabWidget, \
-    QGridLayout
+from PyQt5.QtWidgets import (
+    QListWidgetItem,
+    QWidget,
+    QVBoxLayout,
+    QListWidget,
+    QLineEdit,
+    QLabel,
+    QTabWidget,
+    QGridLayout,
+)
+
 try:
     from kiosk_interface.views.custom_package_item import CustomPackageWidget
     from kiosk_interface.views.tab_kiosk import TabKiosk
@@ -39,10 +48,10 @@ class Kiosk(QWidget):
 
     def __init__(self, app):
         """
-            Initialize the kiosk object.
-            This object set up the mechanism to control the kiosk window
-            Params:
-                app: QApplication is a reference of the main application
+        Initialize the kiosk object.
+        This object set up the mechanism to control the kiosk window
+        Params:
+            app: QApplication is a reference of the main application
         """
         super().__init__()
         self.app = app
@@ -50,10 +59,8 @@ class Kiosk(QWidget):
         self.resize(self.app.parameters.width, self.app.parameters.height)
 
         self.app.logger(
-            "info",
-            self.app.translate(
-                "Application",
-                "Kiosk main view initialization"))
+            "info", self.app.translate("Application", "Kiosk main view initialization")
+        )
         self.tab_kiosk = TabKiosk(self.app, self)
         self.tab_notification = TabNotification(self.app, self)
 

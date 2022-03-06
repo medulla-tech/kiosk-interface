@@ -28,14 +28,14 @@ import configparser
 
 def conffilename(agenttype):
     """
-        Function defining where the configuration file is located.
-        configuration file for the type of machifne and the Operating System
+    Function defining where the configuration file is located.
+    configuration file for the type of machifne and the Operating System
 
-        Args:
-        agenttype: type of the agent, relay or machine or (cluster for ARS)
+    Args:
+    agenttype: type of the agent, relay or machine or (cluster for ARS)
 
-        Returns:
-        Return the config file path
+    Returns:
+    Return the config file path
 
     """
     if agenttype in ["machine"]:
@@ -44,26 +44,16 @@ def conffilename(agenttype):
         conffilenameparameter = "cluster.ini"
     else:
         conffilenameparameter = "relayconf.ini"
-    if sys.platform.startswith('linux'):
+    if sys.platform.startswith("linux"):
+        fileconf = os.path.join("/", "etc", "pulse-xmpp-agent", conffilenameparameter)
+    elif sys.platform.startswith("win"):
         fileconf = os.path.join(
-            "/",
-            "etc",
-            "pulse-xmpp-agent",
-            conffilenameparameter)
-    elif sys.platform.startswith('win'):
+            os.environ["ProgramFiles"], "Pulse", "etc", conffilenameparameter
+        )
+    elif sys.platform.startswith("darwin"):
         fileconf = os.path.join(
-            os.environ["ProgramFiles"],
-            "Pulse",
-            "etc",
-            conffilenameparameter)
-    elif sys.platform.startswith('darwin'):
-        fileconf = os.path.join(
-            "/",
-            "Library",
-            "Application Support",
-            "Pulse",
-            "etc",
-            conffilenameparameter)
+            "/", "Library", "Application Support", "Pulse", "etc", conffilenameparameter
+        )
     else:
         fileconf = conffilenameparameter
     if conffilenameparameter == "cluster.ini":
@@ -77,7 +67,7 @@ def conffilename(agenttype):
 class ConfParameter:
     """ConfParameter create an interface to make easier the use of config files."""
 
-    def __init__(self, typeconf='machine'):
+    def __init__(self, typeconf="machine"):
         """
         Initialization of ConfParameter object
         Param:
@@ -95,12 +85,12 @@ class ConfParameter:
         self.am_server = "localhost"
 
         # Set these attribute with config element found
-        if config.has_option('kiosk', 'am_local_port'):
-            self.am_local_port = config.getint('kiosk', 'am_local_port')
-        if config.has_option('kiosk', 'kiosk_local_port'):
-            self.kiosk_local_port = config.getint('kiosk', 'kiosk_local_port')
-        if config.has_option('kiosk', 'am_server'):
-            self.am_server = config.get('kiosk', 'am_server')
+        if config.has_option("kiosk", "am_local_port"):
+            self.am_local_port = config.getint("kiosk", "am_local_port")
+        if config.has_option("kiosk", "kiosk_local_port"):
+            self.kiosk_local_port = config.getint("kiosk", "kiosk_local_port")
+        if config.has_option("kiosk", "am_server"):
+            self.am_server = config.get("kiosk", "am_server")
 
         self.width = 650
         self.height = 550
