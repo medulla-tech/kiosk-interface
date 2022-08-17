@@ -50,69 +50,76 @@ class EventController(object):
             message: str this message is normally a json stringified. In function of the elements contained in the message,
             the action will reacts differently."""
 
-        self.app.message = message
+        # To be sure the message is a string, not bytes
+        if(isinstance(message, bytes)):
+            try:
+                message = message.decode("utf-8")
+            except:
+                pass
+            
+        self.app.row_message = message
         self.app.logger(
             "info", self.app.translate("Server", "Received message from AM")
         )
+
+        try:
+            self.app.message = json.loads(message)
+        except:
+            self.app.message = {}
+            self.app.logger(
+                "error", self.app.translate("Action", "Error when trying to load datas")
+            )
+
         if self.app.connected is False:
             self.app.connected = True
             self.app.notifier.server_status_changed.emit()
 
-        print("message reçu :")
-        print(message)
-        try:
-            decoded = json.loads(self.app.message)
+        if "action" in self.app.message:
+            if (
+                self.app.message["action"] == "packages"
+                or self.app.message["action"] == "update_profile"
+            ):
+                if "packages_list" in self.app.message:
+                    self.app.packages = self.app.message["packages_list"]
 
-            if "action" in decoded:
-                if (
-                    decoded["action"] == "packages"
-                    or decoded["action"] == "update_profile"
-                ):
-                    if "packages_list" in decoded:
-                        self.app.packages = decoded["packages_list"]
+            elif self.app.message["action"] == "update_launcher":
 
-                elif decoded["action"] == "update_launcher":
+                packages = self.app.packages
+                for package in packages:
+                    if package["uuid"] == self.app.message["uuid"]:
+                        package["launcher"] = self.app.message["launcher"]
+                self.app.packages = packages
 
-                    packages = self.app.packages
-                    for package in packages:
-                        if package["uuid"] == decoded["uuid"]:
-                            package["launcher"] = decoded["launcher"]
-                    self.app.packages = packages
+            elif self.app.message["action"] == "presence":
+                # If the AM send a ping to the kiosk, it answers by a pong
+                if self.app.message["type"] == "ping":
+                    self.app.states['server_connected'] = True
+                    self.app.send_pong()
 
-                elif decoded["action"] == "presence":
-                    # If the AM send a ping to the kiosk, it answers by a pong
-                    if decoded["type"] == "ping":
-                        self.app.connected = True
-                        self.app.send_pong()
+            elif self.app.message["action"] == "action_notification":
+                if self.app.kiosk.tab_notification is not None:
+                    self.app.kiosk.tab_notification.add_notification(
+                        self.app.message["data"]["message"]
+                    )
+                else:
+                    print(self.app.message["message"])
 
-                elif decoded["action"] == "action_notification":
-                    if self.app.kiosk.tab_notification is not None:
-                        self.app.kiosk.tab_notification.add_notification(
-                            decoded["data"]["message"]
-                        )
-                    else:
-                        print(decoded["message"])
+                if "status" in self.app.message["data"] and "stat" in self.app.message["data"]:
+                    uuid = self.app.message["data"]["path"].split("/")
+                    uuid = uuid[-1]
 
-                    if "status" in decoded["data"] and "stat" in decoded["data"]:
-                        uuid = decoded["data"]["path"].split("/")
-                        uuid = uuid[-1]
+                    _package = {}
+                    index = 0
+                    for package in self.app.packages:
+                        if package["uuid"] == uuid:
+                            index = self.app.packages.index(package)
+                            _package = package
+                            _package["status"] = self.app.message["data"]["status"]
+                            _package["stat"] = int(self.app.message["data"]["stat"])
 
-                        _package = {}
-                        index = 0
-                        for package in self.app.packages:
-                            if package["uuid"] == uuid:
-                                index = self.app.packages.index(package)
-                                _package = package
-                                _package["status"] = decoded["data"]["status"]
-                                _package["stat"] = int(decoded["data"]["stat"])
+                    self.app.packages[index] = _package
 
-                        self.app.packages[index] = _package
-
-                self.app.kiosk.tab_kiosk.search()
-        except Exception:
-            self.app.logger(
-                "error", self.app.translate("Action", "Error when trying to load datas")
-            )
+            self.app.kiosk.tab_kiosk.search()
 
     def action_app_launched(self):
         """Action launched when the kiosk is launched"""

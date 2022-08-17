@@ -64,17 +64,19 @@ class Application(QApplication):
         #   self.app.eventCtrl is a reference to the EventController
         #   self.app.parameters is a reference to the Config
 
+        # Shortcuts to some working directories
         self.rootdir = os.path.dirname(__file__)
         self.datasdir = os.path.join(self.rootdir, "datas")
         self.viewsdir = os.path.join(self.rootdir, "views")
-        
+
         # Notify the application when something is happening
         self.notifier = Notifier()
         # Action launched when the kiosk emit a notification
         self.eventCtrl = EventController(self)
 
         self.connected = False
-        self.message = None  # Contains the last received message interpreted as dict
+        self.row_message = ""  # Contains the last received message interpreted as dict
+        self.message = {}
         self.packages = []  # Contains the packages of the application
 
         # Reference to a translate function
