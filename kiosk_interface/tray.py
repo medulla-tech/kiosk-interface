@@ -22,7 +22,7 @@
 # MA 02110-1301, USA.
 
 import sys
-
+import os
 
 from PyQt5.QtGui import QIcon
 from PyQt5.QtWidgets import QSystemTrayIcon, QMenu, QAction, QWidgetAction
@@ -49,8 +49,7 @@ class Tray(QSystemTrayIcon):
         # Call the view for the System Tray
         msg = self.app.translate("Tray", "Launch the tray")
         self.app.logger("info", "%s" % msg)
-
-        self.icon = QIcon("datas/kiosk.png")
+        self.icon = QIcon(os.path.join(self.app.datasdir,"kiosk.png"))
 
         self.setToolTip(self.app.translate("Tray", "Kiosk"))
         self.setIcon(self.icon)
@@ -93,8 +92,7 @@ class Tray(QSystemTrayIcon):
         initialize = threading.Thread(
             target=self.app.send,
             args=(
-                '{"action":"kioskinterface",\
-                                                                  "subaction":"initialization"}',
+                '{"action":"kioskinterface", "subaction":"initialization"}',
             ),
         )
         initialize.start()

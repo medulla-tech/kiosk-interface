@@ -63,14 +63,14 @@ class CustomPackageWidget(QWidget):
         self.name = QLabel(package["name"])
 
         if "icon" in package and package["icon"] != "kiosk.png":
-            icon = QPixmap("datas/" + package["icon"])
+            icon = QPixmap(os.path.join(self.app.datasdir, package["icon"]))
         else:
             icon_name = search_icon_by_name(package["name"])
 
             if icon_name is False:
-                icon = QPixmap("datas/kiosk.png")
+                icon = QPixmap(os.path.join(self.app.datasdir,"kiosk.png"))
             else:
-                icon = QPixmap("datas/" + icon_name)
+                icon = QPixmap(os.path.join(self.app.datasdir, icon_name))
         icon = icon.scaled(24, 24)
         self.icon.setPixmap(icon)
 
@@ -281,7 +281,7 @@ def search_icon_by_name(name):
     """
     prefix = name.split(".")[0]
 
-    datas_dir = os.path.join(os.getcwd(), "datas")
+    datas_dir = os.path.join(os.path.dirname(__file__), '..', "datas")
     icon_list = os.listdir(datas_dir)
     icon_list = [
         {"name": icon.split(".")[0], "ext": icon.split(".")[1]} for icon in icon_list

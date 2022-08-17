@@ -22,6 +22,7 @@
 # MA 02110-1301, USA.
 
 import sys
+import os
 from PyQt5.QtWidgets import QApplication
 from PyQt5.QtGui import QIcon
 
@@ -63,6 +64,10 @@ class Application(QApplication):
         #   self.app.eventCtrl is a reference to the EventController
         #   self.app.parameters is a reference to the Config
 
+        self.rootdir = os.path.dirname(__file__)
+        self.datasdir = os.path.join(self.rootdir, "datas")
+        self.viewsdir = os.path.join(self.rootdir, "views")
+        
         # Notify the application when something is happening
         self.notifier = Notifier()
         # Action launched when the kiosk emit a notification
@@ -86,7 +91,7 @@ class Application(QApplication):
         # The mechanics are launched here
         self.notifier.app_launched.emit()
 
-        self.setWindowIcon(QIcon("datas/kiosk.png"))
+        self.setWindowIcon(QIcon(os.path.join(os.path.dirname(__file__), "datas", "kiosk.png")))
         self.setApplicationName("Kiosk")
         # When the window is closed, the process is not killed
         self.setQuitOnLastWindowClosed(False)

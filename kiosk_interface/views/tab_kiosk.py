@@ -126,6 +126,6 @@ class TabKiosk(QWidget):
                 self.list_wrapper.addItem(item_widget)
                 self.list_wrapper.setItemWidget(item_widget, custom_package)
 
-    def status_changed(self):
+    def status_changed(self, msg=""):
         """Modify the status in the kiosk view"""
         self.label_status.setText(msg)
