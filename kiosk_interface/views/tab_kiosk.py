@@ -57,14 +57,9 @@ class TabKiosk(QWidget):
         self.app.notifier.server_status_changed.connect(self.status_changed)
         self.resize(self.app.parameters.width, self.app.parameters.height)
 
-        if self.app.connected is False:
-            self.label_status = QLabel(
-                self.app.translate("Kiosk", "Status : Disconnected")
-            )
-        else:
-            self.label_status = QLabel(
-                self.app.translate("Kiosk", "Status : Connected")
-            )
+        self.label_status = QLabel(self.app.translate("Kiosk", "Status : Disconnected"))
+        self.status_changed()
+        
         self.input_search = QLineEdit(self.app.tray.criterion, self)
         self.input_search.setPlaceholderText("Search a package by name")
 
@@ -126,6 +121,14 @@ class TabKiosk(QWidget):
                 self.list_wrapper.addItem(item_widget)
                 self.list_wrapper.setItemWidget(item_widget, custom_package)
 
-    def status_changed(self, msg=""):
+    def status_changed(self):
         """Modify the status in the kiosk view"""
+        msg = ""
+
+        # For unknown reason self.app.translate return empty message.
+        # It has for consequences an empty status
+        if self.app.connected is False:
+            msg = "Status : Disconnected"
+        else:
+            msg = "Status : Connected"
         self.label_status.setText(msg)
