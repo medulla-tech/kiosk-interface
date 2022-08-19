@@ -50,3 +50,5 @@ class Notifier(QWidget):
             dict,
         )
     )
+
+    toaster_new_update = pyqtSignal((dict,))

@@ -91,28 +91,29 @@ class CustomPackageWidget(QWidget):
         self.actions = []
         self.action_button = {}
 
-        for action in package["action"]:
-            if action == "Launch":
-                if "launcher" in package:
+        if "action" in package:
+            for action in package["action"]:
+                if action == "Launch":
+                    if "launcher" in package:
+                        self.actions.append(action)
+                        self.action_button[action] = QPushButton(action)
+                    else:
+                        pass
+                else:
                     self.actions.append(action)
                     self.action_button[action] = QPushButton(action)
-                else:
-                    pass
-            else:
-                self.actions.append(action)
-                self.action_button[action] = QPushButton(action)
 
-        self.layout = QGridLayout()
+            self.layout = QGridLayout()
 
-        layout_info = QHBoxLayout()
-        layout_info.addWidget(self.icon)
-        layout_info.addWidget(self.name)
-        layout_info.addWidget(self.version)
-        layout_info.addWidget(self.description)
+            layout_info = QHBoxLayout()
+            layout_info.addWidget(self.icon)
+            layout_info.addWidget(self.name)
+            layout_info.addWidget(self.version)
+            layout_info.addWidget(self.description)
 
-        layout_action = QHBoxLayout()
-        for action in self.actions:
-            layout_action.addWidget(self.action_button[action])
+            layout_action = QHBoxLayout()
+            for action in self.actions:
+                layout_action.addWidget(self.action_button[action])
 
         # Displays a progressbar only if the package has a status and a stat of
         # progression
@@ -124,7 +125,8 @@ class CustomPackageWidget(QWidget):
             self.statusbar.setValue(package["stat"])
 
             # Enable / disable the button if the progressbar is not completed
-            if package["status"] in package["action"]:
+
+            if "action" in package and package["status"] in package["action"]:
                 if 0 < self.statusbar.value() < 100:
                     if package["status"] in self.action_button:
                         self.action_button[package["status"]].setEnabled(False)

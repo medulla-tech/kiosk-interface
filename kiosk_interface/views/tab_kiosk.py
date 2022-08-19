@@ -96,6 +96,11 @@ class TabKiosk(QWidget):
         self.custom_packages = []
         flag = False
         for package in self.app.packages:
+            if "name" not in package or\
+                "uuid" not in package:
+                continue
+            if "action" not in package:
+                package["action"] = []
             if self.input_search.text() != "":
                 if re.search(
                     self.input_search.text(), package["name"], flags=re.IGNORECASE

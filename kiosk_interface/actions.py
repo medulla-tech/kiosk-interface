@@ -24,6 +24,7 @@
 
 import json
 
+from views.toaster import ToasterWidget
 
 class EventController(object):
     """Bind events with actions"""
@@ -43,6 +44,7 @@ class EventController(object):
             self.action_message_received_from_am
         )
         self.app.notifier.tray_action_open.connect(self.action_tray_action_open)
+        self.app.notifier.toaster_new_update.connect(self.action_toaster_new_update)
 
     def action_message_received_from_am(self, message="{}"):
         """Action launched when the kiosk receive a message from Agent Master.
@@ -79,11 +81,33 @@ class EventController(object):
                 self.app.message["action"] == "packages"
                 or self.app.message["action"] == "update_profile"
             ):
+                """
+                Example of message received:
+                {
+                    "action":"packages", 
+                    "packages_list":[
+                        {
+                            "icon":"firefox.png", 
+                            "name":"firefox", 
+                            "uuid":"uuid_of_firefox_package", 
+                            "action":["Launcher", "Install", "Uninstall", "Ask", "Update"], # This line add buttons
+                            "Launcher" : "C:\\Program Files\\Mozilla Firefox\\firefox.exe" # This line is associated to the Launcher button
+                        }
+                    ]
+                }
+                """
                 if "packages_list" in self.app.message:
                     self.app.packages = self.app.message["packages_list"]
 
             elif self.app.message["action"] == "update_launcher":
-
+                """
+                Example of message received : 
+                {
+                    "action":"update_launcher", 
+                    "uuid":"package_uuid", 
+                    "launcher":"C:\\Program Files\\Oracle\\VirtualBox\\VirtualBox.exe"
+                }
+                """
                 packages = self.app.packages
                 for package in packages:
                     if package["uuid"] == self.app.message["uuid"]:
@@ -92,11 +116,25 @@ class EventController(object):
 
             elif self.app.message["action"] == "presence":
                 # If the AM send a ping to the kiosk, it answers by a pong
+                """
+                {
+                    "action": "presence",
+                    "type": "ping"
+                }
+                """
                 if self.app.message["type"] == "ping":
-                    self.app.states['server_connected'] = True
+                    self.app.connected = True
                     self.app.send_pong()
 
             elif self.app.message["action"] == "action_notification":
+                """
+                {
+                    "action": "action_notification",
+                    "data":{
+                        "message": "my message"
+                    }
+                }
+                """
                 if self.app.kiosk.tab_notification is not None:
                     self.app.kiosk.tab_notification.add_notification(
                         self.app.message["data"]["message"]
@@ -119,6 +157,22 @@ class EventController(object):
 
                     self.app.packages[index] = _package
 
+            elif self.app.message["action"] == "toaster_update":
+                """
+                Example of message:
+                {
+                    "action": "toaster_update",
+                    "datas": {
+                        "uuid":"pkg_uuid",
+                        "name":"pkg_name",
+                        "remaining_attempts":3
+                    }
+                }
+                """
+                # popup a toaster like window with all infos
+                self.app.notifier.toaster_new_update.emit(self.app.message["datas"])
+
+            # by calling this method, we refresh the package list view
             self.app.kiosk.tab_kiosk.search()
 
     def action_app_launched(self):
@@ -154,3 +208,8 @@ class EventController(object):
         self.app.kiosk.tab_kiosk.input_search.setText(criterion)
         self.app.kiosk.tab_kiosk.search()
         self.app.kiosk.show()
+
+    def action_toaster_new_update(self, datas):
+        self.app.independant["toaster"] = ToasterWidget(self.app, datas)
+        self.app.independant["toaster"].show()
+        

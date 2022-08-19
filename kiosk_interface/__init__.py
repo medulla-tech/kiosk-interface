@@ -24,9 +24,11 @@
 import sys
 import os
 from PyQt5.QtWidgets import QApplication
+from PyQt5.QtCore import QCoreApplication
 from PyQt5.QtGui import QIcon
 
 try:
+    # Import for unit tests
     from kiosk_interface.config import ConfParameter
     from kiosk_interface.tray import Tray
     from kiosk_interface.kiosk import Kiosk
@@ -34,13 +36,13 @@ try:
     from kiosk_interface.actions import EventController
     from kiosk_interface.server import MessengerToAM, MessengerFromAM
 except BaseException:
+    # Import for normal use
     from config import ConfParameter
     from tray import Tray
     from kiosk import Kiosk
     from notifier import Notifier
     from actions import EventController
     from server import MessengerToAM, MessengerFromAM
-from PyQt5.QtCore import QCoreApplication
 
 
 class Application(QApplication):
@@ -93,7 +95,7 @@ class Application(QApplication):
         # The mechanics are launched here
         self.notifier.app_launched.emit()
 
-        self.setWindowIcon(QIcon(os.path.join(os.path.dirname(__file__), "datas", "kiosk.png")))
+        self.setWindowIcon(QIcon(os.path.join(self.datasdir, "datas", "kiosk.png")))
         self.setApplicationName("Kiosk")
         # When the window is closed, the process is not killed
         self.setQuitOnLastWindowClosed(False)
@@ -104,8 +106,11 @@ class Application(QApplication):
         # Contains the kiosk app
         self.kiosk = Kiosk(self)
 
-    def run(self):
+        # Contains ref to independant windows
+        self.independant = {}
 
+    def run(self):
+        """Launch the main loop"""
         self.exec()
 
     # Associate a unique sender. This module send messages to AM
