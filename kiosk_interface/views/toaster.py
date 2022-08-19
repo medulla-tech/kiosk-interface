@@ -56,7 +56,8 @@ class ToasterWidget(QWidget):
         
         self.layout = None
         self.timer = None
-        self.count_time = 0
+        # count_time setted to 5 min
+        self.count_time = 5*60
         self.toast_response_date = None
         self.init_ui()
 
@@ -65,9 +66,18 @@ class ToasterWidget(QWidget):
         #self.setVisible(False)
         self.setWindowFlags(Qt.Widget|Qt.CustomizeWindowHint|Qt.WindowTitleHint |Qt.WindowStaysOnTopHint)
         self.label_title = QLabel("Install  %s"%self.datas["name"])
-        self.label_attempts = QLabel("You can postpone %s more times"%self.datas["remaining_attempts"])
 
-        self.button_now = QPushButton("Install Now")
+        if self.datas["remaining_attempts"] > 0:
+            self.button_now = QPushButton("Install Now")
+            if self.datas["remaining_attempts"] == 1:
+                self.label_attempts = QLabel("You can postpone %s more times\nIt's your last chance to do it"%self.datas["remaining_attempts"])
+            else:
+                self.label_attempts = QLabel("You can postpone %s more times"%self.datas["remaining_attempts"])
+
+        else:
+            min = int(self.count_time/60)
+            sec = self.count_time%60
+            self.button_now = QPushButton("Install Now (%s min %s secs)"%(min, sec))
         self.button_later = QPushButton("Postpone")
 
         self.combo_report = QComboBox()
@@ -78,30 +88,25 @@ class ToasterWidget(QWidget):
         self.layout.addWidget(self.label_attempts, 1, 0, 1, 4)
 
         self.timer = QTimer()
-        
         self.timer.start(1000)
         
-        button_now_width = 4
-        button_now_position = 0
         if "remaining_attempts" in self.datas and self.datas["remaining_attempts"] > 0:
             self.layout.addWidget(self.combo_report, 2, 0, 1, 4)
             self.layout.addWidget(self.button_later, 3, 0, 1, 1)
-            button_now_width = 1
-            button_now_position = 3
-        self.layout.addWidget(self.button_now, 3, button_now_position, 1, button_now_width)
+            self.layout.addWidget(self.button_now, 3, 3, 1, 1)
+        else:
+            self.layout.addWidget(self.button_now, 3, 0, 1, 4)
 
         self.setLayout(self.layout)
 
+        if "remaining_attempts" not in self.datas or self.datas["remaining_attempts"] == 0:
+            self.timer.timeout.connect(self.countdown)
         self.button_later.clicked.connect(self.later)
         self.button_now.clicked.connect(self.now)
 
-        
-        self.timer.timeout.connect(self.time)
-
     def show(self):
         super().show()
-        if "remaining_attempts" not in self.datas or self.datas["remaining_attempts"] == 0:
-            self.now()
+        
 
 
     def now(self):
@@ -124,7 +129,13 @@ class ToasterWidget(QWidget):
     def close(self):
         super().close()
 
-    def time(self):
-        self.count_time += 1
+    def countdown(self):
+        self.count_time -= 1
 
-        print(self.count_time)
+        min = int(self.count_time/60)
+        sec = self.count_time%60
+
+        self.button_now.setText("Install Now (%s min %s sec)"%(min, sec))
+        if self.count_time == 0:
+            self.timer.stop()
+            self.now()
