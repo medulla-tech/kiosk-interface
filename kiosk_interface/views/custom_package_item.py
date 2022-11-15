@@ -291,7 +291,7 @@ def search_icon_by_name(name):
 
     # Research the prefix in name value of icon_list
     for icon in icon_list:
-        if re.match(prefix, icon["name"], re.I):
+        if re.match(prefix.replace('+', '\+').replace('*', '\*'), icon["name"], re.I):
             return icon["name"] + "." + icon["ext"]
     return False
 
