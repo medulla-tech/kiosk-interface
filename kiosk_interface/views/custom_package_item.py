@@ -41,6 +41,7 @@ except BaseException:
 import base64
 import os
 import subprocess
+from datetime import datetime
 
 
 class CustomPackageWidget(QWidget):
@@ -243,15 +244,15 @@ class CustomPackageWidget(QWidget):
 
         elif action == "Ask":
             self._message = (
-                """{"uuid": "%s", "action": "kioskinterface%s", "subaction": "%s"}"""
-                % (self.uuid, action, action)
+                """{"uuid": "%s", "action": "kioskinterface%s", "subaction": "%s", "askuser":"%s", "askdate":"%s"}"""
+                % (self.uuid, action, action, os.getlogin(), datetime.now())
             )
             self.app.send(self._message)
             msg = self.app.translate(
                 "Action",
                 "The access to the application %s is asked to admin" % self.name.text(),
             )
-            # self.app.kiosk.tab_notification.add_notification(msg)
+            self.app.kiosk.tab_notification.add_notification(msg)
 
         elif action == "Update":
             self._message = (
