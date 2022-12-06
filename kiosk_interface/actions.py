@@ -126,10 +126,10 @@ class EventController(object):
                     self.app.connected = True
                     self.app.send_pong()
 
-            elif self.app.message["action"] == "action_notification":
+            elif self.app.message["action"] == "action_kiosknotification":
                 """
                 {
-                    "action": "action_notification",
+                    "action": "action_kiosknotification",
                     "data":{
                         "message": "my message"
                     }
