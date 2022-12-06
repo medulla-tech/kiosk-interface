@@ -54,7 +54,7 @@ The Agent Machine can send a ping to the kiosk to know if it's present or not.
 The Agent Machine can send informative messages to the kiosk :
 
     {
-        "action": "action_notification",
+        "action": "action_kiosknotification",
         "data":{
             "message": "my message"
         }
