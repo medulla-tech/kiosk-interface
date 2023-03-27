@@ -44,16 +44,19 @@ class TabNotification(QWidget):
 
     def add_notification(self, message):
         date_str = (
-            str(datetime.now().year)
-            + "/"
-            + str(datetime.now().month)
-            + "/"
-            + str(str(datetime.now().day))
-            + " "
+            (
+                (
+                    str(datetime.now().year)
+                    + "/"
+                    + str(datetime.now().month)
+                    + "/"
+                    + str(datetime.now().day)
+                )
+                + " "
+            )
             + str(datetime.now().hour)
             + ":"
-            + str(datetime.now().minute)
-        )
+        ) + str(datetime.now().minute)
 
         msg = "\n" + date_str + " -- " + message
 

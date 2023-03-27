@@ -58,7 +58,7 @@ class EventController(object):
                 message = message.decode("utf-8")
             except:
                 pass
-            
+
         self.app.row_message = message
         self.app.logger(
             "info", self.app.translate("Server", "Received message from AM")
@@ -77,10 +77,7 @@ class EventController(object):
             self.app.notifier.server_status_changed.emit()
 
         if "action" in self.app.message:
-            if (
-                self.app.message["action"] == "packages"
-                or self.app.message["action"] == "update_profile"
-            ):
+            if self.app.message["action"] in ["packages", "update_profile"]:
                 """
                 Example of message received:
                 {
@@ -192,7 +189,7 @@ class EventController(object):
     def action_server_cant_send_message_to_am(self, message):
         """Action launched when a message is received from the Agent Machine"""
         msg = self.app.translate("Server", "Message can't be sent to AM ")
-        print(msg + ": %s" % message)
+        print(f"{msg}: {message}")
 
         if self.app.connected is True:
             self.app.connected = False

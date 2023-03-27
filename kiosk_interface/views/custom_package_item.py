@@ -94,16 +94,13 @@ class CustomPackageWidget(QWidget):
 
         if "action" in package:
             for action in package["action"]:
-                if action == "Launch":
-                    if "launcher" in package:
-                        self.actions.append(action)
-                        self.action_button[action] = QPushButton(action)
-                    else:
-                        pass
-                else:
+                if (
+                    action == "Launch"
+                    and "launcher" in package
+                    or action != "Launch"
+                ):
                     self.actions.append(action)
                     self.action_button[action] = QPushButton(action)
-
             self.layout = QGridLayout()
 
             layout_info = QHBoxLayout()
@@ -131,8 +128,6 @@ class CustomPackageWidget(QWidget):
                 if 0 < self.statusbar.value() < 100:
                     if package["status"] in self.action_button:
                         self.action_button[package["status"]].setEnabled(False)
-                    else:
-                        pass
                 else:
 
                     if self.statusbar.value() == 100:
@@ -141,8 +136,7 @@ class CustomPackageWidget(QWidget):
                             + "\n"
                             + self.app.translate(
                                 "Action",
-                                "%s for package %s Done"
-                                % (package["status"], package["name"]),
+                                f'{package["status"]} for package {package["name"]} Done',
                             )
                         )
 
@@ -155,8 +149,6 @@ class CustomPackageWidget(QWidget):
                     self.statusbar.setVisible(False)
                     if package["status"] in self.action_button:
                         self.action_button[package["status"]].setEnabled(True)
-                    else:
-                        pass
                 self.layout.addWidget(self.statusbar, 2, 0, 1, 1)
 
         self.layout.addLayout(layout_info, 0, 0, 1, 1)
@@ -203,7 +195,7 @@ class CustomPackageWidget(QWidget):
                 )
             )
             msg = self.app.translate(
-                "Action", "The application %s is installing" % self.name.text()
+                "Action", f"The application {self.name.text()} is installing"
             )
             self.app.kiosk.tab_notification.add_notification(msg)
         elif action == "Delete":
@@ -213,7 +205,7 @@ class CustomPackageWidget(QWidget):
             )
             self.app.send(self._message)
             msg = self.app.translate(
-                "Action", "The application %s is deleting" % self.name.text()
+                "Action", f"The application {self.name.text()} is deleting"
             )
             self.app.kiosk.tab_notification.add_notification(msg)
 
@@ -229,18 +221,13 @@ class CustomPackageWidget(QWidget):
                 launcher = inject_env_into_str(launcher)
                 if os.path.isfile(launcher):
                     subprocess.Popen(launcher)
-                    msg = self.app.translate(
-                        "Action", "The app %s is launched" % self.name.text()
-                    )
+                    msg = self.app.translate("Action", f"The app {self.name.text()} is launched")
                     self.app.kiosk.tab_notification.add_notification(msg)
                 else:
-                    self.app.kiosk.tab_notification.add_notification(
-                        launcher + "not found"
-                    )
+                    self.app.kiosk.tab_notification.add_notification(f"{launcher}not found")
 
-            else:
-                if "Launch" in self.package["action"]:
-                    self.package["action"].remove("Launch")
+            elif "Launch" in self.package["action"]:
+                self.package["action"].remove("Launch")
 
         elif action == "Ask":
             self._message = (
@@ -250,7 +237,7 @@ class CustomPackageWidget(QWidget):
             self.app.send(self._message)
             msg = self.app.translate(
                 "Action",
-                "The access to the application %s is asked to admin" % self.name.text(),
+                f"The access to the application {self.name.text()} is asked to admin",
             )
             self.app.kiosk.tab_notification.add_notification(msg)
 
@@ -261,7 +248,7 @@ class CustomPackageWidget(QWidget):
             )
             self.app.send(self._message)
             msg = self.app.translate(
-                "Action", "The application %s is updating" % self.name.text()
+                "Action", f"The application {self.name.text()} is updating"
             )
             self.app.kiosk.tab_notification.add_notification(msg)
 
@@ -290,11 +277,18 @@ def search_icon_by_name(name):
         {"name": icon.split(".")[0], "ext": icon.split(".")[1]} for icon in icon_list
     ]
 
-    # Research the prefix in name value of icon_list
-    for icon in icon_list:
-        if re.match(prefix.replace('+', '\+').replace('*', '\*'), icon["name"], re.I):
-            return icon["name"] + "." + icon["ext"]
-    return False
+    return next(
+        (
+            icon["name"] + "." + icon["ext"]
+            for icon in icon_list
+            if re.match(
+                prefix.replace('+', '\+').replace('*', '\*'),
+                icon["name"],
+                re.I,
+            )
+        ),
+        False,
+    )
 
 
 def inject_env_into_str(mesg):
