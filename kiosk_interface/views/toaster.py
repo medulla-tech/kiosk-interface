@@ -65,19 +65,21 @@ class ToasterWidget(QWidget):
     def init_ui(self):
         #self.setVisible(False)
         self.setWindowFlags(Qt.Widget|Qt.CustomizeWindowHint|Qt.WindowTitleHint |Qt.WindowStaysOnTopHint)
-        self.label_title = QLabel("Install  %s"%self.datas["name"])
+        self.label_title = QLabel(f'Install  {self.datas["name"]}')
 
         if self.datas["remaining_attempts"] > 0:
             self.button_now = QPushButton("Install Now")
             if self.datas["remaining_attempts"] == 1:
                 self.label_attempts = QLabel("You can postpone %s more times\nIt's your last chance to do it"%self.datas["remaining_attempts"])
             else:
-                self.label_attempts = QLabel("You can postpone %s more times"%self.datas["remaining_attempts"])
+                self.label_attempts = QLabel(
+                    f'You can postpone {self.datas["remaining_attempts"]} more times'
+                )
 
         else:
             min = int(self.count_time/60)
             sec = self.count_time%60
-            self.button_now = QPushButton("Install Now (%s min %s secs)"%(min, sec))
+            self.button_now = QPushButton(f"Install Now ({min} min {sec} secs)")
         self.button_later = QPushButton("Postpone")
 
         self.combo_report = QComboBox()
@@ -89,7 +91,7 @@ class ToasterWidget(QWidget):
 
         self.timer = QTimer()
         self.timer.start(1000)
-        
+
         if "remaining_attempts" in self.datas and self.datas["remaining_attempts"] > 0:
             self.layout.addWidget(self.combo_report, 2, 0, 1, 4)
             self.layout.addWidget(self.button_later, 3, 0, 1, 1)
@@ -116,12 +118,10 @@ class ToasterWidget(QWidget):
         self.close()
 
     def later(self):
-        print("Send message : install %s in %s min (%s), attempt #%s"%(
-            self.datas["uuid"], 
-            self.combo_value[self.combo_report.currentText()], 
-            self.combo_report.currentText(), 
-            self.datas["remaining_attempts"]))
-    
+        print(
+            f'Send message : install {self.datas["uuid"]} in {self.combo_value[self.combo_report.currentText()]} min ({self.combo_report.currentText()}), attempt #{self.datas["remaining_attempts"]}'
+        )
+
         self.has_to_send.emit()
         self.timer.stop()
         self.close()
@@ -132,10 +132,8 @@ class ToasterWidget(QWidget):
     def countdown(self):
         self.count_time -= 1
 
-        min = int(self.count_time/60)
-        sec = self.count_time%60
-
-        self.button_now.setText("Install Now (%s min %s sec)"%(min, sec))
+        min, sec = divmod(self.count_time, 60)
+        self.button_now.setText(f"Install Now ({min} min {sec} sec)")
         if self.count_time == 0:
             self.timer.stop()
             self.now()

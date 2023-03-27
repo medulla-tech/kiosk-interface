@@ -48,7 +48,7 @@ class Tray(QSystemTrayIcon):
 
         # Call the view for the System Tray
         msg = self.app.translate("Tray", "Launch the tray")
-        self.app.logger("info", "%s" % msg)
+        self.app.logger("info", f"{msg}")
         self.icon = QIcon(os.path.join(self.app.datasdir,"kiosk.png"))
 
         self.setToolTip(self.app.translate("Tray", "Kiosk"))

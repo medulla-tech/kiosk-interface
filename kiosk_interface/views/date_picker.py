@@ -249,14 +249,9 @@ def generate_list(min, max):
     max = int(max)
 
     tmp = []
-    _tmp = []
-
     if min > max:
         min, max = max, min
 
     tmp = list(range(min, max))
 
-    for element in tmp:
-        _tmp.append(str(element))
-
-    return _tmp
+    return [str(element) for element in tmp]

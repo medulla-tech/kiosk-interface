@@ -58,10 +58,7 @@ def conffilename(agenttype):
         fileconf = conffilenameparameter
     if conffilenameparameter == "cluster.ini":
         return fileconf
-    if os.path.isfile(fileconf):
-        return fileconf
-    else:
-        return conffilenameparameter
+    return fileconf if os.path.isfile(fileconf) else conffilenameparameter
 
 
 class ConfParameter:
@@ -76,8 +73,8 @@ class ConfParameter:
         config = configparser.ConfigParser()
         namefileconfig = conffilename(typeconf)
         config.read(namefileconfig)
-        if os.path.exists(namefileconfig + ".local"):
-            config.read(namefileconfig + ".local")
+        if os.path.exists(f"{namefileconfig}.local"):
+            config.read(f"{namefileconfig}.local")
 
         # Default parameters if no conf is found
         self.am_local_port = 8765
