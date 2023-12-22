@@ -71,6 +71,15 @@ class Application(QApplication):
         self.datasdir = os.path.join(self.rootdir, "datas")
         self.viewsdir = os.path.join(self.rootdir, "views")
 
+        if sys.platform.startswith("win"):
+            pidfile = os.path.join("C:\\", "tmp", "kiosk.pid")
+        else:
+            pidfile = os.path.join("/", "tmp", "kiosk.pid")
+
+        with open(pidfile, "w") as pidfb:
+            pidfb.write("%s"%os.getpid())
+            pidfb.close()
+
         # Notify the application when something is happening
         self.notifier = Notifier()
         # Action launched when the kiosk emit a notification
