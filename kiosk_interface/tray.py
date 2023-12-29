@@ -24,14 +24,14 @@
 import sys
 import os
 
-from PyQt5.QtGui import QIcon
-from PyQt5.QtWidgets import QSystemTrayIcon, QMenu, QAction, QWidgetAction
+from PyQt6.QtGui import QIcon, QAction
+from PyQt6.QtWidgets import QSystemTrayIcon, QMenu, QWidgetAction
 
 try:
     from kiosk_interface.views.custom_search_bar import CustomSearchBar
 except BaseException:
     from views.custom_search_bar import CustomSearchBar
-from PyQt5.QtGui import QCursor
+from PyQt6.QtGui import QCursor
 import threading
 
 

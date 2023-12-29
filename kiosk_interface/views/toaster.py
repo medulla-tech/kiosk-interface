@@ -22,8 +22,8 @@
 # MA 02110-1301, USA.
 
 
-from PyQt5.QtCore import Qt, pyqtSignal, QTimer
-from PyQt5.QtWidgets import QWidget, \
+from PyQt6.QtCore import Qt, pyqtSignal, QTimer
+from PyQt6.QtWidgets import QWidget, \
     QGridLayout,\
     QPushButton,\
     QLabel,\

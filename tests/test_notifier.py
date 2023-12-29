@@ -21,11 +21,11 @@
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
 # MA 02110-1301, USA.
 
-from PyQt5.QtCore import pyqtSignal
+from PyQt6.QtCore import pyqtSignal
 
 from kiosk_interface.notifier import Notifier
-from PyQt5.QtWidgets import QApplication
-import PyQt5
+from PyQt6.QtWidgets import QApplication
+import PyQt6
 import sys
 
 
@@ -56,29 +56,29 @@ class TestNotifier:
         assert hasattr(self.notifier, "updated")
 
     def test_type_signals(self):
-        assert isinstance(self.notifier.app_launched, PyQt5.QtCore.pyqtBoundSignal)
-        assert isinstance(self.notifier.app_claused, PyQt5.QtCore.pyqtBoundSignal)
-        assert isinstance(self.notifier.tray_loaded, PyQt5.QtCore.pyqtBoundSignal)
-        assert isinstance(self.notifier.tray_action_open, PyQt5.QtCore.pyqtBoundSignal)
-        assert isinstance(self.notifier.kiosk_loaded, PyQt5.QtCore.pyqtBoundSignal)
-        assert isinstance(self.notifier.server_tcp_start, PyQt5.QtCore.pyqtBoundSignal)
-        assert isinstance(self.notifier.server_tcp_stop, PyQt5.QtCore.pyqtBoundSignal)
+        assert isinstance(self.notifier.app_launched, PyQt6.QtCore.pyqtBoundSignal)
+        assert isinstance(self.notifier.app_claused, PyQt6.QtCore.pyqtBoundSignal)
+        assert isinstance(self.notifier.tray_loaded, PyQt6.QtCore.pyqtBoundSignal)
+        assert isinstance(self.notifier.tray_action_open, PyQt6.QtCore.pyqtBoundSignal)
+        assert isinstance(self.notifier.kiosk_loaded, PyQt6.QtCore.pyqtBoundSignal)
+        assert isinstance(self.notifier.server_tcp_start, PyQt6.QtCore.pyqtBoundSignal)
+        assert isinstance(self.notifier.server_tcp_stop, PyQt6.QtCore.pyqtBoundSignal)
         assert isinstance(
-            self.notifier.server_cant_send_message_to_am, PyQt5.QtCore.pyqtBoundSignal
+            self.notifier.server_cant_send_message_to_am, PyQt6.QtCore.pyqtBoundSignal
         )
         assert isinstance(
-            self.notifier.server_ping_presence, PyQt5.QtCore.pyqtBoundSignal
+            self.notifier.server_ping_presence, PyQt6.QtCore.pyqtBoundSignal
         )
         assert isinstance(
-            self.notifier.server_status_changed, PyQt5.QtCore.pyqtBoundSignal
+            self.notifier.server_status_changed, PyQt6.QtCore.pyqtBoundSignal
         )
         assert isinstance(
-            self.notifier.message_received_from_am, PyQt5.QtCore.pyqtBoundSignal
+            self.notifier.message_received_from_am, PyQt6.QtCore.pyqtBoundSignal
         )
         assert isinstance(
-            self.notifier.message_sent_to_am, PyQt5.QtCore.pyqtBoundSignal
+            self.notifier.message_sent_to_am, PyQt6.QtCore.pyqtBoundSignal
         )
-        assert isinstance(self.notifier.updated, PyQt5.QtCore.pyqtBoundSignal)
+        assert isinstance(self.notifier.updated, PyQt6.QtCore.pyqtBoundSignal)
 
     def test_connect_signals(self):
         def _action_app_launched():

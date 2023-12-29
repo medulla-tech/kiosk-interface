@@ -47,7 +47,7 @@ setup(
     ],
     keywords="pulse xmpp kiosk interface",
     name="kiosk_interface",
-    version="0.3",
+    version="1.0.0",
     debian_distro="stretch",
     description="XMPP Agent for pulse",
     url="https://www.siveo.net/",
@@ -59,5 +59,7 @@ setup(
     package_data={},
     entry_points={},
     extras_require={},
-    install_requires=[],
+    install_requires=[
+        "QtWidgets",
+        "PyQt6"],
 )
