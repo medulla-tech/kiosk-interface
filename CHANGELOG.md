@@ -1,6 +1,9 @@
 # Change Log
 
-## [v0.1]
+## [v1.0.0](https://github.com/medulla-tech/kiosk-interface/tree/v1.0.0) (2023-12-29)
+- [FEATURE] Port the code to Python Qt6
+
+## [v0.1.0]
 - [FEATURE] Add unit test for the kiosk module
 - [FEATURE] Add unit test for the notifier module
 - [FEATURE] Add unit test for the config module

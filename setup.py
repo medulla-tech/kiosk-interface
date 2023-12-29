@@ -47,7 +47,7 @@ setup(
     ],
     keywords="pulse xmpp kiosk interface",
     name="kiosk_interface",
-    version="1.0",
+    version="1.0.0",
     debian_distro="stretch",
     description="XMPP Agent for pulse",
     url="https://www.siveo.net/",
