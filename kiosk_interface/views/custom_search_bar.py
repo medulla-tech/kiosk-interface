@@ -21,7 +21,7 @@
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
 # MA 02110-1301, USA.
 
-from PyQt5.QtWidgets import QWidget, QLineEdit, QPushButton, QHBoxLayout
+from PyQt6.QtWidgets import QWidget, QLineEdit, QPushButton, QHBoxLayout
 
 
 class CustomSearchBar(QWidget):

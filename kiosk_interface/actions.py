@@ -24,7 +24,10 @@
 
 import json
 
-from views.toaster import ToasterWidget
+try:
+    from kiosk_interface.views.toaster import ToasterWidget
+except BaseException:
+    from views.toaster import ToasterWidget
 
 class EventController(object):
     """Bind events with actions"""

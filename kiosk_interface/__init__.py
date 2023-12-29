@@ -23,9 +23,9 @@
 
 import sys
 import os
-from PyQt5.QtWidgets import QApplication
-from PyQt5.QtCore import QCoreApplication
-from PyQt5.QtGui import QIcon
+from PyQt6.QtWidgets import QApplication
+from PyQt6.QtCore import QCoreApplication
+from PyQt6.QtGui import QIcon
 
 try:
     # Import for unit tests
@@ -37,12 +37,12 @@ try:
     from kiosk_interface.server import MessengerToAM, MessengerFromAM
 except BaseException:
     # Import for normal use
-    from config import ConfParameter
-    from tray import Tray
-    from kiosk import Kiosk
-    from notifier import Notifier
-    from actions import EventController
-    from server import MessengerToAM, MessengerFromAM
+    from .config import ConfParameter
+    from .tray import Tray
+    from .kiosk import Kiosk
+    from .notifier import Notifier
+    from .actions import EventController
+    from .server import MessengerToAM, MessengerFromAM
 
 
 class Application(QApplication):

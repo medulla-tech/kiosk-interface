@@ -22,7 +22,7 @@
 # MA 02110-1301, USA.
 
 
-from PyQt5.QtWidgets import QTextEdit, QWidget, QVBoxLayout
+from PyQt6.QtWidgets import QTextEdit, QWidget, QVBoxLayout
 from datetime import datetime
 
 

@@ -21,7 +21,7 @@
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
 # MA 02110-1301, USA.
 
-from PyQt5.QtWidgets import (
+from PyQt6.QtWidgets import (
     QListWidgetItem,
     QWidget,
     QVBoxLayout,

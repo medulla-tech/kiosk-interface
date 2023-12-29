@@ -21,7 +21,7 @@
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
 # MA 02110-1301, USA.
 
-from PyQt5.QtWidgets import (
+from PyQt6.QtWidgets import (
     QWidget,
     QGridLayout,
     QPushButton,
@@ -29,7 +29,7 @@ from PyQt5.QtWidgets import (
     QCalendarWidget,
     QComboBox,
 )
-from PyQt5.QtCore import QDate, QDateTime, QTime, Qt, pyqtSignal
+from PyQt6.QtCore import QDate, QDateTime, QTime, Qt, pyqtSignal
 from datetime import datetime
 
 
