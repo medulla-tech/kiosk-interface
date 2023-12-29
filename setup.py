@@ -59,5 +59,7 @@ setup(
     package_data={},
     entry_points={},
     extras_require={},
-    install_requires=[],
+    install_requires=[
+        "QtWidgets",
+        "PyQt6"],
 )
