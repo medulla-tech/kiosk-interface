@@ -56,7 +56,7 @@ setup(
         ("datas", ["kiosk_interface/datas/vlc.png", "kiosk_interface/datas/kiosk.png"]),
     ],
     test_suite="",
-    package_data={},
+    package_data={'': ['__main__.py']},
     entry_points={},
     extras_require={},
     install_requires=[
