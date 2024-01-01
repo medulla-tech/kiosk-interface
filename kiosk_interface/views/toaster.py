@@ -63,7 +63,6 @@ class ToasterWidget(QWidget):
 
 
     def init_ui(self):
-        #self.setVisible(False)
         self.setWindowFlags(Qt.Widget|Qt.CustomizeWindowHint|Qt.WindowTitleHint |Qt.WindowStaysOnTopHint)
         self.label_title = QLabel("Install  %s"%self.datas["name"])
 
