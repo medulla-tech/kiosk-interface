@@ -52,9 +52,7 @@ setup(
     description="XMPP Agent for pulse",
     url="https://www.siveo.net/",
     packages=["kiosk_interface", "kiosk_interface.views"],
-    data_files=[
-        ("datas", ["kiosk_interface/datas/vlc.png", "kiosk_interface/datas/kiosk.png"]),
-    ],
+    package_data={'kiosk_interface': ['datas/*']},
     test_suite="",
     package_data={},
     entry_points={},
