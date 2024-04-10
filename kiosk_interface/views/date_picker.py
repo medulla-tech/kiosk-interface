@@ -75,7 +75,7 @@ class DatePickerWidget(QWidget):
         #
         self.ref_button.setEnabled(False)
         self.setWindowFlags(
-            Qt.CustomizeWindowHint | Qt.WindowTitleHint | Qt.WindowStaysOnTopHint
+            Qt.WindowType.CustomizeWindowHint| Qt.WindowType.WindowTitleHint | Qt.WindowType.WindowStaysOnTopHint
         )
 
         #
@@ -196,12 +196,12 @@ class DatePickerWidget(QWidget):
         self.datetime_current = QDateTime(
             self.date_today,
             QTime(int(self.hour_current[0]), int(self.hour_current[1])),
-            Qt.LocalTime,
+            Qt.TimeSpec.LocalTime,
         ).toUTC()
         self.datetime_selected = QDateTime(
             self.date_selected,
             QTime(int(self.hour_selected[0]), int(self.hour_selected[1])),
-            Qt.LocalTime,
+            Qt.TimeSpec.LocalTime,
         ).toUTC()
         self.tuple_current = (
             self.datetime_current.date().year(),
