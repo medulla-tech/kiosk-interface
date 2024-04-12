@@ -26,6 +26,7 @@ import os
 from PyQt6.QtWidgets import QApplication
 from PyQt6.QtCore import QCoreApplication
 from PyQt6.QtGui import QIcon
+import logging
 
 try:
     # Import for unit tests
@@ -48,10 +49,10 @@ except BaseException:
 class Application(QApplication):
     """Generate the main app object"""
 
-    def __init__(self):
+    def __init__(self, conf):
         """Initialize the object"""
-
         super().__init__(sys.argv)  # Initialize the Qapplication
+        self.log = logging.getLogger()
 
         # To add an event :
         # 1 - In Notifier create the signal
@@ -85,13 +86,14 @@ class Application(QApplication):
         self.translate = QCoreApplication.translate
 
         # Keep the config parameters in memory
-        self.parameters = ConfParameter()
+        self.parameters = conf
 
         # Socket server. It is always running. This module listen and wait the
         # messages from AM
         self.receiver = MessengerFromAM(self)
 
         self.logger("info", "Initialization")
+        self.log.info("Kiosk initialization")
         # The mechanics are launched here
         self.notifier.app_launched.emit()
 
@@ -111,12 +113,18 @@ class Application(QApplication):
 
     def run(self):
         """Launch the main loop"""
-        self.exec()
+        try:
+            self.exec()
+        except Exception as err:
+            self.log.error("Error during execution: %s" % err)
 
     # Associate a unique sender. This module send messages to AM
     def send(self, message):
         messenger = MessengerToAM(self)
-        messenger.send(message)
+        try:
+            messenger.send(message)
+        except Exception as err:
+            self.log.error("Error during sending %s : %s" % (message, err))
 
     def logger(self, type, msg):
         """Send log message to Agent Machine.
@@ -144,6 +152,14 @@ class Application(QApplication):
 
 
 if __name__ == "__main__":
-    app = Application()
+    conf = ConfParameter()
+    format = "%(asctime)s - %(levelname)s -(LAUNCHER)%(message)s"
+    formatter = logging.Formatter(format)
+    logdir = os.path.dirname(conf.logfilename())
+    if os.path.isdir(logdir):
+        os.makedirs(logdir, exist_ok=True)
+    logging.basicConfig(level=conf.log_level, format=format, filename=conf.logfilename(), filemode="a")
+
+    app = Application(conf)
     app.send_ping()
     app.run()

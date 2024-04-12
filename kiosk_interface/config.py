@@ -94,3 +94,48 @@ class ConfParameter:
 
         self.width = 650
         self.height = 550
+
+        self.log_level = self.get_loglevel_from_str("INFO")
+        if config.has_option("global", "log_level"):
+            self.log_level = self.get_loglevel_from_str(config.get("global", "log_level"))
+
+
+    def get_loglevel_from_str(self, levelstring):
+        strlevel = levelstring.upper()
+        if strlevel in ["CRITICAL", "FATAL"]:
+            return 50
+        elif strlevel == "ERROR":
+            return 40
+        elif strlevel in ["WARNING", "WARN"]:
+            return 30
+        elif strlevel == "INFO":
+            return 20
+        elif strlevel == "DEBUG":
+            return 10
+        elif strlevel == "NOTSET":
+            return 0
+        elif strlevel in ["LOG", "DEBUGPULSE"]:
+            return 25
+        else:
+            return 20
+
+    def logfilename(self):
+        """
+        Function defining where the log file is located.
+        configuration file for the type of machifne and the Operating System
+
+        Returns:
+        Return the log file path
+
+        """
+        logfilenameparameter = "kiosk-interface.log"
+
+        if sys.platform.startswith("linux"):
+            fileconf = os.path.join(os.path.expanduser("~"), logfilenameparameter)
+        elif sys.platform.startswith("win"):
+            fileconf = os.path.join(
+                os.path.expanduser("~"), logfilenameparameter
+            )
+        elif sys.platform.startswith("darwin"):
+            fileconf = os.path.join(os.path.expanduser("~"), logfilenameparameter)
+        return fileconf
