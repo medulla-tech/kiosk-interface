@@ -78,11 +78,16 @@ class MessengerFromAM(object):
         """
         try:
             # request the recv message
-            recv_msg_from_AM = client_socket.recv(5000).decode("utf-8")
+            recv_msg_from_AM = client_socket.recv(5000)
+            try:
+                recv_msg_from_AM = recv_msg_from_AM.decode("utf-8")
+            except:
+                pass
             ref.message = recv_msg_from_AM
             ref.notifier.message_received_from_am.emit(recv_msg_from_AM)
 
         finally:
+            ref.log.info("recieved from AM: %s"%recv_msg_from_AM)
             client_socket.close()
 
 
@@ -115,12 +120,14 @@ class MessengerToAM(object):
             '{"uuid" : "45d4-3124c21-3123", "action": "kioskinterfaceinstall", "subaction" : "install"}'
         """
         if self.active:
+            self.app.log.info("send datas to AM : %s"%msg)
             if not isinstance(msg, bytes):
                 self.sock.sendall(msg.encode("utf-8"))
                 self.app.notifier.message_sent_to_am.emit(msg)
             else:
                 self.sock.sendall(msg)
                 self.app.notifier.message_sent_to_am.emit(msg.decode("utf-8"))
+            self.handle()
         else:
             self.app.notifier.server_cant_send_message_to_am.emit(msg)
             self.sock.close()
