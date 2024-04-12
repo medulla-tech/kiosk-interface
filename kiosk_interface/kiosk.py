@@ -62,11 +62,11 @@ class Kiosk(QWidget):
             "info", self.app.translate("Application", "Kiosk main view initialization")
         )
         self.tab_kiosk = TabKiosk(self.app, self)
-        self.tab_notification = TabNotification(self.app, self)
+        # self.tab_notification = TabNotification(self.app, self)
 
         self.tabs = QTabWidget(self.app.kiosk)
         self.tabs.addTab(self.tab_kiosk, "Packages")
-        self.tabs.addTab(self.tab_notification, "Notifications")
+        # self.tabs.addTab(self.tab_notification, "Notifications")
 
         grid = QGridLayout(self.app.kiosk)
         grid.addWidget(self.tabs, 1, 1, 1, 1)
