@@ -63,7 +63,7 @@ class ToasterWidget(QWidget):
 
 
     def init_ui(self):
-        self.setWindowFlags(Qt.Widget|Qt.CustomizeWindowHint|Qt.WindowTitleHint |Qt.WindowStaysOnTopHint)
+        self.setWindowFlags(Qt.WindowType.Widget|Qt.WindowType.CustomizeWindowHint|Qt.WindowType.WindowTitleHint |Qt.WindowType.WindowStaysOnTopHint)
         self.label_title = QLabel("Install  %s"%self.datas["name"])
 
         if self.datas["remaining_attempts"] > 0:
