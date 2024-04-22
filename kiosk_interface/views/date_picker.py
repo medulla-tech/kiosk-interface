@@ -197,12 +197,12 @@ class DatePickerWidget(QWidget):
             self.date_today,
             QTime(int(self.hour_current[0]), int(self.hour_current[1])),
             Qt.TimeSpec.LocalTime,
-        ).toUTC()
+        )
         self.datetime_selected = QDateTime(
             self.date_selected,
             QTime(int(self.hour_selected[0]), int(self.hour_selected[1])),
             Qt.TimeSpec.LocalTime,
-        ).toUTC()
+        )
         self.tuple_current = (
             self.datetime_current.date().year(),
             self.datetime_current.date().month(),
