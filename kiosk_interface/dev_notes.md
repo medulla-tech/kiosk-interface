@@ -28,101 +28,175 @@ Here the list of parameters by default
 | kiosk   | kiosk_local_port | 8766      | Port for socket listened by Kiosk                   |
 | kiosk   | am_server        | localhost | Server address where the TCP connections are opened |
 
+To summarize:
+- AM -- (TCP/IP : 8766) --> kiosk
+- kiosk -- (TCP/IP : 8765) --> AM
 
 Messages sent through the sockets are serialized JSON. 
 
-To summarize :
-
-- send message to localhost:8765 = message to Agent Machine 
-- send message to localhost:8766 = message to kiosk
-
-
-
-## Messages Received by the Kiosk
+## List of messages received by the Kiosk
 
 What we see on the kiosk and kiosk behaviours are driven by the messages it receives. In this part we will see the structure of the messages sent by Agent Machine and received by the Kiosk.
 
 All the messages received by the kiosk have an **action** and can have some additionnals parameters.
 
-The Agent Machine can send a ping to the kiosk to know if it's present or not.
 
-    {
-        "action": "presence",
-        "type":"ping"
-    }
+### Ping
 
-The Agent Machine can send informative messages to the kiosk :
+- Desc : The Agent Machine can send a ping to the kiosk to know if it's present or not. This action changes the kiosk status to connected.
+- Incomming message :
+```json
+{
+    "action": "presence",
+    "type":"ping"
+}
+```
+- response :
+```json
+{
+    "action": "kioskLog",
+    "type": "info",
+    "message": "Received message from AM"
+}
+{
+    "action": "presence",
+    "type":"pong"
+}
+```
 
-    {
-        "action": "action_kiosknotification",
-        "data":{
-            "message": "my message"
-        }
-    }
+### Package list:
 
-
-The Agent Machine can send packages list to the kiosk. Each package can have some parameters :
-
-    # Minimal message
-    {
-        "action":"packages", 
-        "packages_list":[
-            {
-                "name":"firefox", 
-                "uuid":"aaa", 
-                "action":[]
-            }
-        ]
-    }
-
-    # Additionnal infos
+- Desc: Send packages list to the kiosk. It is the main message comming to the kiosk. There is an another message with the action __update_profile__. This message is the same and do the same thing.
+- Incomming Message:
+    ```json
     {
         "action":"packages", 
         "packages_list":[
             {
-                "name":"pkg_name", 
-                "uuid":"pkg_uuid", 
-                "version" : "V1_0",
-                "description": "pkg description",
-                "icon":"firefox.png", # This line associate an icon stored in kiosk_dir/datas/
-                "action":[]
-            }
-        ]
-    }
-
-    # Add a launcher action
-    {
-        "action":"packages", 
-        "packages_list":[
-            {
-                "icon":"firefox.png", 
-                "name":"firefox", 
-                "uuid":"aaa", 
-                "action":["Launcher"], # This line add a launcher button
-                "launcher" : "C:\\Program Files\\Mozilla Firefox\\firefox.exe" # This line is associated to the Launcher button
-            }
-        ]
-    }
-
-    {
-        "action":"packages", 
-        "packages_list":[
-            {
-                "icon":"firefox.png", 
-                "name":"firefox", 
-                "uuid":"aaa", 
-                "version": "v1", 
+                "icon":"firefox.png",
+                "name":"firefox",
+                "uuid":"aaa",
+                "version": "v1",
                 "description":"my description",
-                "action":["Launch", "Install", "Uninstall", "Ask"],
-                "launcher" : "C:\\Program Files\\Mozilla Firefox\\firefox.exe", 
-                "status": "Launch", # Correspond to the action name ("Launch", "Install", "Uninstall", "Ask"). Disable the corresponding button
-                "stat": 25 # progression (0 to 100%) for the action triggered
-                }]}
+                "action":["Launch", "Install","Uninstall", "Ask"],
+                "launcher" : "QzpcXFByb2dyYW0gRmlsZXNcXE1vemlsbGEgRmlyZWZveFxcZmlyZWZveC5leGU=",
+                "status": "Launch",
+                "stat": 25
+            }
+        ]
+    }
+    ```
+- Optionnal keys (on package description):
+    - icon: give an icon name to the package. If an icon is found, display it on the kiosk.
+    - launcher : the launcher is associated with the Launch button. launcher is a base64 string of the path to the executable.
+    - stat: Specify the action advencement. If given, a progress bar will appear below the package in kiosk. It is a float value from 0 to 100 and correspond to a percentage.
+     - status: Associate an action button to the stat progress bar.
+    If specified, the associated button is disabled unless the stat reach 100 (100%). If a stat is declared in the package, make sure to declare at the end of the package workflow a 100 stat. Like this the package will not be stuck in a transition phase.
+    - action: the action key is mandatory, but no can be declared inside.
+- Response :
+```json
+{
+    "action": "kioskLog",
+    "type": "info",
+    "message": "Received message from AM"
+}
+```
+### Progress Notification
+- Desc: The Agent Machine can send progression infos. When the stat reach 100, the action button specified in status key is reactivated.
+- Incomming message:
+```json
+{
+    "action":"action_kiosknotification",
+    "data":{
+        "path":"firefox/aaa",
+        "stat": 50,
+        "status": "Launch"
+    }
+}
+```
+
+### Update launcher
+- Desc : Modify a launcher for a specific package in the kiosk
+- Incomming message:
+```json
+{
+    "action":"update_launcher",
+    "uuid":"aaa",
+    "launcher":"L3Vzci9iaW4vZmlyZWZveA=="
+}
+```
+
 
 ## Messages Sent by the kiosk
 
-TODO
+### Initialization
+- Desc : Ask the package list specific for this kiosk. The package list is depending on the user profiles.
+- Message:
+```json
+{
+    "action":"kioskinterface",
+    "subaction":"initialization"
+}
+```
+- Resp: a packages or update_profile message
 
+### Log to xmpp
+- Desc : Send logs to xmpp agent
+- Message :
+```json
+{
+    "action": "kioskLog",
+    "type": "info",
+    "message": "Initialization"
+}
+```
+
+### Ask presence
+- Desc : Send a presence message to the AM. If the the kiosk is able to send it, the connection is established. Then the kiosk can work normally.
+- Message:
+```json
+{
+    "action": "presence",
+    "type":"ping"
+}
+```
+
+### Install package
+- Desc : send the installation request to the AM if the Install button is pressed. The difference between the "now install" and "later install" is the datetime sent in this message.
+- Message :
+```json
+{
+    "uuid": "aaa",
+    "action": "kioskinterfaceInstall",
+    "subaction": "Install",
+    "utcdatetime": "(2024, 4, 15, 9, 21)"
+}
+```
+
+### Uninstall package
+- Desc : send the uninstall request to the AM if the Uninstall button is pressed.
+- Message :
+```json
+{
+    "uuid": "aaa",
+    "action": "kioskinterfaceUninstall",
+    "subaction": "Uninstall"
+}
+```
+
+### Ask grants
+- Desc : In the defined profile, if the package is associated in the "Ask acknowledgement" list, the user need first to ask the rights to install it.
+After this this request need a validation from an administrator.
+- Message :
+```json
+{
+    "uuid": "aaa",
+    "action": "kioskinterfaceAsk",
+    "subaction": "Ask",
+    "askuser":"JohnDoe",
+    "askdate":"2024-04-15 11:22:10.894378"
+}
+```
 # Project Structure
 
 This representation represents folders by adding / at the end of the name and regular files are normally called. 
@@ -142,13 +216,12 @@ We can add some additionnal comments represented by ```The comment```
         - custom_search_bar.py ```Create a wrapper widget for searchbar in the tray```
         - date_picked.py ```Create a personnalized datepicker sized for our needs```
         - tab_kiosk.py ```Wrapper for the packages tab, wherein they are displayed.```
-        - tab_notification.py ```Wrapper for the notification tab```
         - toaster.py ```Widget where the toaster popup is designed```
     - \_\_init\_\_.py ```Declare the Application class then run it.```
     - actions.py ```All the main actions are declared here```
     - config.py ```The configuration is read by this object```
     - dev_notes.md ```This document```
-    - kiosk.py ```Widget where the main window is designed. See also views.tab_kiosk.py and views.tab_notification.py```
+    - kiosk.py ```Widget where the main window is designed. See also views.tab_kiosk.py```
     - lib.py ```If we need to implement class/function accessible from everywhere```
     - notifier.py ```Static object where all the personnal triggers are declared. These triggers call actions from actions.py```
     - server.py ```TCP sender and receiver```

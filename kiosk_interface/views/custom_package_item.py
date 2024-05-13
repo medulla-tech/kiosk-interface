@@ -136,17 +136,6 @@ class CustomPackageWidget(QWidget):
                 else:
 
                     if self.statusbar.value() == 100:
-                        actual_notif = (
-                            self.app.kiosk.tab_notification.text_logs.toPlainText()
-                            + "\n"
-                            + self.app.translate(
-                                "Action",
-                                "%s for package %s Done"
-                                % (package["status"], package["name"]),
-                            )
-                        )
-
-                        self.app.kiosk.tab_notification.add_notification(actual_notif)
 
                         for pkg_ref in self.app.packages:
                             if pkg_ref == package:
@@ -175,9 +164,9 @@ class CustomPackageWidget(QWidget):
             self.action_button["Update"].clicked.connect(
                 lambda: self.return_message(self.action_button["Update"], "Update")
             )
-        if "Delete" in self.actions:
-            self.action_button["Delete"].clicked.connect(
-                lambda: self.return_message(self.action_button["Delete"], "Delete")
+        if "Uninstall" in self.actions:
+            self.action_button["Uninstall"].clicked.connect(
+                lambda: self.return_message(self.action_button["Uninstall"], "Uninstall")
             )
         if "Launch" in self.actions:
             self.action_button["Launch"].clicked.connect(
@@ -190,7 +179,7 @@ class CustomPackageWidget(QWidget):
         Params:
             button : QPushButton is a reference to the clicked button
             action: string added to the message sent to the agent-machine. The possibilities are:
-                "Install" | "Delete" | "Launch" | "Ask" | "Update"
+                "Install" | "Uninstall" | "Launch" | "Ask" | "Update"
         """
         if action == "Install":
             self.scheduler_wrapper = DatePickerWidget(self, button)
@@ -205,8 +194,7 @@ class CustomPackageWidget(QWidget):
             msg = self.app.translate(
                 "Action", "The application %s is installing" % self.name.text()
             )
-            self.app.kiosk.tab_notification.add_notification(msg)
-        elif action == "Delete":
+        elif action == "Uninstall":
             self._message = (
                 """{"uuid": "%s", "action": "kioskinterface%s", "subaction": "%s"}"""
                 % (self.uuid, action, action)
@@ -215,7 +203,6 @@ class CustomPackageWidget(QWidget):
             msg = self.app.translate(
                 "Action", "The application %s is deleting" % self.name.text()
             )
-            self.app.kiosk.tab_notification.add_notification(msg)
 
         elif action == "Launch":
             if "launcher" in self.package:
@@ -232,11 +219,6 @@ class CustomPackageWidget(QWidget):
                     msg = self.app.translate(
                         "Action", "The app %s is launched" % self.name.text()
                     )
-                    self.app.kiosk.tab_notification.add_notification(msg)
-                else:
-                    self.app.kiosk.tab_notification.add_notification(
-                        launcher + "not found"
-                    )
 
             else:
                 if "Launch" in self.package["action"]:
@@ -252,7 +234,6 @@ class CustomPackageWidget(QWidget):
                 "Action",
                 "The access to the application %s is asked to admin" % self.name.text(),
             )
-            self.app.kiosk.tab_notification.add_notification(msg)
 
         elif action == "Update":
             self._message = (
@@ -263,7 +244,6 @@ class CustomPackageWidget(QWidget):
             msg = self.app.translate(
                 "Action", "The application %s is updating" % self.name.text()
             )
-            self.app.kiosk.tab_notification.add_notification(msg)
 
         else:
             self._message = (
