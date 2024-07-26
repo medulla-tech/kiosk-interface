@@ -164,9 +164,9 @@ class CustomPackageWidget(QWidget):
             self.action_button["Update"].clicked.connect(
                 lambda: self.return_message(self.action_button["Update"], "Update")
             )
-        if "Uninstall" in self.actions:
-            self.action_button["Uninstall"].clicked.connect(
-                lambda: self.return_message(self.action_button["Uninstall"], "Uninstall")
+        if "Delete" in self.actions:
+            self.action_button["Delete"].clicked.connect(
+                lambda: self.return_message(self.action_button["Delete"], "Delete")
             )
         if "Launch" in self.actions:
             self.action_button["Launch"].clicked.connect(
@@ -179,7 +179,7 @@ class CustomPackageWidget(QWidget):
         Params:
             button : QPushButton is a reference to the clicked button
             action: string added to the message sent to the agent-machine. The possibilities are:
-                "Install" | "Uninstall" | "Launch" | "Ask" | "Update"
+                "Install" | "Delete" | "Launch" | "Ask" | "Update"
         """
         if action == "Install":
             self.scheduler_wrapper = DatePickerWidget(self, button)
@@ -194,7 +194,7 @@ class CustomPackageWidget(QWidget):
             msg = self.app.translate(
                 "Action", "The application %s is installing" % self.name.text()
             )
-        elif action == "Uninstall":
+        elif action == "Delete":
             self._message = (
                 """{"uuid": "%s", "action": "kioskinterface%s", "subaction": "%s"}"""
                 % (self.uuid, action, action)
