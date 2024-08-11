@@ -138,13 +138,6 @@ class EventController(object):
                     }
                 }
                 """
-                if self.app.kiosk.tab_notification is not None:
-                    self.app.kiosk.tab_notification.add_notification(
-                        self.app.message["data"]["message"]
-                    )
-                else:
-                    print(self.app.message["message"])
-
                 if "status" in self.app.message["data"] and "stat" in self.app.message["data"]:
                     uuid = self.app.message["data"]["path"].split("/")
                     uuid = uuid[-1]
