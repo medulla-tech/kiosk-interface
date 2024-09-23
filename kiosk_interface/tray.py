@@ -1,8 +1,8 @@
-#!/usr/bin/env python3
+#!/usr/bin/python3
 # coding: utf-8
 """Declare the Tray object"""
 #
-# (c) 2018 Siveo, http://www.siveo.net
+# (c) 2018-2022 Siveo, http://www.siveo.net
 #
 # This file is part of Pulse 2, http://www.siveo.net
 #
@@ -22,16 +22,18 @@
 # MA 02110-1301, USA.
 
 import sys
+import os
 
+from PyQt6.QtGui import QIcon, QAction
+from PyQt6.QtWidgets import QSystemTrayIcon, QMenu, QWidgetAction
 
-from PyQt5.QtGui import QIcon
-from PyQt5.QtWidgets import QSystemTrayIcon, QMenu, QAction, QWidgetAction
 try:
     from kiosk_interface.views.custom_search_bar import CustomSearchBar
-except:
+except BaseException:
     from views.custom_search_bar import CustomSearchBar
-from PyQt5.QtGui import QCursor
+from PyQt6.QtGui import QCursor
 import threading
+
 
 class Tray(QSystemTrayIcon):
     """This class define the system tray object. This is the first controller called by the app."""
@@ -45,15 +47,15 @@ class Tray(QSystemTrayIcon):
         self.criterion = ""
 
         # Call the view for the System Tray
-        msg = self.app.translate("Tray", 'Launch the tray')
-        self.app.logger("info","%s" % msg)
-
-        self.icon = QIcon("datas/kiosk.png")
+        msg = self.app.translate("Tray", "Launch the tray")
+        self.app.logger("info", "%s" % msg)
+        self.icon = QIcon(os.path.join(self.app.datasdir,"kiosk.png"))
 
         self.setToolTip(self.app.translate("Tray", "Kiosk"))
         self.setIcon(self.icon)
 
-        # With this the kiosk is always running even if the main window is closed.
+        # With this the kiosk is always running even if the main window is
+        # closed.
         self.setVisible(True)
 
         self.menu = QMenu()
@@ -64,7 +66,7 @@ class Tray(QSystemTrayIcon):
             self.search_action.setDefaultWidget(self.input_search)
 
         # Add the open option to the menu
-        if hasattr(self, 'search_action'):
+        if hasattr(self, "search_action"):
             self.menu.addAction(self.search_action)
         self.open_action = QAction(self.app.translate("Tray", "Open"))
         self.open_action.setParent(self.menu)
@@ -75,20 +77,26 @@ class Tray(QSystemTrayIcon):
 
         # Bind the actions
         if sys.platform != "darwin":
-            self.activated.connect(self.open_menu)  # left click action for Windows and Linux
+            # left click action for Windows and Linux
+            self.activated.connect(self.open_menu)
         self.open_action.triggered.connect(self.open)
 
-        # Connect the input_search from the menu with actions, only for Windows and Linux OS
-        if hasattr(self, 'input_search'):
+        # Connect the input_search from the menu with actions, only for Windows
+        # and Linux OS
+        if hasattr(self, "input_search"):
             self.input_search.changed.connect(self.update_criterion)
             self.input_search.clicked.connect(self.open)
 
     def open(self):
         """This method is called if the event 'open' is launched. Use it as midddleware"""
-        initialize = threading.Thread(target=self.app.send, args=('{"action":"kioskinterface",\
-                                                                  "subaction":"initialization"}',))
+        initialize = threading.Thread(
+            target=self.app.send,
+            args=(
+                '{"action":"kioskinterface", "subaction":"initialization"}',
+            ),
+        )
         initialize.start()
-        if hasattr(self, 'input_search'):
+        if hasattr(self, "input_search"):
             self.app.notifier.tray_action_open.emit(self.input_search.text)
         else:
             self.app.notifier.tray_action_open.emit("")

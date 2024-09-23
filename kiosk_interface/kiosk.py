@@ -1,8 +1,8 @@
-#!/usr/bin/env python3
+#!/usr/bin/python3
 # coding: utf-8
 """Declare the Kiosk object"""
 #
-# (c) 2018 Siveo, http://www.siveo.net
+# (c) 2018-2022 Siveo, http://www.siveo.net
 #
 # This file is part of Pulse 2, http://www.siveo.net
 #
@@ -21,16 +21,23 @@
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
 # MA 02110-1301, USA.
 
-from PyQt5.QtWidgets import QListWidgetItem, QWidget, QVBoxLayout, QListWidget, QLineEdit, QLabel, QTabWidget, \
-    QGridLayout
+from PyQt6.QtWidgets import (
+    QListWidgetItem,
+    QWidget,
+    QVBoxLayout,
+    QListWidget,
+    QLineEdit,
+    QLabel,
+    QTabWidget,
+    QGridLayout,
+)
+
 try:
     from kiosk_interface.views.custom_package_item import CustomPackageWidget
     from kiosk_interface.views.tab_kiosk import TabKiosk
-    from kiosk_interface.views.tab_notification import TabNotification
-except:
+except BaseException:
     from views.custom_package_item import CustomPackageWidget
     from views.tab_kiosk import TabKiosk
-    from views.tab_notification import TabNotification
 import re
 
 
@@ -39,28 +46,28 @@ class Kiosk(QWidget):
 
     def __init__(self, app):
         """
-            Initialize the kiosk object.
-            This object set up the mechanism to control the kiosk window
-            Params:
-                app: QApplication is a reference of the main application
+        Initialize the kiosk object.
+        This object set up the mechanism to control the kiosk window
+        Params:
+            app: QApplication is a reference of the main application
         """
         super().__init__()
         self.app = app
 
         self.resize(self.app.parameters.width, self.app.parameters.height)
 
-        self.app.logger("info", self.app.translate("Application", "Kiosk main view initialization"))
+        self.app.logger(
+            "info", self.app.translate("Application", "Kiosk main view initialization")
+        )
         self.tab_kiosk = TabKiosk(self.app, self)
-        self.tab_notification = TabNotification(self.app, self)
 
         self.tabs = QTabWidget(self.app.kiosk)
         self.tabs.addTab(self.tab_kiosk, "Packages")
-        self.tabs.addTab(self.tab_notification, "Notifications")
 
         grid = QGridLayout(self.app.kiosk)
-        grid.addWidget(self.tabs, 1,1,1,1)
-
+        grid.addWidget(self.tabs, 1, 1, 1, 1)
 
         self.setLayout(grid)
+
     def show(self):
         super().show()

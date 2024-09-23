@@ -1,8 +1,8 @@
-#!/usr/bin/env python3
+#!/usr/bin/python3
 # coding: utf-8
 """ Define a partial view for search bar in the tray"""
 #
-# (c) 2018 Siveo, http://www.siveo.net
+# (c) 2018-2022 Siveo, http://www.siveo.net
 #
 # This file is part of Pulse 2, http://www.siveo.net
 #
@@ -21,11 +21,12 @@
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
 # MA 02110-1301, USA.
 
-from PyQt5.QtWidgets import QWidget, QLineEdit, QPushButton, QHBoxLayout
+from PyQt6.QtWidgets import QWidget, QLineEdit, QPushButton, QHBoxLayout
 
 
 class CustomSearchBar(QWidget):
     """This object is the specialized menu action which contains the searchbar."""
+
     def __init__(self, app, ref):
         """Initialize the object"""
         super().__init__()
@@ -37,8 +38,7 @@ class CustomSearchBar(QWidget):
         self.layout = QHBoxLayout()
         self.input = QLineEdit()
         self.input.setPlaceholderText(self.app.translate("Tray", "Search Package"))
-        self.btn_launch_search = QPushButton(self.app.translate("Tray","search"))
-
+        self.btn_launch_search = QPushButton(self.app.translate("Tray", "search"))
 
         self.layout.addWidget(self.input)
         self.layout.addWidget(self.btn_launch_search)

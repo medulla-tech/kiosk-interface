@@ -1,8 +1,8 @@
-#!/usr/bin/env python3
+#!/usr/bin/python3
 # coding: utf-8
 """Declare some notifier for the app"""
 #
-# (c) 2018 Siveo, http://www.siveo.net
+# (c) 2018-2022 Siveo, http://www.siveo.net
 #
 # This file is part of Pulse 2, http://www.siveo.net
 #
@@ -21,12 +21,13 @@
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
 # MA 02110-1301, USA.
 
-from PyQt5.QtWidgets import QWidget
-from PyQt5.Qt import pyqtSignal
+from PyQt6.QtWidgets import QWidget
+from PyQt6.QtCore import pyqtSignal
 
 
 class Notifier(QWidget):
     """This class allows to create some signals for the application"""
+
     app_launched = pyqtSignal()
     app_claused = pyqtSignal()
 
@@ -43,4 +44,11 @@ class Notifier(QWidget):
     message_received_from_am = pyqtSignal((str,))
     message_sent_to_am = pyqtSignal((str,))
 
-    updated = pyqtSignal((str, dict,))
+    updated = pyqtSignal(
+        (
+            str,
+            dict,
+        )
+    )
+
+    toaster_new_update = pyqtSignal((dict,))

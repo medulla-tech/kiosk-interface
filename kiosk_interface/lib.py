@@ -1,8 +1,8 @@
 #!/usr/bin/python3
 # coding: utf-8
-"""This file initialize the views module"""
+"""This module launch the kiosk interface"""
 #
-# (c) 2018-2022 Siveo, http://www.siveo.net
+# (c) 2022 Siveo, http://www.siveo.net
 #
 # This file is part of Pulse 2, http://www.siveo.net
 #
@@ -20,3 +20,12 @@
 # along with Pulse 2; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
 # MA 02110-1301, USA.
+
+class Singleton(object):
+    _instances = {}
+    def instance(func):
+        def wrapper(*args, **kwargs):
+            if func not in Singleton._instances:
+                Singleton._instances[func] = func(*args, **kwargs)
+            return Singleton._instances[func]
+        return wrapper

@@ -1,8 +1,8 @@
-#!/usr/bin/env python3
+#!/usr/bin/python3
 # coding: utf-8
 """Declare the kiosk space for the app"""
 #
-# (c) 2018 Siveo, http://www.siveo.net
+# (c) 2018-2022 Siveo, http://www.siveo.net
 #
 # This file is part of Pulse 2, http://www.siveo.net
 #
@@ -21,10 +21,19 @@
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
 # MA 02110-1301, USA.
 
-from PyQt5.QtWidgets import QListWidgetItem, QWidget, QVBoxLayout, QListWidget, QLineEdit, QLabel, QTabWidget
+from PyQt6.QtWidgets import (
+    QListWidgetItem,
+    QWidget,
+    QVBoxLayout,
+    QListWidget,
+    QLineEdit,
+    QLabel,
+    QTabWidget,
+)
+
 try:
     from kiosk_interface.views.custom_package_item import CustomPackageWidget
-except:
+except BaseException:
     from views.custom_package_item import CustomPackageWidget
 
 import re
@@ -35,10 +44,10 @@ class TabKiosk(QWidget):
 
     def __init__(self, app, kiosk):
         """
-            Initialize the kiosk object.
-            This object set up the mechanism to control the kiosk window
-            Params:
-                app: QApplication is a reference of the main application
+        Initialize the kiosk object.
+        This object set up the mechanism to control the kiosk window
+        Params:
+            app: QApplication is a reference of the main application
         """
         super().__init__()
         self.app = app
@@ -48,10 +57,9 @@ class TabKiosk(QWidget):
         self.app.notifier.server_status_changed.connect(self.status_changed)
         self.resize(self.app.parameters.width, self.app.parameters.height)
 
-        if self.app.connected is False:
-            self.label_status = QLabel(self.app.translate("Kiosk", "Status : Disconnected"))
-        else:
-            self.label_status = QLabel(self.app.translate("Kiosk", "Status : Connected"))
+        self.label_status = QLabel(self.app.translate("Kiosk", "Status : Disconnected"))
+        self.status_changed()
+        
         self.input_search = QLineEdit(self.app.tray.criterion, self)
         self.input_search.setPlaceholderText("Search a package by name")
 
@@ -72,10 +80,11 @@ class TabKiosk(QWidget):
         self.input_search.textChanged.connect(self.search)
 
     def show(self):
-        """ Displays the main window for the kiosk package manager"""
+        """Displays the main window for the kiosk package manager"""
 
         # Firstly the search action is launched because it refresh the UI with the latest packages.
-        # Moreover if a criterion is given, the search method update the package list with corresponding packages
+        # Moreover if a criterion is given, the search method update the
+        # package list with corresponding packages
         self.search()
         super().show()
 
@@ -87,8 +96,15 @@ class TabKiosk(QWidget):
         self.custom_packages = []
         flag = False
         for package in self.app.packages:
+            if "name" not in package or\
+                "uuid" not in package:
+                continue
+            if "action" not in package:
+                package["action"] = []
             if self.input_search.text() != "":
-                if re.search(self.input_search.text(), package["name"], flags=re.IGNORECASE):
+                if re.search(
+                    self.input_search.text(), package["name"], flags=re.IGNORECASE
+                ):
                     item_widget = QListWidgetItem(self.list_wrapper)
                     custom_package = CustomPackageWidget(self.app, package)
                     item_widget.setSizeHint(custom_package.sizeHint())
@@ -112,4 +128,12 @@ class TabKiosk(QWidget):
 
     def status_changed(self):
         """Modify the status in the kiosk view"""
+        msg = ""
+
+        # For unknown reason self.app.translate return empty message.
+        # It has for consequences an empty status
+        if self.app.connected is False:
+            msg = "Status : Disconnected"
+        else:
+            msg = "Status : Connected"
         self.label_status.setText(msg)

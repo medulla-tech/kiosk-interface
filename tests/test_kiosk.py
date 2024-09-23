@@ -1,8 +1,8 @@
-#!/usr/bin/env python3
+#!/usr/bin/python3
 # coding: utf-8
 """Test the kiosk module"""
 #
-# (c) 2018 Siveo, http://www.siveo.net
+# (c) 2018-2022 Siveo, http://www.siveo.net
 #
 # This file is part of Pulse 2, http://www.siveo.net
 #
@@ -21,13 +21,15 @@
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
 # MA 02110-1301, USA.
 
-from PyQt5.QtWidgets import QApplication
+from PyQt6.QtWidgets import QApplication
 import sys
+
 try:
     from kiosk_interface.kiosk import Kiosk
-except:
+except BaseException:
     from kiosk import Kiosk
 
-class TestKiosk():
+
+class TestKiosk:
     app = QApplication(sys.argv)
     kiosk = Kiosk(app)

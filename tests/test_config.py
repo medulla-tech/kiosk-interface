@@ -1,8 +1,8 @@
-#!/usr/bin/env python3
+#!/usr/bin/python3
 # coding: utf-8
 """Test the config module"""
 #
-# (c) 2018 Siveo, http://www.siveo.net
+# (c) 2018-2022 Siveo, http://www.siveo.net
 #
 # This file is part of Pulse 2, http://www.siveo.net
 #
@@ -29,7 +29,7 @@ import os
 
 def test_config_file():
     """Test the config file path function"""
-    if sys.platform.startswith('win'):
+    if sys.platform.startswith("win"):
         assert conffilename("machine") == "C:\\Program Files\\Pulse\\etc\\agentconf.ini"
         assert conffilename("cluster") == "C:\\Program Files\\Pulse\\etc\\cluster.ini"
         if os.path.isfile("C:\\Program Files\\Pulse\\etc\\relayconf.ini"):
@@ -37,7 +37,7 @@ def test_config_file():
         else:
             assert conffilename("") == "relayconf.ini"
 
-    elif sys.platform.startswith('linux'):
+    elif sys.platform.startswith("linux"):
         assert conffilename("machine") == "/etc/pulse-xmpp-agent/agentconf.ini"
         assert conffilename("cluster") == "/etc/pulse-xmpp-agent/cluster.ini"
         if os.path.isfile("/etc/pulse-xmpp-agent/relayconf.ini"):
@@ -47,21 +47,28 @@ def test_config_file():
 
     elif sys.platform.startswith("darwin"):
         assert conffilename("machine") == "agentconf.ini"
-        assert conffilename("cluster") == "/Library/Application Support/Pulse/etc/cluster.ini"
+        assert (
+            conffilename("cluster")
+            == "/Library/Application Support/Pulse/etc/cluster.ini"
+        )
         if os.path.isfile("/Library/Application Support/Pulse/etc/relayconf.ini"):
-            assert conffilename("") == "/Library/Application Support/Pulse/etc/relayconf.ini"
+            assert (
+                conffilename("")
+                == "/Library/Application Support/Pulse/etc/relayconf.ini"
+            )
         else:
             assert conffilename("") == "relayconf.ini"
 
 
-class TestConfig():
+class TestConfig:
     """Test the config module"""
+
     conf = ConfParameter()
 
     def test_init(self):
         """Test the ConfigParameter creation"""
         assert self.conf is not None
-        assert type(self.conf) is ConfParameter
+        assert isinstance(self.conf, ConfParameter)
 
     def test_attr(self):
         """Test the attributes of ConfigParameter class"""

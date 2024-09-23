@@ -1,5 +1,6 @@
+#!/usr/bin/python3
 #
-# (c) 2016-2017 siveo, http://www.siveo.net
+# (c) 2016-2022 siveo, http://www.siveo.net
 #
 # This file is part of Pulse 2, http://www.siveo.net
 #
@@ -24,38 +25,37 @@ from distutils.command.install import INSTALL_SCHEMES
 import os
 import sys
 
-if sys.platform.startswith('linux'):
-    fileconf = os.path.join("/", "etc" ,"pulse-xmpp-agent")
-elif sys.platform.startswith('win'):
+if sys.platform.startswith("linux"):
+    fileconf = os.path.join("/", "etc", "pulse-xmpp-agent")
+elif sys.platform.startswith("win"):
     fileconf = os.path.join(os.environ["ProgramFiles"], "Pulse", "etc")
-elif sys.platform.startswith('darwin'):
+elif sys.platform.startswith("darwin"):
     fileconf = os.path.join("/", "Library", "Application Support", "Pulse", "etc")
 
 for scheme in INSTALL_SCHEMES.values():
-    scheme['data'] = os.path.join(scheme['purelib'], "kiosk_interface")
+    scheme["data"] = os.path.join(scheme["purelib"], "kiosk_interface")
 
 setup(
     classifiers=[
-        'Development Status :: 3 - Alpha',
-        'Intended Audience :: Developers',
-        'Topic :: Software Development :: Build Tools',
-        'License :: OSI Approved :: MIT License',
-        'Programming Language :: Python :: 2',
-        'Programming Language :: Python :: 2.6',
-        'Programming Language :: Python :: 2.7',
+        "Development Status :: 3 - Alpha",
+        "Intended Audience :: Developers",
+        "Topic :: Software Development :: Build Tools",
+        "License :: OSI Approved :: MIT License",
+        "Programming Language :: Python :: 2",
+        "Programming Language :: Python :: 2.6",
+        "Programming Language :: Python :: 2.7",
     ],
-
-    keywords='pulse xmpp kiosk interface',
-    name='kiosk_interface',
-    version='0.2',
-    debian_distro='stretch',
-    description = 'XMPP Agent for pulse',
-    url='https://www.siveo.net/',
-    packages=['kiosk_interface', 'kiosk_interface.views'],
-    data_files = [('datas', ['kiosk_interface/datas/vlc.png', 'kiosk_interface/datas/kiosk.png']),],
-    test_suite='',
-    package_data={},
+    keywords="pulse xmpp kiosk interface",
+    name="kiosk_interface",
+    version="1.0.0",
+    debian_distro="stretch",
+    description="XMPP Agent for pulse",
+    url="https://www.siveo.net/",
+    packages=["kiosk_interface", "kiosk_interface.views"],
+    package_data={'': ['__main__.py'], 'kiosk_interface': ['datas/*']},
+    test_suite="",
     entry_points={},
     extras_require={},
-    install_requires=[],
-    )
+    install_requires=[
+        "PyQt6"],
+)

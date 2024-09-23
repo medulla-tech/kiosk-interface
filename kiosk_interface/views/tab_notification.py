@@ -1,8 +1,8 @@
-#!/usr/bin/env python3
+#!/usr/bin/python3
 # coding: utf-8
 """Declare a notification space for the app"""
 #
-# (c) 2018 Siveo, http://www.siveo.net
+# (c) 2018-2022 Siveo, http://www.siveo.net
 #
 # This file is part of Pulse 2, http://www.siveo.net
 #
@@ -22,12 +22,11 @@
 # MA 02110-1301, USA.
 
 
-from PyQt5.QtWidgets import QTextEdit, QWidget, QVBoxLayout
+from PyQt6.QtWidgets import QTextEdit, QWidget, QVBoxLayout
 from datetime import datetime
 
 
 class TabNotification(QWidget):
-
     def __init__(self, app, kiosk):
         super().__init__()
         self.app = app
@@ -44,10 +43,19 @@ class TabNotification(QWidget):
         self.setLayout(self.lay)
 
     def add_notification(self, message):
-        date_str = str(datetime.now().year) + "/" + str(datetime.now().month) + "/" + str(str(datetime.now().day)) + \
-            " "+ str(datetime.now().hour) + ":" + str(datetime.now().minute)
+        date_str = (
+            str(datetime.now().year)
+            + "/"
+            + str(datetime.now().month)
+            + "/"
+            + str(str(datetime.now().day))
+            + " "
+            + str(datetime.now().hour)
+            + ":"
+            + str(datetime.now().minute)
+        )
 
-        msg = "\n"+ date_str + " -- " + message
+        msg = "\n" + date_str + " -- " + message
 
         logs = self.text_logs.toPlainText()
         logs = logs + "\n"
