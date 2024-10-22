@@ -31,6 +31,7 @@ from PyQt6.QtWidgets import (
     QTabWidget,
     QGridLayout,
 )
+from PyQt6.QtGui import QIcon
 
 try:
     from kiosk_interface.views.custom_package_item import CustomPackageWidget
@@ -39,6 +40,7 @@ except BaseException:
     from views.custom_package_item import CustomPackageWidget
     from views.tab_kiosk import TabKiosk
 import re
+import os
 
 
 class Kiosk(QWidget):
@@ -53,6 +55,7 @@ class Kiosk(QWidget):
         """
         super().__init__()
         self.app = app
+        self.setWindowIcon(QIcon(os.path.join(self.app.datasdir,"kiosk.png")))
 
         self.resize(self.app.parameters.width, self.app.parameters.height)
 
