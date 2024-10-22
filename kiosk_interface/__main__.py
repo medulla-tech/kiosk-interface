@@ -74,6 +74,11 @@ class Application(QApplication):
 
         if sys.platform.startswith("win"):
             pidfile = os.path.join("C:\\", "windows", "temp", "kiosk.pid")
+
+            import ctypes
+            myappid = 'Medulla.kiosk.1.0'
+            ctypes.windll.shell32.SetCurrentProcessExplicitAppUserModelID(myappid)
+
         else:
             pidfile = os.path.join("/", "tmp", "kiosk.pid")
 
@@ -106,7 +111,7 @@ class Application(QApplication):
         # The mechanics are launched here
         self.notifier.app_launched.emit()
 
-        self.setWindowIcon(QIcon(os.path.join(self.datasdir, "datas", "kiosk.png")))
+        self.setWindowIcon(QIcon(os.path.join(self.datasdir, "kiosk.png")))
         self.setApplicationName("Kiosk")
         # When the window is closed, the process is not killed
         self.setQuitOnLastWindowClosed(False)
