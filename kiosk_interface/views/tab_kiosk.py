@@ -22,13 +22,17 @@
 # MA 02110-1301, USA.
 
 from PyQt6.QtWidgets import (
-    QListWidgetItem,
-    QWidget,
-    QVBoxLayout,
-    QListWidget,
-    QLineEdit,
+    QHBoxLayout,
     QLabel,
+    QLineEdit,
+    QListWidget,
+    QListWidgetItem,
+    QPushButton,
+    QSizePolicy,
+    QSpacerItem,
     QTabWidget,
+    QVBoxLayout,
+    QWidget,
 )
 
 try:
@@ -59,17 +63,39 @@ class TabKiosk(QWidget):
 
         self.label_status = QLabel(self.app.translate("Kiosk", "Status : Disconnected"))
         self.status_changed()
-        
+        self.label_last_inventory = QLabel(
+            f"Last Inventory : {self.app.last_inventory or 'N/A'}"
+        )
+
+        # Create a horizontal layout to display both the status and the inventory
+        self.status_inventory_layout = QHBoxLayout()
+        self.status_inventory_layout.addWidget(self.label_status)
+
+        # Add a spacer to push the last inventory to the right
+        self.status_inventory_layout.addItem(
+            QSpacerItem(
+                40, 20, QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Minimum
+            )
+        )
+
+        self.status_inventory_layout.addWidget(self.label_last_inventory)
+
         self.input_search = QLineEdit(self.app.tray.criterion, self)
         self.input_search.setPlaceholderText("Search a package by name")
+
+        self.button_refresh = QPushButton("Actualiser", self)
+        self.button_refresh.clicked.connect(self.on_refresh_clicked)
 
         self.item_custom_packages = []
         self.custom_packages = []
         self.list_wrapper = QListWidget()
         self.list_wrapper.resize(self.width(), self.height())
         self.lay = QVBoxLayout()
-        self.lay.addWidget(self.label_status)
+        self.lay.addLayout(
+            self.status_inventory_layout
+        )
         self.lay.addWidget(self.input_search)
+        self.lay.addWidget(self.button_refresh)
         self.lay.addWidget(self.list_wrapper)
         self.setLayout(self.lay)
 
@@ -78,6 +104,7 @@ class TabKiosk(QWidget):
         # https://stackoverflow.com/questions/37331270/how-to-create-grid-style-qlistwidget
 
         self.input_search.textChanged.connect(self.search)
+        self.update_last_inventory_display()
 
     def show(self):
         """Displays the main window for the kiosk package manager"""
@@ -96,8 +123,7 @@ class TabKiosk(QWidget):
         self.custom_packages = []
         flag = False
         for package in self.app.packages:
-            if "name" not in package or\
-                "uuid" not in package:
+            if "name" not in package or "uuid" not in package:
                 continue
             if "action" not in package:
                 package["action"] = []
@@ -137,3 +163,22 @@ class TabKiosk(QWidget):
         else:
             msg = "Status : Connected"
         self.label_status.setText(msg)
+
+    def update_last_inventory_display(self):
+        """Updates the display of the last inventory date."""
+        if self.app.last_inventory:
+            self.label_last_inventory.setText(
+                f"Last Inventory : {self.app.last_inventory}"
+            )
+        else:
+            self.label_last_inventory.setText("Last Inventory : N/A")
+
+    def on_refresh_clicked(self):
+        """Method called when the 'update' button is clicked"""
+        self.app.send('{"action":"kioskinterface", "subaction":"initialization"}')
+        self.app.send('{"action":"kioskinterface", "subaction":"inventory"}')
+
+    def request_inventory(self):
+        """Request the date of the last inventory to AM"""
+        self.app.send('{"action":"kioskinterface", "subaction":"inventory"}')
+

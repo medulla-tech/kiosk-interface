@@ -46,6 +46,7 @@ class DatePickerWidget(QWidget):
         super().__init__()
         self.ref = ref
         self.ref_button = button
+        self.cancelled = False
         self.date_selected = None
         self.date_today = None
         self.hour_current = None
@@ -160,7 +161,7 @@ class DatePickerWidget(QWidget):
         #
         self.calendar.selectionChanged.connect(self.get_selected_date)
         self.button_now.clicked.connect(self.now)
-        self.button_cancel.clicked.connect(self.close)
+        self.button_cancel.clicked.connect(self.cancel)
         self.button_later.clicked.connect(self.later)
         self.combo_hours.currentIndexChanged.connect(
             lambda: self.get_selected_hour("hour")
@@ -223,6 +224,8 @@ class DatePickerWidget(QWidget):
         self.datetime_selected = self.datetime_current
         self.tuple_selected = self.tuple_current
         self.has_to_send.emit()
+        self.ref_button.setEnabled(False)
+        self.ref_button.setText("Install in progress ...")
         self.close()
 
     def later(self):
@@ -231,11 +234,15 @@ class DatePickerWidget(QWidget):
         self.close()
 
     def close(self):
-        """Method called when the Cancel button is called"""
-        super().close()
-        if self.ref_button is not None:
+        """Method called when the DatePickerWidget is closed"""
+        if self.cancelled:
             self.ref_button.setEnabled(True)
+        super().close()
 
+    def cancel(self):
+        """Method called when the user cancels the installation"""
+        self.cancelled = True
+        self.close()
 
 def generate_list(min, max):
     """Generate a list of int stringified in the range of min to max

@@ -23,6 +23,7 @@
 
 
 import json
+from datetime import datetime
 
 try:
     from kiosk_interface.views.toaster import ToasterWidget
@@ -102,6 +103,7 @@ class EventController(object):
                 if "packages_list" in self.app.message:
                     self.app.packages = self.app.message["packages_list"]
 
+                self.app.kiosk.tab_kiosk.search()
             elif self.app.message["action"] == "update_launcher":
                 """
                 Example of message received : 
@@ -168,8 +170,36 @@ class EventController(object):
                 # popup a toaster like window with all infos
                 self.app.notifier.toaster_new_update.emit(self.app.message["datas"])
 
+            elif self.app.message["action"] == "inventory":
+                if self.app.last_inventory == "":
+                    self.app.last_inventory = self.app.message.get("inventory", "N/A")
+                else:
+                    if self.app.temp_inventory != "":
+                        # Recover the new inventory (keep in the form of a chain)
+                        new_inventory = self.app.message.get("inventory", "N/A")
+
+                        # Convert only for comparison
+                        new_inventory_dt = datetime.strptime(new_inventory, "%Y-%m-%d %H:%M:%S")
+                        temp_inventory_dt = datetime.strptime(self.app.temp_inventory, "%Y-%m-%d %H:%M:%S")
+
+                        if new_inventory_dt > temp_inventory_dt:
+                            self.app.send('{"action":"kioskinterface", "subaction":"initialization"}')
+
+                            # Update of Last_inventory with the new date without converting it
+                            self.app.last_inventory = new_inventory
+                            # Reset after use
+                            self.app.temp_inventory = ""
+
+                        else:
+                            pass
+                    else:
+                        pass
+
+                # Update the display of the inventory date
+                self.app.kiosk.tab_kiosk.update_last_inventory_display()
+
+
             # by calling this method, we refresh the package list view
-            self.app.kiosk.tab_kiosk.search()
 
     def action_app_launched(self):
         """Action launched when the kiosk is launched"""
@@ -203,9 +233,9 @@ class EventController(object):
         self.app.send_ping()
         self.app.kiosk.tab_kiosk.input_search.setText(criterion)
         self.app.kiosk.tab_kiosk.search()
+        self.app.kiosk.tab_kiosk.request_inventory()
         self.app.kiosk.show()
 
     def action_toaster_new_update(self, datas):
         self.app.independant["toaster"] = ToasterWidget(self.app, datas)
         self.app.independant["toaster"].show()
-        
