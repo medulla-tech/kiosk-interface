@@ -73,7 +73,7 @@ class Application(QApplication):
         self.viewsdir = os.path.join(self.rootdir, "views")
 
         if sys.platform.startswith("win"):
-            pidfile = os.path.join("C:\\", "windows", "temp", "kiosk.pid")
+            pidfile = os.path.join("C:\\", "progra~1", "Medulla", "bin", "kiosk.pid")
 
             import ctypes
             myappid = 'Medulla.kiosk.1.0'
