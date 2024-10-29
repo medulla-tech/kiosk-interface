@@ -95,9 +95,9 @@ class CustomPackageWidget(QWidget):
         if "action" in package:
             for action in package["action"]:
                 if action == "Launch":
-                    if "launcher" in package:
-                        self.actions.append(action)
-                        self.action_button[action] = QPushButton(action)
+                    if "launcher_cmd" in package and package["launcher_cmd"]:
+                                    self.actions.append(action)
+                                    self.action_button[action] = QPushButton(action)
                     else:
                         pass
                 else:
@@ -210,9 +210,9 @@ class CustomPackageWidget(QWidget):
             )
 
         elif action == "Launch":
-            if "launcher" in self.package:
+            if "launcher_cmd" in self.package:
                 try:
-                    launcher = base64.b64decode(self.package["launcher"]).decode(
+                    launcher = base64.b64decode(self.package["launcher_cmd"]).decode(
                         "utf-8"
                     )
                 except BaseException:
