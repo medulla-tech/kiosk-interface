@@ -83,7 +83,7 @@ class TabKiosk(QWidget):
         self.input_search = QLineEdit(self.app.tray.criterion, self)
         self.input_search.setPlaceholderText("Search a package by name")
 
-        self.button_refresh = QPushButton("Actualiser", self)
+        self.button_refresh = QPushButton("Refresh", self)
         self.button_refresh.clicked.connect(self.on_refresh_clicked)
 
         self.item_custom_packages = []
@@ -173,8 +173,14 @@ class TabKiosk(QWidget):
         else:
             self.label_last_inventory.setText("Last Inventory : N/A")
 
+        self.button_refresh.setEnabled(True)
+        self.button_refresh.setText("Refresh")
+
     def on_refresh_clicked(self):
         """Method called when the 'update' button is clicked"""
+        self.button_refresh.setEnabled(False)
+        self.button_refresh.setText("Refresh in progress...")
+
         self.app.send('{"action":"kioskinterface", "subaction":"initialization"}')
         self.app.send('{"action":"kioskinterface", "subaction":"inventory"}')
 
