@@ -34,6 +34,7 @@ from PyQt6.QtWidgets import (
     QVBoxLayout,
     QWidget,
 )
+from PyQt6.QtCore import QTimer
 
 try:
     from kiosk_interface.views.custom_package_item import CustomPackageWidget
@@ -83,6 +84,9 @@ class TabKiosk(QWidget):
         self.input_search = QLineEdit(self.app.tray.criterion, self)
         self.input_search.setPlaceholderText("Search a package by name")
 
+        self.refresh_timer = QTimer(self)
+        self.refresh_timer.setSingleShot(True)
+        self.refresh_timer.timeout.connect(self.reset_refresh_button)
         self.button_refresh = QPushButton("Refresh", self)
         self.button_refresh.clicked.connect(self.on_refresh_clicked)
 
@@ -176,11 +180,16 @@ class TabKiosk(QWidget):
         self.button_refresh.setEnabled(True)
         self.button_refresh.setText("Refresh")
 
+    def reset_refresh_button(self):
+        """Reset the refresh button if kiosk lost the connection to AM"""
+        self.button_refresh.setEnabled(True)
+        self.button_refresh.setText("Refresh")
+
     def on_refresh_clicked(self):
         """Method called when the 'update' button is clicked"""
         self.button_refresh.setEnabled(False)
         self.button_refresh.setText("Refresh in progress...")
-
+        self.refresh_timer.start(30000)
         self.app.send('{"action":"kioskinterface", "subaction":"initialization"}')
         self.app.send('{"action":"kioskinterface", "subaction":"inventory"}')
 
