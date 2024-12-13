@@ -73,7 +73,7 @@ class Application(QApplication):
         self.viewsdir = os.path.join(self.rootdir, "views")
 
         if sys.platform.startswith("win"):
-            pidfile = os.path.join("C:\\", "windows", "temp", "kiosk.pid")
+            pidfile = os.path.join("C:\\", "progra~1", "Medulla", "bin", "kiosk.pid")
 
             import ctypes
             myappid = 'Medulla.kiosk.1.0'
@@ -95,6 +95,8 @@ class Application(QApplication):
         self.row_message = ""  # Contains the last received message interpreted as dict
         self.message = {}
         self.packages = []  # Contains the packages of the application
+        self.last_inventory = ""
+        self.temp_inventory = ""
 
         # Reference to a translate function
         self.translate = QCoreApplication.translate
