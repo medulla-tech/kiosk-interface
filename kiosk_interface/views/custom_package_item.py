@@ -95,9 +95,9 @@ class CustomPackageWidget(QWidget):
         if "action" in package:
             for action in package["action"]:
                 if action == "Launch":
-                    if "launcher" in package:
-                        self.actions.append(action)
-                        self.action_button[action] = QPushButton(action)
+                    if "launcher_cmd" in package and package["launcher_cmd"]:
+                                    self.actions.append(action)
+                                    self.action_button[action] = QPushButton(action)
                     else:
                         pass
                 else:
@@ -182,6 +182,7 @@ class CustomPackageWidget(QWidget):
                 "Install" | "Delete" | "Launch" | "Ask" | "Update"
         """
         if action == "Install":
+            self.app.temp_inventory = self.app.last_inventory
             self.scheduler_wrapper = DatePickerWidget(self, button)
             self.scheduler_wrapper.show()
             self.scheduler_wrapper.has_to_send.connect(
@@ -192,22 +193,26 @@ class CustomPackageWidget(QWidget):
                 )
             )
             msg = self.app.translate(
-                "Action", "The application %s is installing" % self.name.text()
+                "Action", "The application %s is being installed" % self.name.text()
             )
         elif action == "Delete":
+            self.app.temp_inventory = self.app.last_inventory
+            button.setEnabled(False)
+            button.setText("Uninstall in progress ...")
+
             self._message = (
                 """{"uuid": "%s", "action": "kioskinterface%s", "subaction": "%s"}"""
                 % (self.uuid, action, action)
             )
             self.app.send(self._message)
             msg = self.app.translate(
-                "Action", "The application %s is deleting" % self.name.text()
+                "Action", "The application %s is being uninstalled" % self.name.text()
             )
 
         elif action == "Launch":
-            if "launcher" in self.package:
+            if "launcher_cmd" in self.package:
                 try:
-                    launcher = base64.b64decode(self.package["launcher"]).decode(
+                    launcher = base64.b64decode(self.package["launcher_cmd"]).decode(
                         "utf-8"
                     )
                 except BaseException:
