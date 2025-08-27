@@ -21,7 +21,6 @@
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
 # MA 02110-1301, USA.
 import sys
-
 import os
 import configparser
 
@@ -48,8 +47,9 @@ def conffilename(agenttype):
         fileconf = os.path.join("/", "etc", "pulse-xmpp-agent", conffilenameparameter)
     elif sys.platform.startswith("win"):
         fileconf = os.path.join(
-            os.environ["ProgramFiles"], "Pulse", "etc", conffilenameparameter
-        )
+        os.environ["ProgramFiles"], "Medulla", "etc", conffilenameparameter
+    )
+
     elif sys.platform.startswith("darwin"):
         fileconf = os.path.join(
             "/", "Library", "Application Support", "Pulse", "etc", conffilenameparameter
@@ -79,26 +79,40 @@ class ConfParameter:
         if os.path.exists(namefileconfig + ".local"):
             config.read(namefileconfig + ".local")
 
-        # Default parameters if no conf is found
+        # ==== Defaults (si pas trouvé dans agentconf.ini) ====
         self.am_local_port = 8765
         self.kiosk_local_port = 8766
         self.am_server = "localhost"
+        self.glpi_url = "http://glpi.medulla.lan/glpi/apirest.php"
+        self.glpi_app_token = ""
+        self.glpi_api_token = ""
+        self.api_provider = "anthropic"
+        self.api_key = ""
 
-        # Set these attribute with config element found
+        # ==== Override avec les valeurs trouvées ====
         if config.has_option("kiosk", "am_local_port"):
             self.am_local_port = config.getint("kiosk", "am_local_port")
         if config.has_option("kiosk", "kiosk_local_port"):
             self.kiosk_local_port = config.getint("kiosk", "kiosk_local_port")
         if config.has_option("kiosk", "am_server"):
             self.am_server = config.get("kiosk", "am_server")
+        if config.has_option("kiosk", "glpi_url"):
+            self.glpi_url = config.get("kiosk", "glpi_url")
+        if config.has_option("kiosk", "glpi_app_token"):
+            self.glpi_app_token = config.get("kiosk", "glpi_app_token")
+        if config.has_option("kiosk", "glpi_api_token"):
+            self.glpi_api_token = config.get("kiosk", "glpi_api_token")
+        if config.has_option("kiosk", "api_provider"):
+            self.api_provider = config.get("kiosk", "api_provider")
+        if config.has_option("kiosk", "api_key"):
+            self.api_key = config.get("kiosk", "api_key")
 
-        self.width = 650
-        self.height = 550
+        self.width = 1000
+        self.height = 800
 
         self.log_level = self.get_loglevel_from_str("INFO")
         if config.has_option("global", "log_level"):
             self.log_level = self.get_loglevel_from_str(config.get("global", "log_level"))
-
 
     def get_loglevel_from_str(self, levelstring):
         strlevel = levelstring.upper()
@@ -139,3 +153,5 @@ class ConfParameter:
         elif sys.platform.startswith("darwin"):
             fileconf = os.path.join(os.path.expanduser("~"), logfilenameparameter)
         return fileconf
+ 
+ 
