@@ -1268,3 +1268,301 @@ class MainWindow(QMainWindow):
         """Scroller automatiquement vers le bas"""
         scrollbar = self.chat_scroll_area.verticalScrollBar()
         scrollbar.setValue(scrollbar.maximum())
+
+     # MÉTHODES DE TRANSCRIPTION VOCALE
+    def toggle_microphone(self):
+        if not self.is_recording:
+        # Démarrer micro
+            try:
+                mic_list = sr.Microphone.list_microphone_names()
+                if not mic_list:
+                    QMessageBox.warning(self, "Microphone non trouvé", "Aucun micro détecté.")
+                    return
+                self.microphone = sr.Microphone(device_index=0)
+            except Exception as e:
+                QMessageBox.warning(self, "Erreur micro", str(e))
+                return
+
+            self.is_recording = True
+            # Mettre icône rouge
+            self.mic_btn.setIcon(QIcon(self.red_mic_icon))
+            QTimer.singleShot(50, self.start_voice_recording)  # lancer après l'update UI
+
+        else:
+            # Arrêter micro
+            self.is_recording = False
+            self.stop_voice_recording()
+            # Revenir icône normale
+            self.mic_btn.setIcon(QIcon(self.normal_mic_icon))
+
+
+    def start_voice_recording(self):
+        if self.microphone is None:
+            return
+        try:
+            # Chaque fois, ouvrir le micro dans un "with"
+            with self.microphone as source:
+                self.recognizer.adjust_for_ambient_noise(source, duration=0.5)
+
+            # Lancer en arrière-plan
+            self.stop_listening = self.recognizer.listen_in_background(
+                self.microphone, self.process_audio
+            )
+            print("🎙️ Enregistrement démarré (background)")
+
+        except Exception as e:
+            print(f"❌ Erreur micro: {e}")
+            self.is_recording = False
+            self.mic_btn.setIcon(QIcon(self.normal_mic_icon))
+
+
+
+    def stop_voice_recording(self):
+         if self.stop_listening is not None:
+            # arrêter l'écoute proprement
+            self.stop_listening(wait_for_stop=True)  # wait_for_stop=True pour s'assurer que le thread est terminé
+            self.stop_listening = None
+            print("🛑 Enregistrement arrêté")
+
+
+
+    def process_audio(self, recognizer, audio):
+        """Callback appelé à chaque phrase captée en background."""
+        try:
+            text = recognizer.recognize_google(audio, language="fr-FR")
+            print(f"✅ Reconnu : {text}")
+            # Thread-safe : on passe par un signal Qt
+            self.voice_text_ready.emit(text)
+        except sr.UnknownValueError:
+            print("🤔 Audio non compris")
+        except sr.RequestError as e:
+            print(f"❌ Erreur API Google: {e}")
+
+
+    def restore_mic_button(self):
+        """Restaure l'apparence normale du bouton microphone"""
+        def restore():
+            self.mic_btn.setEnabled(True)
+            self.mic_btn.setIcon(QIcon(self.normal_mic_icon))
+            self.mic_btn.setStyleSheet("""
+                QPushButton {
+                    background-color: transparent;
+                    border: none;
+                }
+                QPushButton:hover {
+                    background-color: #e9ecef;
+                }
+                QPushButton:pressed {
+                    background-color: #dc3545;
+                    color: white;
+                }
+            """)
+        QTimer.singleShot(0, restore)
+
+    def _connect_signals(self):
+        # Navigation buttons
+        self.chats_btn.clicked.connect(self._show_chats)
+        self.tickets_btn.clicked.connect(self._show_tickets)
+        
+        # Action buttons (for chats view)
+        self.new_conversation_btn.clicked.connect(self._new_conversation)
+        self.conversation_history_btn.clicked.connect(self._show_conversation_history)
+        self.search_chats_btn.clicked.connect(self._search_chats)
+        
+        # Saisie message
+        self.send_btn.clicked.connect(self._send_message)
+        self.input_field.returnPressed.connect(self._send_message)
+        
+        # Bouton microphone
+        self.mic_btn.clicked.connect(self.toggle_microphone)
+
+        
+        # Bouton ticket
+        self.create_ticket_btn.clicked.connect(self._create_ticket)
+        
+        # Signaux du modèle
+        self.model.message_added.connect(self._on_message_added)
+        self.model.ticket_created.connect(self._on_ticket_created)
+        
+        self.item_list.itemClicked.connect(self._open_selected_conversation)
+
+
+    
+    def _show_chats(self):
+        self.current_view = "chats"
+        self.chats_btn.setChecked(True)
+        self.tickets_btn.setChecked(False)
+        
+        # Show action buttons, hide item list
+        self.action_buttons_widget.show()
+        self.item_list.hide()
+
+    def _show_tickets(self):
+        self.current_view = "tickets"
+        self.chats_btn.setChecked(False)
+        self.tickets_btn.setChecked(True)
+        
+        # Hide action buttons, show item list
+        self.action_buttons_widget.hide()
+        self.item_list.show()
+        
+        # Populate with ticket data
+        self._populate_tickets()
+
+    def _populate_tickets(self):
+        self.item_list.clear()
+        # Add sample tickets as shown in mockup
+        tickets_data = [
+            {
+                "title": "Software update",
+                "description": "Request for MEDULLA software update",
+                "priority": "Medium",
+                "time": "2 hours ago",
+                "status": "In progress"
+            },
+            {
+                "title": "Network configuration", 
+                "description": "Configuration of a new network printer",
+                "priority": "Low",
+                "time": "Yesterday",
+                "status": "Resolved"
+            }
+        ]
+        
+        # Add real tickets from model
+        tickets = self.model.get_tickets()
+        
+        # If no real tickets, show sample data
+        
+        if not tickets:
+            for ticket_data in tickets_data:
+                item_widget = self._create_ticket_item(ticket_data)
+                list_item = QListWidgetItem()
+                list_item.setSizeHint(item_widget.sizeHint())
+                self.item_list.addItem(list_item)
+                self.item_list.setItemWidget(list_item, item_widget)
+        else:
+            # Show real tickets
+            for ticket in tickets:
+                # Convertir l'objet Ticket en dictionnaire pour _create_ticket_item
+                ticket_data = {
+                    "id": ticket.id,
+                    "title": ticket.description,  # Utilise description comme titre
+                    "status": ticket.status.capitalize(),  # Première lettre en majuscule
+                    "description": ticket.description,
+                    "priority": getattr(ticket, 'priority', 'Low'),  # 'Low' par défaut si priority n'existe pas
+                    "time": ticket.created_at.strftime("%B %d, %Y at %H:%M")  # Format: "January 15, 2025 at 14:30"
+                }
+                
+                item_widget = self._create_ticket_item(ticket_data)
+                list_item = QListWidgetItem()
+                list_item.setSizeHint(item_widget.sizeHint())
+                self.item_list.addItem(list_item)
+                self.item_list.setItemWidget(list_item, item_widget)
+
+    def _create_ticket_item(self, ticket_data):
+        widget = QWidget()
+        widget.setFixedWidth(270)
+    
+        layout = QVBoxLayout(widget)
+        layout.setContentsMargins(15, 15, 15, 15)
+        layout.setSpacing(6)
+        
+        # Titre et statut sur la même ligne
+        title_layout = QHBoxLayout()
+        title_layout.setContentsMargins(0, 0, 0, 0)
+        
+        title_label = QLabel(ticket_data["title"])
+        title_label.setStyleSheet("font-weight: bold; font-size: 14px; color: black;")
+        
+        status_label = QLabel(ticket_data["status"])
+        if ticket_data["status"] == "Resolved":
+            status_color = "#28a745"
+        elif ticket_data["status"] == "In progress":
+            status_color = "#ffc107"
+            text_color = "black"  # Texte noir pour le jaune
+        else:
+            status_color = "#6c757d"
+            text_color = "white"
+        
+        # Couleur du texte selon le statut
+        text_color = "black" if ticket_data["status"] == "In progress" else "white"
+        
+        status_label.setStyleSheet(f"""
+            background-color: {status_color};
+            color: {text_color};
+            padding: 4px 8px;
+            border-radius: 8px;
+            font-size: 11px;
+            font-weight: bold;
+        """)
+        status_label.setFixedHeight(30)
+        
+        title_layout.addWidget(title_label)
+        title_layout.addStretch()  # Pousse le statut vers la droite
+        title_layout.addWidget(status_label)
+        
+        # Description tronquée si trop longue
+        description_text = ticket_data["description"]
+        if len(description_text) > 50:  # Limite à 50 caractères
+            description_text = description_text[:47] + "..."
+        
+        description_label = QLabel(description_text)
+        description_label.setStyleSheet("color: #666; font-size: 12px; margin-top: 5px;")
+        description_label.setWordWrap(False)  # Pas de retour à la ligne automatique
+        
+
+        # Ligne du bas avec priorité et temps
+        bottom_layout = QHBoxLayout()
+        bottom_layout.setContentsMargins(0, 5, 0, 0)
+        
+        priority_label = QLabel(ticket_data["priority"])
+        priority_label.setStyleSheet("color: #666; font-size: 12px;")
+        
+        time_label = QLabel(ticket_data["time"])
+        time_label.setStyleSheet("color: #666; font-size: 12px;")
+        
+        bottom_layout.addWidget(priority_label)
+        bottom_layout.addStretch()
+        bottom_layout.addWidget(time_label)
+        
+        # Ajouter tous les layouts au layout principal
+        layout.addLayout(title_layout)
+        layout.addWidget(description_label)
+        layout.addLayout(bottom_layout)
+        
+        # Style du widget 
+        widget.setStyleSheet("""
+        QWidget {
+            background-color: #f8f9fa;
+            border: 1px solid #e9ecef;
+            border-radius: 8px;
+            margin: 4px 10px 4px 10px;
+        }
+        QWidget:hover {
+            background-color: #e9ecef;
+        }
+        QLabel {
+            border: none;
+            background-color: transparent;
+        }
+    """)
+        
+        # --- Bouton Historique ---
+        actions_layout = QHBoxLayout()
+        history_btn = QPushButton("Historique")
+        history_btn.setStyleSheet("padding:6px 10px; border:1px solid #8bc34a; border-radius:6px;")
+
+        # On stocke l'ID du ticket (vient de ticket_data)
+        widget.ticket_id = ticket_data.get("id")
+
+        # Quand on clique → appel de _open_ticket_history
+        history_btn.clicked.connect(lambda _=False, t_id=widget.ticket_id: self._open_ticket_history(t_id))
+
+        actions_layout.addStretch()
+        actions_layout.addWidget(history_btn)
+        layout.addLayout(actions_layout)
+
+
+        
+        return widget
