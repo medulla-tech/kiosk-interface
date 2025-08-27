@@ -1566,3 +1566,298 @@ class MainWindow(QMainWindow):
 
         
         return widget
+    # Placeholder methods for action buttons
+    def _new_conversation(self):
+        """Démarre une nouvelle conversation normale avec le bot"""
+        # Réinitialiser le mode réponse ticket
+        self.reply_ticket_id = None
+        self.input_field.setPlaceholderText("Type your message...")
+        
+        # Sauvegarder l'ancienne conversation si elle existe
+        if hasattr(self.model, '_current_conversation_id') and self.model._current_conversation_id:
+            self.model.save_current_conversation()
+        
+        # Créer nouvelle conversation
+        conv_id = self.model.new_conversation("New conversation")
+        
+        # Nettoyer l'interface
+        self._clear_chat_area()
+        
+        # Message de bienvenue du bot (conversation normale)
+        self.model.add_message("Hello! How can I help you today? ✅", "bot")
+        self.model.save_current_conversation()
+        
+        # Masquer le bouton ticket au début
+        self.create_ticket_btn.hide()
+        
+        logger.info(f"Nouvelle conversation créée : {conv_id}")
+        
+        # Rafraîchir la liste des conversations si visible
+        if self.item_list.isVisible():
+            self._show_conversation_history()
+
+
+
+    def _show_conversation_history(self):
+        """Afficher la liste des conversations dans le panneau gauche"""
+        self.item_list.clear()
+        self.item_list.show()
+
+        conversations = self.model.list_saved_conversations()
+        if not conversations:
+            conversations = self.model.get_conversations()  # fallback (données d'exemple)
+
+        for conv in conversations:
+            item = QListWidgetItem()
+            widget = ConversationItem(conv)  # joli rendu titre + dernier message + heure
+            item.setSizeHint(widget.sizeHint())
+            item.setData(Qt.ItemDataRole.UserRole, conv.id)  # <-- on stocke l'ID ici
+            self.item_list.addItem(item)
+            self.item_list.setItemWidget(item, widget)
+
+
+
+    def _search_chats(self):
+        print("Search chats clicked")
+        # Ici vous pouvez ajouter la logique de recherche
+
+    
+    def _send_message(self):
+        text = self.input_field.text().strip()
+        if not text:
+            return
+        
+        # --- Si on est en mode réponse GLPI ---
+        if getattr(self, "reply_ticket_id", None):
+            print(f"📤 Envoi réponse medulla pour ticket {self.reply_ticket_id}: {text}")
+            
+            # Affiche le message côté utilisateur
+            self._on_message_added(Message(id=str(uuid.uuid4()), text=text, sender="user"))
+            self.input_field.clear()
+
+            # Vérifier que l'ID est numérique
+            try:
+                numeric_id = int(self.reply_ticket_id)
+            except ValueError:
+                self._on_message_added(Message(id=str(uuid.uuid4()), text="❌ Error: Invalid ticket ID", sender="bot"))
+
+                return
+
+            # Envoie le message à GLPI comme followup
+            try:
+                print("🔌 Initialisation session GLPI pour followup...")
+                session = init_session()
+                
+                print(f"📤 Ajout followup au ticket {numeric_id}...")
+                followup_id = add_ticket_followup(session, numeric_id, text)
+                
+                print("🔌 Fermeture session GLPI...")
+                kill_session(session)
+                
+                if followup_id:
+                    print(f"✅ Followup envoyé avec succès (ID: {followup_id})")
+                    self._on_message_added(Message(id=str(uuid.uuid4()), text="✅ Response sent to medulla", sender="bot"))
+                else:
+                    print("⚠️ Followup envoyé mais pas d'ID retourné")
+                    self._on_message_added(Message(id=str(uuid.uuid4()), text="✅ Response probably sent to medulla", sender="bot"))
+
+                
+                    
+            except Exception as e:
+                print(f"❌ Erreur envoi followup: {e}")
+                error_msg = str(e)
+                if "400" in error_msg:
+                    self._on_message_added(Message(id=str(uuid.uuid4()), text="❌ GLPI error: Incorrect data format", sender="bot"))
+
+                elif "401" in error_msg:
+                    self._on_message_added(Message(id=str(uuid.uuid4()), text="❌ GLPI Error: Unauthorized", sender="bot"))
+
+                elif "404" in error_msg:
+                    self._on_message_added(Message(id=str(uuid.uuid4()), text="❌ GLPI error: Ticket not found", sender="bot"))
+
+                else:
+                    self._on_message_added(Message(id=str(uuid.uuid4()), text="❌ GLPI sending error: {error_msg[:50]}...", sender="bot"))
+
+
+            # ⚠️ Pas de save_current_conversation ici → on ne pollue pas la liste des conversations
+            return
+
+        # --- Sinon, mode normal (conversation bot) ---
+        self.model.add_message(text, "user")
+        self.model.save_current_conversation()
+        self.input_field.clear()
+        QTimer.singleShot(1500, lambda: self._simulate_bot_response(text))
+
+
+    
+     
+    def _open_ticket_history(self, ticket_id: str):
+        print(f"🔍 DEBUG: ticket_id reçu = '{ticket_id}' (type: {type(ticket_id)})")
+    
+        if not ticket_id:
+            QMessageBox.information(self, "Historique", "Pas d'ID GLPI pour ce ticket.")
+            return
+
+        # Vérifier si l'ID est numérique (requis pour GLPI)
+        try:
+            numeric_id = int(ticket_id)
+            print(f"✅ ID numérique validé: {numeric_id}")
+        except ValueError:
+            QMessageBox.warning(self, "Erreur", f"ID ticket invalide: {ticket_id} (doit être numérique)")
+            return
+
+        try:
+            print("🔌 Initialisation session GLPI...")
+            session = init_session()
+            print("✅ Session GLPI initialisée")
+            
+            print(f"📋 Récupération historique ticket {numeric_id}...")
+            
+            try:
+                followups = list_ticket_followups(session, numeric_id)
+                print(f"✅ Historique récupéré: {len(followups) if followups else 0} éléments")
+            except AttributeError:
+                print("⚠️ Fonction list_ticket_followups non disponible")
+                QMessageBox.information(self, "Info", "La récupération d'historique n'est pas encore implémentée.")
+                kill_session(session)
+                return
+            except Exception as api_error:
+                print(f"❌ Erreur API GLPI pour followups: {api_error}")
+                followups = []
+            
+            print("🔌 Fermeture session GLPI...")
+            kill_session(session)
+            print("✅ Session fermée")
+            
+        except Exception as e:
+            print(f"❌ Erreur lors de la récupération: {e}")
+            reply = QMessageBox.question(
+                self, 
+                "Erreur GLPI", 
+                f"Impossible de récupérer l'historique du ticket #{ticket_id}.\n\n"
+                f"Erreur: {str(e)[:100]}...\n\n"
+                "Voulez-vous continuer sans historique pour répondre au ticket ?",
+                QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No
+            )
+            
+            if reply == QMessageBox.StandardButton.No:
+                return
+            
+            followups = []
+
+        # --- Zone de chat ---
+        print("🧹 Nettoyage zone de chat...")
+        self._clear_chat_area()
+
+        
+
+        # Ajouter les messages ou message d'info
+        if not followups:
+            print("ℹ️ Historique vide ou indisponible")
+            self.model.add_message(f"Ticket #{ticket_id} - History not available", "bot")
+            self.model.add_message("You can now type your answer below.", "bot")
+        else:
+            print(f"📝 Ajout de {len(followups)} messages à l'historique")
+            self.model.add_message(f"=== Historique du ticket #{ticket_id} ===", "bot")
+            for i, f in enumerate(followups):
+                raw_content = html.unescape((f.get("content") or "").strip()) or "(message vide)"
+                content = re.sub(r"<[^>]*>", "", raw_content)  # supprime les balises HTML
+
+                author = f.get("users_id_editor", "Système")
+                date = f.get("date_creation", "")
+                
+                message = f"[{date}] {author}: {content}"
+                print(f"  📝 Message {i+1}: {content[:50]}...")
+                self.model.add_message(message, "bot")
+
+       
+
+        # Passer en mode réponse
+        self.reply_ticket_id = str(ticket_id)
+        placeholder_text = f"Répondre au ticket #{ticket_id}..."
+        self.input_field.setPlaceholderText(placeholder_text)
+        print(f"✅ Mode réponse activé pour ticket {ticket_id}")
+
+
+
+    #
+    def _simulate_bot_response(self, user_text):
+        response = envoyer_message_au_bot(user_text)
+        self.model.add_message(response, "bot")
+        self.model.save_current_conversation()
+
+        QTimer.singleShot(500, self._show_ticket_button)
+
+    def _show_ticket_button(self):
+        """Afficher le bouton de création de ticket"""
+        self.create_ticket_btn.show()
+
+    def _on_message_added(self, message: Message):
+        bubble = MessageBubble(message)
+        self.chat_layout.addWidget(bubble)
+        QTimer.singleShot(100, self._scroll_to_bottom)
+
+    def _scroll_to_bottom(self):
+        scrollbar = self.chat_scroll_area.verticalScrollBar()
+        scrollbar.setValue(scrollbar.maximum())
+
+    def _create_ticket(self):
+        dialog = CreateTicketDialog(self)
+        if dialog.exec() == QDialog.DialogCode.Accepted:
+            ticket = self.model.create_ticket(
+                description=dialog.description,
+                screenshot_path=dialog.screenshot_path
+            )
+            QMessageBox.information(
+                self, 
+                "Ticket Created", 
+                f"Your ticket has been created successfully!\nTicket ID: {ticket.id}"
+            )
+            self.create_ticket_btn.hide()
+
+    def _on_ticket_created(self, ticket: Ticket):
+        logger.info(f"Ticket created: {ticket}")
+        if self.current_view == "tickets":
+            self._show_tickets()
+    def _clear_chat_area(self):
+        for i in reversed(range(self.chat_layout.count())):
+            w = self.chat_layout.itemAt(i).widget()
+            if w:
+                w.deleteLater()
+    
+    
+    def _open_selected_conversation(self, item: QListWidgetItem):
+        conv_id = item.data(Qt.ItemDataRole.UserRole)
+        if not conv_id:
+            return
+
+        # 🔹 Revenir en mode chat normal
+        self.reply_ticket_id = None
+        self.input_field.setPlaceholderText("Type your message...")
+
+        # Charger conversation
+        self.model.load_conversation(conv_id)
+        self._clear_chat_area()
+        for msg in self.model.get_messages():
+            self._on_message_added(msg)
+
+        self.create_ticket_btn.hide()
+
+    
+
+def main():
+    app = QApplication(sys.argv)
+    
+    # Configuration de l'application
+    app.setApplicationName("Medulla")
+    app.setApplicationVersion("1.0")
+    
+    # Créer le modèle et la fenêtre
+    model = ChatModel()
+    window = MainWindow(model)
+    window.show()
+    
+    sys.exit(app.exec())
+
+if __name__ == "__main__":
+    main()
