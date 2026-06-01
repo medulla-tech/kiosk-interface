@@ -23,7 +23,7 @@
 
 import sys
 import os
-from PyQt6.QtWidgets import QApplication
+from PyQt6.QtWidgets import QApplication, QSystemTrayIcon
 from PyQt6.QtCore import QCoreApplication
 from PyQt6.QtGui import QIcon
 import logging
@@ -114,7 +114,11 @@ class Application(QApplication):
         self.notifier.app_launched.emit()
 
         self.setWindowIcon(QIcon(os.path.join(self.datasdir, "kiosk.png")))
-        self.setApplicationName("Kiosk")
+        self.setApplicationName("Medulla Kiosk")
+        # Link the app to its .desktop file so the desktop environment shows the
+        # proper name/icon (e.g. GNOME top bar) instead of the interpreter name
+        # ("python3"). The name matches /usr/share/applications/medulla-kiosk.desktop.
+        self.setDesktopFileName("medulla-kiosk")
         # When the window is closed, the process is not killed
         self.setQuitOnLastWindowClosed(False)
 
@@ -126,6 +130,15 @@ class Application(QApplication):
 
         # Contains ref to independant windows
         self.independant = {}
+
+        # On desktops without a system tray (e.g. GNOME, which dropped the
+        # legacy notification area), the tray icon never shows up, so the user
+        # would have no way to open the kiosk. In that case, display the main
+        # window directly at startup. Where a tray is available (KDE, Xfce,
+        # MATE, Cinnamon...), we keep the discreet tray-driven behaviour.
+        if not QSystemTrayIcon.isSystemTrayAvailable():
+            self.log.info("No system tray available, opening kiosk window directly")
+            self.notifier.tray_action_open.emit("")
 
     def run(self):
         """Launch the main loop"""
@@ -167,8 +180,37 @@ class Application(QApplication):
         self.send(signal_presence)
 
 
+def notify_running_instance_to_show(conf):
+    """Ask an already-running kiosk to bring its window to the foreground.
+
+    Connects to the local socket the running kiosk listens on and sends a
+    ``show`` message. Used by the application menu launcher on desktops without
+    a system tray (e.g. GNOME). Returns True if a running instance was reached.
+    """
+    import socket
+    import json
+
+    try:
+        sock = socket.create_connection(
+            (conf.am_server, conf.kiosk_local_port), timeout=2
+        )
+        sock.sendall(json.dumps({"action": "show"}).encode("utf-8"))
+        sock.close()
+        return True
+    except OSError:
+        return False
+
+
 if __name__ == "__main__":
     conf = ConfParameter()
+
+    # `--show` is used by the desktop menu launcher to reopen the window of an
+    # already-running instance. If none is running, fall through and start the
+    # kiosk normally.
+    if "--show" in sys.argv:
+        if notify_running_instance_to_show(conf):
+            sys.exit(0)
+
     format = "%(asctime)s - %(levelname)s -(LAUNCHER)%(message)s"
     formatter = logging.Formatter(format)
     logdir = os.path.dirname(conf.logfilename())

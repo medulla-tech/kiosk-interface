@@ -119,6 +119,18 @@ class EventController(object):
                         package["launcher"] = self.app.message["launcher"]
                 self.app.packages = packages
 
+            elif self.app.message["action"] == "show":
+                # Request to bring the main window to the foreground. Used on
+                # Linux desktops without a system tray (e.g. GNOME), where the
+                # menu launcher sends this message to the already-running
+                # instance to reopen the window after it has been closed.
+                """
+                {
+                    "action": "show"
+                }
+                """
+                self.action_tray_action_open("")
+
             elif self.app.message["action"] == "presence":
                 # If the AM send a ping to the kiosk, it answers by a pong
                 """
@@ -235,6 +247,10 @@ class EventController(object):
         self.app.kiosk.tab_kiosk.search()
         self.app.kiosk.tab_kiosk.request_inventory()
         self.app.kiosk.show()
+        # Make sure the window comes back to the foreground, even if it was
+        # only minimized/hidden behind other windows.
+        self.app.kiosk.raise_()
+        self.app.kiosk.activateWindow()
 
     def action_toaster_new_update(self, datas):
         self.app.independant["toaster"] = ToasterWidget(self.app, datas)
