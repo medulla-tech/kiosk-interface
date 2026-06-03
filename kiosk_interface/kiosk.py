@@ -56,6 +56,7 @@ class Kiosk(QWidget):
         super().__init__()
         self.app = app
         self.setWindowIcon(QIcon(os.path.join(self.app.datasdir,"kiosk.png")))
+        self.setWindowTitle("Medulla Kiosk")
 
         self.resize(self.app.parameters.width, self.app.parameters.height)
 

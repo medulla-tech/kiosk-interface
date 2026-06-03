@@ -1,0 +1,11 @@
+[Desktop Entry]
+Type=Application
+Name=Medulla Kiosk
+Comment=Open the Medulla software kiosk
+Exec=python3 -m kiosk_interface --show
+Icon=/usr/lib/python3/dist-packages/kiosk_interface/datas/kiosk.png
+Terminal=false
+Categories=System;Utility;
+Keywords=medulla;kiosk;software;packages;
+StartupNotify=true
+StartupWMClass=medulla-kiosk
