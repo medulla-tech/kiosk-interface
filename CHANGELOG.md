@@ -1,5 +1,8 @@
 # Change Log
 
+## [2.0.0](https://github.com/medulla-tech/kiosk-interface/tree/2.0.0) (2026-06-03)
+- [FEATURE] Initial Linux version
+
 ## [v1.0.0](https://github.com/medulla-tech/kiosk-interface/tree/v1.0.0) (2023-12-29)
 - [FEATURE] Port the code to Python Qt6
 

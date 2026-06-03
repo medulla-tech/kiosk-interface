@@ -76,7 +76,7 @@ class Application(QApplication):
             pidfile = os.path.join("C:\\", "progra~1", "Medulla", "bin", "kiosk.pid")
 
             import ctypes
-            myappid = 'Medulla.kiosk.1.0'
+            myappid = 'Medulla.kiosk.2.0'
             ctypes.windll.shell32.SetCurrentProcessExplicitAppUserModelID(myappid)
 
         else:
