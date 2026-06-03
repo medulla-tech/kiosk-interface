@@ -12,7 +12,7 @@ The kiosk read some config files to do its job
 
 The kiosk read the config files (.ini and .ini.local) located in :
 
-- *C:\Program Files\Pulse\etc\agentconf.ini* for Windows,
+- *C:\Program Files\Medulla\etc\agentconf.ini* for Windows,
 - */etc/pulse-xmpp-agent/agentconf.ini* for Linux,
 - */Library/Application Support/Pulse/etc/agentconf.ini* for MacOs.
 
