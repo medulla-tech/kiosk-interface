@@ -18,7 +18,7 @@ from PyQt6.QtWidgets import (
     QVBoxLayout,
     QWidget,
 )
-from PyQt6.QtCore import QTimer
+from PyQt6.QtCore import QTimer, QSize
 
 try:
     from kiosk_interface.views.custom_package_item import CustomPackageWidget
@@ -72,6 +72,7 @@ class TabKiosk(QWidget):
         self.refresh_timer.setSingleShot(True)
         self.refresh_timer.timeout.connect(self.reset_refresh_button)
         self.button_refresh = QPushButton("Refresh", self)
+        self.button_refresh.setObjectName("refreshBtn")
         self.button_refresh.clicked.connect(self.on_refresh_clicked)
 
         self.item_custom_packages = []
@@ -121,7 +122,7 @@ class TabKiosk(QWidget):
                 ):
                     item_widget = QListWidgetItem(self.list_wrapper)
                     custom_package = CustomPackageWidget(self.app, package)
-                    item_widget.setSizeHint(custom_package.sizeHint())
+                    item_widget.setSizeHint(QSize(custom_package.sizeHint().width(), max(custom_package.sizeHint().height(), 72)))
                     self.custom_packages.append(custom_package)
                     self.item_custom_packages.append(item_widget)
 
@@ -133,7 +134,7 @@ class TabKiosk(QWidget):
             else:
                 item_widget = QListWidgetItem(self.list_wrapper)
                 custom_package = CustomPackageWidget(self.app, package)
-                item_widget.setSizeHint(custom_package.sizeHint())
+                item_widget.setSizeHint(QSize(custom_package.sizeHint().width(), max(custom_package.sizeHint().height(), 72)))
                 self.custom_packages.append(custom_package)
                 self.item_custom_packages.append(item_widget)
 

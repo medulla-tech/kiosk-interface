@@ -6,6 +6,7 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import re
+from PyQt6.QtCore import Qt
 from PyQt6.QtGui import QPixmap
 from PyQt6.QtWidgets import (
     QWidget,
@@ -13,6 +14,7 @@ from PyQt6.QtWidgets import (
     QPushButton,
     QLabel,
     QHBoxLayout,
+    QVBoxLayout,
     QProgressBar,
     QMessageBox,
 )
@@ -88,17 +90,61 @@ class CustomPackageWidget(QWidget):
                     self.actions.append(action)
                     self.action_button[action] = QPushButton(action)
 
-            self.layout = QGridLayout()
+            # White rounded card (painted via the stylesheet).
+            self.setAttribute(Qt.WidgetAttribute.WA_StyledBackground, True)
+            self.setObjectName("packageCard")
 
-            layout_info = QHBoxLayout()
-            layout_info.addWidget(self.icon)
-            layout_info.addWidget(self.name)
-            layout_info.addWidget(self.version)
-            layout_info.addWidget(self.description)
+            # Name (bold) stacked over the description.
+            self.name.setObjectName("pkgName")
+            text_col = QVBoxLayout()
+            text_col.setSpacing(2)
+            text_col.setContentsMargins(0, 0, 0, 0)
+            text_col.addWidget(self.name)
+            if self.description.text():
+                self.description.setObjectName("pkgDesc")
+                text_col.addWidget(self.description)
 
-            layout_action = QHBoxLayout()
+            # Version: fixed-width column so it lines up across all rows.
+            self.version.setObjectName("pkgVersion")
+            self.version.setFixedWidth(64)
+            self.version.setAlignment(
+                Qt.AlignmentFlag.AlignRight | Qt.AlignmentFlag.AlignVCenter
+            )
+
+            # Action buttons in a fixed-width zone, right-aligned, so the buttons
+            # always occupy the same right column whatever their number.
+            # Transparent so the empty part of the zone doesn't paint a grey box.
+            actions_box = QWidget()
+            actions_box.setObjectName("actionsBox")
+            actions_layout = QHBoxLayout(actions_box)
+            actions_layout.setContentsMargins(0, 0, 0, 0)
+            actions_layout.setSpacing(8)
+            actions_layout.addStretch()
             for action in self.actions:
-                layout_action.addWidget(self.action_button[action])
+                # Pixel-identical buttons: 36 px is tall enough for the text +
+                # padding (so nothing is clipped), and AlignVCenter keeps them
+                # centred in the row without stretching.
+                self.action_button[action].setFixedSize(90, 36)
+                # Delete is destructive -> red (styled via #deleteBtn in the QSS).
+                if action == "Delete":
+                    self.action_button[action].setObjectName("deleteBtn")
+                actions_layout.addWidget(
+                    self.action_button[action], 0, Qt.AlignmentFlag.AlignVCenter
+                )
+            actions_box.setFixedWidth(188)
+
+            # Single row: icon | name+description (stretch) | version | actions.
+            top_row = QHBoxLayout()
+            top_row.setContentsMargins(12, 14, 20, 14)
+            top_row.setSpacing(12)
+            top_row.addWidget(self.icon)
+            top_row.addLayout(text_col, 1)
+            top_row.addWidget(self.version)
+            top_row.addWidget(actions_box)
+
+            self.layout = QVBoxLayout()
+            self.layout.setContentsMargins(0, 0, 0, 0)
+            self.layout.addLayout(top_row)
 
         # Displays a progressbar only if the package has a status and a stat of
         # progression
@@ -130,10 +176,8 @@ class CustomPackageWidget(QWidget):
                         self.action_button[package["status"]].setEnabled(True)
                     else:
                         pass
-                self.layout.addWidget(self.statusbar, 2, 0, 1, 1)
+                self.layout.addWidget(self.statusbar)
 
-        self.layout.addLayout(layout_info, 0, 0, 1, 1)
-        self.layout.addLayout(layout_action, 1, 0, 1, 1)
         self.setLayout(self.layout)
 
         if "Install" in self.actions:

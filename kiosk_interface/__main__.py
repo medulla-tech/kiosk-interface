@@ -103,6 +103,16 @@ class Application(QApplication):
         # proper name/icon (e.g. GNOME top bar) instead of the interpreter name
         # ("python3"). The name matches /usr/share/applications/medulla-kiosk.desktop.
         self.setDesktopFileName("medulla-kiosk")
+
+        # Apply the cosmetic Medulla theme (petrol header, green actions, light
+        # body). Kept in a separate .qss; missing file -> default Qt style.
+        try:
+            qss_path = os.path.join(self.datasdir, "style.qss")
+            with open(qss_path, "r", encoding="utf-8") as qss_file:
+                self.setStyleSheet(qss_file.read())
+        except OSError:
+            self.log.warning("Stylesheet not found, using default Qt style")
+
         # When the window is closed, the process is not killed
         self.setQuitOnLastWindowClosed(False)
 

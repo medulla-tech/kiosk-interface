@@ -1,0 +1,123 @@
+/* Medulla Kiosk — cosmetic theme aligned with the Medulla brand / web console.
+   Brand palette (from branding assets + web frontend):
+     petrol  #25607D  (navbar / header)
+     green   #8CB63C  (actions), darker #6a9a1e
+     body    #f0f4f8 / surfaces #e8eff3
+   Purely cosmetic. Loaded at startup in __main__.py. */
+
+QWidget {
+    background-color: #f0f4f8;
+    color: #2f3a44;
+    font-family: "Segoe UI", "Cantarell", "Noto Sans", "DejaVu Sans", sans-serif;
+    font-size: 13px;
+}
+
+/* Labels are transparent so they don't paint a grey rectangle over the
+   cards/body (the global QWidget background would otherwise show through). */
+QLabel { background: transparent; }
+
+/* Top header banner (petrol bar holding the Medulla logo) */
+#medullaHeader {
+    background-color: #25607D;
+    border: none;
+}
+
+/* Tabs */
+QTabWidget::pane {
+    border: 1px solid #d7e0e8;
+    border-radius: 4px;
+    background: #f0f4f8;
+    top: -1px;
+}
+QTabBar::tab {
+    background: #e8eff3;
+    color: #25607D;
+    padding: 8px 20px;
+    border-top-left-radius: 4px;
+    border-top-right-radius: 4px;
+    margin-right: 2px;
+    font-weight: bold;
+}
+QTabBar::tab:selected { background: #25607D; color: #ffffff; }
+QTabBar::tab:hover:!selected { background: #d0e4ed; }
+
+/* Search field */
+QLineEdit {
+    background: #ffffff;
+    border: 1px solid #cdd7df;
+    border-radius: 4px;
+    padding: 8px 12px;
+    selection-background-color: #8CB63C;
+    selection-color: #ffffff;
+}
+QLineEdit:focus { border: 1px solid #25607D; }
+
+/* Action buttons — brand green */
+QPushButton {
+    background-color: #8CB63C;
+    color: #ffffff;
+    border: none;
+    border-radius: 4px;
+    padding: 8px 16px;
+    font-weight: bold;
+}
+QPushButton:hover { background-color: #7aa033; }
+QPushButton:pressed { background-color: #6a9a1e; }
+QPushButton:disabled { background-color: #c6d99a; color: #eef3e2; }
+
+/* Destructive action (Delete): red. */
+#deleteBtn { background-color: #dc3545; }
+#deleteBtn:hover { background-color: #c82333; }
+#deleteBtn:pressed { background-color: #a71d2a; }
+
+/* Secondary button (Refresh): neutral, petrol-outlined — keeps the green
+   reserved for the primary action (Install). */
+#refreshBtn {
+    background-color: #ffffff;
+    color: #25607D;
+    border: 1px solid #cdd7df;
+    border-radius: 4px;
+    padding: 8px 16px;
+    font-weight: bold;
+}
+#refreshBtn:hover { background-color: #e8eff3; border-color: #25607D; }
+#refreshBtn:pressed { background-color: #d0e4ed; }
+
+/* Package list — transparent, so the white cards float on the light body */
+QListWidget {
+    background: transparent;
+    border: none;
+    outline: none;
+}
+QListWidget::item { margin: 4px 1px; }
+QListWidget::item:hover { background: transparent; }
+QListWidget::item:selected { background: transparent; }
+
+/* Package card */
+#packageCard {
+    background-color: #ffffff;
+    border: 1px solid #e1e8ee;
+    border-radius: 6px;
+}
+#pkgName { font-weight: bold; color: #2f3a44; }
+#pkgDesc { color: #6c7a86; font-size: 12px; }
+#pkgVersion { color: #8a97a3; }
+/* Action zone container: transparent so the empty area stays on the card. */
+#actionsBox { background: transparent; }
+
+/* Progress bar */
+QProgressBar {
+    border: 1px solid #cdd7df;
+    border-radius: 4px;
+    background: #eef2f6;
+    text-align: center;
+    min-height: 14px;
+    color: #2f3a44;
+}
+QProgressBar::chunk { background-color: #8CB63C; border-radius: 4px; }
+
+/* Scrollbar */
+QScrollBar:vertical { background: #eef2f6; width: 10px; margin: 0; border-radius: 5px; }
+QScrollBar::handle:vertical { background: #b9c6d1; border-radius: 5px; min-height: 24px; }
+QScrollBar::handle:vertical:hover { background: #9bafbd; }
+QScrollBar::add-line:vertical, QScrollBar::sub-line:vertical { height: 0; }

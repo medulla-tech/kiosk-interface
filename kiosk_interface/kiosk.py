@@ -15,7 +15,8 @@ from PyQt6.QtWidgets import (
     QTabWidget,
     QGridLayout,
 )
-from PyQt6.QtGui import QIcon
+from PyQt6.QtGui import QIcon, QPixmap
+from PyQt6.QtCore import Qt
 
 try:
     from kiosk_interface.views.custom_package_item import CustomPackageWidget
@@ -47,15 +48,38 @@ class Kiosk(QWidget):
         self.app.logger(
             "info", self.app.translate("Application", "Kiosk main view initialization")
         )
+        # --- Medulla header banner: petrol bar holding the brand logo ---
+        self.header = QLabel()
+        self.header.setObjectName("medullaHeader")
+        self.header.setFixedHeight(64)
+        self.header.setContentsMargins(18, 0, 0, 0)
+        self.header.setAlignment(
+            Qt.AlignmentFlag.AlignVCenter | Qt.AlignmentFlag.AlignLeft
+        )
+        logo = QPixmap(os.path.join(self.app.datasdir, "medulla_logo.png"))
+        if not logo.isNull():
+            self.header.setPixmap(
+                logo.scaledToHeight(44, Qt.TransformationMode.SmoothTransformation)
+            )
+
         self.tab_kiosk = TabKiosk(self.app, self)
 
         self.tabs = QTabWidget(self.app.kiosk)
         self.tabs.addTab(self.tab_kiosk, "Packages")
 
-        grid = QGridLayout(self.app.kiosk)
-        grid.addWidget(self.tabs, 1, 1, 1, 1)
+        # Body wrapper to give the content some padding under the header
+        body = QWidget()
+        body_layout = QVBoxLayout(body)
+        body_layout.setContentsMargins(12, 12, 12, 12)
+        body_layout.addWidget(self.tabs)
 
-        self.setLayout(grid)
+        layout = QVBoxLayout()
+        layout.setContentsMargins(0, 0, 0, 0)
+        layout.setSpacing(0)
+        layout.addWidget(self.header)
+        layout.addWidget(body)
+
+        self.setLayout(layout)
 
     def show(self):
         super().show()

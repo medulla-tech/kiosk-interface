@@ -77,8 +77,8 @@ class ConfParameter:
         if config.has_option("kiosk", "am_server"):
             self.am_server = config.get("kiosk", "am_server")
 
-        self.width = 650
-        self.height = 550
+        self.width = 820
+        self.height = 655
 
         self.log_level = self.get_loglevel_from_str("INFO")
         if config.has_option("global", "log_level"):
