@@ -121,17 +121,18 @@ class CustomPackageWidget(QWidget):
             actions_layout.setSpacing(8)
             actions_layout.addStretch()
             for action in self.actions:
-                # Pixel-identical buttons: 36 px is tall enough for the text +
-                # padding (so nothing is clipped), and AlignVCenter keeps them
-                # centred in the row without stretching.
-                self.action_button[action].setFixedSize(90, 36)
+                # Uniform 90 px in the normal state, but allowed to grow so the
+                # longer "... in progress ..." label (set on click) isn't
+                # clipped. Fixed height so nothing is cut at the bottom.
+                self.action_button[action].setFixedHeight(36)
+                self.action_button[action].setMinimumWidth(90)
                 # Delete is destructive -> red (styled via #deleteBtn in the QSS).
                 if action == "Delete":
                     self.action_button[action].setObjectName("deleteBtn")
                 actions_layout.addWidget(
                     self.action_button[action], 0, Qt.AlignmentFlag.AlignVCenter
                 )
-            actions_box.setFixedWidth(188)
+            actions_box.setMinimumWidth(188)
 
             # Single row: icon | name+description (stretch) | version | actions.
             top_row = QHBoxLayout()
