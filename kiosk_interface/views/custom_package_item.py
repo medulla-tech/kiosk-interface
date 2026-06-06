@@ -81,9 +81,11 @@ class CustomPackageWidget(QWidget):
         if "action" in package:
             for action in package["action"]:
                 if action == "Launch":
-                    if "launcher_cmd" in package and package["launcher_cmd"]:
-                                    self.actions.append(action)
-                                    self.action_button[action] = QPushButton(action)
+                    # The launch command is sent base64-encoded under the
+                    # "launcher" key by the master; show the button only when set.
+                    if package.get("launcher"):
+                        self.actions.append(action)
+                        self.action_button[action] = QPushButton(action)
                     else:
                         pass
                 else:
@@ -239,23 +241,25 @@ class CustomPackageWidget(QWidget):
             )
 
         elif action == "Launch":
-            if "launcher_cmd" in self.package:
-                try:
-                    launcher = base64.b64decode(self.package["launcher_cmd"]).decode(
-                        "utf-8"
-                    )
-                except BaseException:
-                    launcher = self.package["launcher"]
+            # The launcher path is stored base64-encoded under the "launcher" key.
+            launcher = self.package.get("launcher", "")
+            try:
+                decoded = base64.b64decode(launcher).decode("utf-8")
+                if decoded:
+                    launcher = decoded
+            except BaseException:
+                pass
 
-                launcher = inject_env_into_str(launcher)
-                if os.path.isfile(launcher):
-                    subprocess.Popen(launcher)
-                    msg = self.app.translate(
-                        "Action", "The app %s is launched" % self.name.text()
-                    )
-
+            # Strip env vars + surrounding quotes so os.path.isfile gets a clean
+            # path; Popen with a list handles paths containing spaces.
+            launcher = inject_env_into_str(launcher).strip().strip('"')
+            if launcher and os.path.isfile(launcher):
+                subprocess.Popen([launcher])
+                msg = self.app.translate(
+                    "Action", "The app %s is launched" % self.name.text()
+                )
             else:
-                if "Launch" in self.package["action"]:
+                if "Launch" in self.package.get("action", []):
                     self.package["action"].remove("Launch")
 
         elif action == "Ask":
