@@ -1,5 +1,9 @@
 # Change Log
 
+## [2.1.0](https://github.com/medulla-tech/kiosk-interface/tree/2.1.0) (2026-06-08)
+- [FEATURE] Integration of Medulla theming for Kiosk UI
+- [BUGFIX]  Fix Launch button
+
 ## [2.0.0](https://github.com/medulla-tech/kiosk-interface/tree/2.0.0) (2026-06-03)
 - [FEATURE] Initial Linux version
 
