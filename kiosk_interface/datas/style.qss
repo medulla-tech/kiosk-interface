@@ -70,6 +70,17 @@ QPushButton:disabled { background-color: #c6d99a; color: #eef3e2; }
 #deleteBtn:hover { background-color: #c82333; }
 #deleteBtn:pressed { background-color: #a71d2a; }
 
+/* Status badge (Installed): white background, green text, non-actionable.
+   Shown for a package that is installed but ships no uninstall section. */
+#installedBtn, #installedBtn:disabled {
+    background-color: #ffffff;
+    color: #6a9a1e;
+    border: 1px solid #8CB63C;
+    border-radius: 4px;
+    padding: 8px 16px;
+    font-weight: bold;
+}
+
 /* Secondary button (Refresh): neutral, petrol-outlined — keeps the green
    reserved for the primary action (Install). */
 #refreshBtn {

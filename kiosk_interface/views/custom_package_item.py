@@ -88,6 +88,13 @@ class CustomPackageWidget(QWidget):
                         self.action_button[action] = QPushButton(action)
                     else:
                         pass
+                elif action == "Installed":
+                    # Non-actionable status badge: the package is installed but
+                    # ships no uninstall section, so there is nothing to do.
+                    self.actions.append(action)
+                    btn = QPushButton(action)
+                    btn.setEnabled(False)
+                    self.action_button[action] = btn
                 else:
                     self.actions.append(action)
                     self.action_button[action] = QPushButton(action)
@@ -131,6 +138,8 @@ class CustomPackageWidget(QWidget):
                 # Delete is destructive -> red (styled via #deleteBtn in the QSS).
                 if action == "Delete":
                     self.action_button[action].setObjectName("deleteBtn")
+                elif action == "Installed":
+                    self.action_button[action].setObjectName("installedBtn")
                 actions_layout.addWidget(
                     self.action_button[action], 0, Qt.AlignmentFlag.AlignVCenter
                 )
@@ -250,9 +259,12 @@ class CustomPackageWidget(QWidget):
             except BaseException:
                 pass
 
-            # Strip env vars + surrounding quotes so os.path.isfile gets a clean
-            # path; Popen with a list handles paths containing spaces.
-            launcher = inject_env_into_str(launcher).strip().strip('"')
+            # Expand env vars then strip surrounding quotes so os.path.isfile
+            # gets a clean path; Popen with a list handles paths with spaces.
+            # inject_env_into_str handles the @_@VAR@_@ form; expandvars handles
+            # the OS-native form (%VAR% on Windows, $VAR on Linux).
+            launcher = inject_env_into_str(launcher)
+            launcher = os.path.expandvars(launcher).strip().strip('"')
             if launcher and os.path.isfile(launcher):
                 subprocess.Popen([launcher])
                 msg = self.app.translate(
