@@ -1,5 +1,8 @@
 # Change Log
 
+## [2.1.1](https://github.com/medulla-tech/kiosk-interface/tree/2.1.1) (2026-06-16)
+- [FEATURE] Show Installed status when a package is installed but does not have a Uninstall section
+
 ## [2.1.0](https://github.com/medulla-tech/kiosk-interface/tree/2.1.0) (2026-06-08)
 - [FEATURE] Integration of Medulla theming for Kiosk UI
 - [BUGFIX]  Fix Launch button
