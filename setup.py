@@ -40,5 +40,6 @@ setup(
     entry_points={},
     extras_require={},
     install_requires=[
-        "PyQt6"],
+        "PyQt6",
+        "setproctitle"],
 )

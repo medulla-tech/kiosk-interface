@@ -196,6 +196,18 @@ def notify_running_instance_to_show(conf):
 
 
 if __name__ == "__main__":
+    # Name the process "Medulla Kiosk" instead of the bare interpreter name.
+    # On Linux the GNOME bar (setDesktopFileName) and on Windows the taskbar
+    # (AppUserModelID + window title) already show the app name; macOS has no
+    # .app bundle here, so without this it shows up as "Python" in Activity
+    # Monitor. Set before QApplication so the name is in place at startup.
+    # setproctitle is optional: skip silently if it isn't installed.
+    try:
+        import setproctitle
+        setproctitle.setproctitle("Medulla Kiosk")
+    except Exception:
+        pass
+
     conf = ConfParameter()
 
     # `--show` is used by the desktop menu launcher to reopen the window of an

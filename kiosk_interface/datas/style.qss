@@ -29,6 +29,10 @@ QTabWidget::pane {
     background: #f0f4f8;
     top: -1px;
 }
+/* Force left-aligned tab bar on all platforms: the native macOS style centers
+   the tab bar, unlike Linux/Windows. This keeps the "Packages" tab top-left
+   everywhere. */
+QTabWidget::tab-bar { alignment: left; }
 QTabBar::tab {
     background: #e8eff3;
     color: #25607D;
