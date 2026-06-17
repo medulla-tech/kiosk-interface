@@ -41,5 +41,7 @@ setup(
     extras_require={},
     install_requires=[
         "PyQt6",
-        "setproctitle"],
+        # setproctitle: process rename, macOS only (the Windows/Linux updater
+        # installs with --no-index offline and could not fetch it from PyPI).
+        "setproctitle; sys_platform == 'darwin'"],
 )

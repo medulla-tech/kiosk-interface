@@ -61,9 +61,27 @@ class MessengerFromAM(object):
         Returns:
             no return value
         """
+        recv_msg_from_AM = b""
         try:
-            # request the recv message
-            recv_msg_from_AM = client_socket.recv(5000)
+            # Read until the full message arrives: a single recv() can truncate
+            # a large package list (TCP is a stream) -> JSON error + RST. Loop
+            # until the buffer parses as complete JSON (or peer close / timeout).
+            client_socket.settimeout(5)
+            chunks = []
+            while True:
+                try:
+                    chunk = client_socket.recv(8192)
+                except Exception:
+                    break
+                if not chunk:
+                    break
+                chunks.append(chunk)
+                try:
+                    json.loads(b"".join(chunks).decode("utf-8"))
+                    break  # complete JSON received, stop reading
+                except (ValueError, UnicodeDecodeError):
+                    continue  # message not complete yet, keep reading
+            recv_msg_from_AM = b"".join(chunks)
             try:
                 recv_msg_from_AM = recv_msg_from_AM.decode("utf-8")
             except:
@@ -72,7 +90,7 @@ class MessengerFromAM(object):
             ref.notifier.message_received_from_am.emit(recv_msg_from_AM)
 
         finally:
-            ref.log.info("recieved from AM: %s"%recv_msg_from_AM)
+            ref.log.info("recieved from AM: %s" % recv_msg_from_AM)
             client_socket.close()
 
 
