@@ -1,5 +1,9 @@
 # Change Log
 
+## [2.1.2](https://github.com/medulla-tech/kiosk-interface/tree/2.1.2) (2026-06-18)
+- [FEATURE] Standardise process name as Medulla Kiosk and tab bar alignment
+- [BUGFIX]  Fix socket reception limitation
+
 ## [2.1.1](https://github.com/medulla-tech/kiosk-interface/tree/2.1.1) (2026-06-16)
 - [FEATURE] Show Installed status when a package is installed but does not have a Uninstall section
 
