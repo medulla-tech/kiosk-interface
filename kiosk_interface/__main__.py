@@ -80,7 +80,6 @@ class Application(QApplication):
         self.message = {}
         self.packages = []  # Contains the packages of the application
         self.last_inventory = ""
-        self.temp_inventory = ""
 
         # Reference to a translate function
         self.translate = QCoreApplication.translate

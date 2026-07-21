@@ -7,7 +7,6 @@
 
 
 import json
-from datetime import datetime
 
 try:
     from kiosk_interface.views.toaster import ToasterWidget
@@ -166,30 +165,38 @@ class EventController(object):
                 # popup a toaster like window with all infos
                 self.app.notifier.toaster_new_update.emit(self.app.message["datas"])
 
+            elif self.app.message["action"] == "deploymentEnd":
+                """
+                Sent by the agent machine at the end of a kiosk deployment, to
+                update the buttons at once instead of waiting for the inventory.
+                {
+                    "action": "deploymentEnd",
+                    "data": {
+                        "uuid": "package_uuid",
+                        "success": true,
+                        "action": ["Launch", "Delete"]
+                    }
+                }
+                """
+                datas = self.app.message.get("data", {})
+                uuid = datas.get("uuid", "")
+                actions = datas.get("action", [])
+                if datas.get("success") and uuid != "" and actions:
+                    for package in self.app.packages:
+                        if package.get("uuid") == uuid:
+                            package["action"] = actions
+                            # Launch shows only when "launcher" is set.
+                            if datas.get("launcher"):
+                                package["launcher"] = datas["launcher"]
+                            break
+
+                # Re-render: also clears the "Install in progress ..." label.
+                self.app.kiosk.tab_kiosk.search()
+
             elif self.app.message["action"] == "inventory":
-                if self.app.last_inventory == "":
-                    self.app.last_inventory = self.app.message.get("inventory", "N/A")
-                else:
-                    if self.app.temp_inventory != "":
-                        # Recover the new inventory (keep in the form of a chain)
-                        new_inventory = self.app.message.get("inventory", "N/A")
-
-                        # Convert only for comparison
-                        new_inventory_dt = datetime.strptime(new_inventory, "%Y-%m-%d %H:%M:%S")
-                        temp_inventory_dt = datetime.strptime(self.app.temp_inventory, "%Y-%m-%d %H:%M:%S")
-
-                        if new_inventory_dt > temp_inventory_dt:
-                            self.app.send('{"action":"kioskinterface", "subaction":"initialization"}')
-
-                            # Update of Last_inventory with the new date without converting it
-                            self.app.last_inventory = new_inventory
-                            # Reset after use
-                            self.app.temp_inventory = ""
-
-                        else:
-                            pass
-                    else:
-                        pass
+                # Date is only displayed now; the refresh is driven by
+                # "deploymentEnd", sent by the agent at end of deployment.
+                self.app.last_inventory = self.app.message.get("inventory", "N/A")
 
                 # Update the display of the inventory date
                 self.app.kiosk.tab_kiosk.update_last_inventory_display()
