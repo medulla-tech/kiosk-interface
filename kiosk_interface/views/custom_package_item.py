@@ -222,7 +222,6 @@ class CustomPackageWidget(QWidget):
                 "Install" | "Delete" | "Launch" | "Ask" | "Update"
         """
         if action == "Install":
-            self.app.temp_inventory = self.app.last_inventory
             self.scheduler_wrapper = DatePickerWidget(self, button)
             self.scheduler_wrapper.show()
             self.scheduler_wrapper.has_to_send.connect(
@@ -236,7 +235,6 @@ class CustomPackageWidget(QWidget):
                 "Action", "The application %s is being installed" % self.name.text()
             )
         elif action == "Delete":
-            self.app.temp_inventory = self.app.last_inventory
             button.setEnabled(False)
             button.setText("Uninstall in progress ...")
 
