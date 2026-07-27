@@ -1,0 +1,2 @@
+recursive-include macos *
+recursive-include linux *

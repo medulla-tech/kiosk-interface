@@ -43,5 +43,8 @@ setup(
         "PyQt6",
         # setproctitle: process rename, macOS only (the Windows/Linux updater
         # installs with --no-index offline and could not fetch it from PyPI).
-        "setproctitle; sys_platform == 'darwin'"],
+        "setproctitle; sys_platform == 'darwin'",
+        # pyobjc-framework-Cocoa: pour NSApp.setActivationPolicy(Accessory) et
+        # cacher l'app du dock (equivalent runtime de LSUIElement).
+        "pyobjc-framework-Cocoa; sys_platform == 'darwin'"],
 )

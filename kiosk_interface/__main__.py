@@ -7,8 +7,9 @@
 
 import sys
 import os
+import signal
 from PyQt6.QtWidgets import QApplication, QSystemTrayIcon
-from PyQt6.QtCore import QCoreApplication
+from PyQt6.QtCore import QCoreApplication, QTimer
 from PyQt6.QtGui import QIcon
 import logging
 
@@ -37,6 +38,41 @@ class Application(QApplication):
         """Initialize the object"""
         super().__init__(sys.argv)  # Initialize the Qapplication
         self.log = logging.getLogger()
+
+        # macOS : cache l'app du dock (equivalent runtime de LSUIElement).
+        # LSUIElement dans Info.plist ne suffit pas quand le process actif
+        # n'est pas identifie comme le bundle (cas typique d'une app Python).
+        if sys.platform.startswith("darwin"):
+            try:
+                from AppKit import NSApp
+                NSApp.setActivationPolicy_(1)  # NSApplicationActivationPolicyAccessory
+            except Exception:
+                pass
+            # Intercepte le "reopen" Apple Event (double-clic sur .app deja lance)
+            # via NSAppleEventManager (mecanisme officiel Apple, ne touche pas au
+            # delegate Qt donc pas de conflit). 'aevt' = kCoreEventClass, 'rapp'
+            # = kAEReopenApplication.
+            try:
+                from Foundation import NSAppleEventManager, NSObject
+                app_ref = self
+
+                class _KioskReopenHandler(NSObject):
+                    def handleReopen_withReplyEvent_(self, event, reply):
+                        try:
+                            app_ref.notifier.tray_action_open.emit("")
+                        except Exception:
+                            pass
+
+                self._reopen_handler = _KioskReopenHandler.alloc().init()
+                mgr = NSAppleEventManager.sharedAppleEventManager()
+                mgr.setEventHandler_andSelector_forEventClass_andEventID_(
+                    self._reopen_handler,
+                    b"handleReopen:withReplyEvent:",
+                    0x61657674,  # kCoreEventClass 'aevt'
+                    0x72617070,  # kAEReopenApplication 'rapp'
+                )
+            except Exception:
+                pass
 
         # To add an event :
         # 1 - In Notifier create the signal
@@ -219,10 +255,19 @@ if __name__ == "__main__":
     format = "%(asctime)s - %(levelname)s -(LAUNCHER)%(message)s"
     formatter = logging.Formatter(format)
     logdir = os.path.dirname(conf.logfilename())
-    if os.path.isdir(logdir):
-        os.makedirs(logdir, exist_ok=True)
+    os.makedirs(logdir, exist_ok=True)
     logging.basicConfig(level=conf.log_level, format=format, filename=conf.logfilename(), filemode="a")
 
     app = Application(conf)
+
+    # Quitter proprement sur SIGTERM (shutdown/reboot macOS/Linux) et SIGINT (Ctrl+C).
+    # Le QTimer force PyQt à repasser regulierement dans l'interpreteur Python pour
+    # que les handlers de signal soient traites.
+    signal.signal(signal.SIGTERM, lambda s, f: app.quit())
+    signal.signal(signal.SIGINT, lambda s, f: app.quit())
+    _sig_timer = QTimer()
+    _sig_timer.start(500)
+    _sig_timer.timeout.connect(lambda: None)
+
     app.send_ping()
     app.run()

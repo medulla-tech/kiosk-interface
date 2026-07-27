@@ -122,5 +122,5 @@ class ConfParameter:
                 os.path.expanduser("~"), logfilenameparameter
             )
         elif sys.platform.startswith("darwin"):
-            fileconf = os.path.join(os.path.expanduser("~"), logfilenameparameter)
+            fileconf = os.path.join("/", "var", "log", "medulla", logfilenameparameter)
         return fileconf
