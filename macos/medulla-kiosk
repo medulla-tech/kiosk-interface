@@ -1,0 +1,12 @@
+#!/bin/bash
+# Lanceur du bundle Medulla Kiosk.app
+# Utilise l'interpreteur du venv Medulla si disponible, sinon fallback systeme.
+
+for PYTHON in /opt/medulla/venv/bin/python3 /opt/medulla/bin/python3 /usr/bin/python3; do
+    if [ -x "$PYTHON" ]; then
+        exec "$PYTHON" -m kiosk_interface "$@"
+    fi
+done
+
+echo "medulla-kiosk: no python interpreter with kiosk_interface installed" >&2
+exit 1

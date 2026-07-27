@@ -56,6 +56,12 @@ class Tray(QSystemTrayIcon):
         self.open_action.setParent(self.menu)
         self.menu.addAction(self.open_action)
 
+        # Add the quit option to the menu (arrete completement le kiosk)
+        self.menu.addSeparator()
+        self.quit_action = QAction(self.app.translate("Tray", "Quit"))
+        self.quit_action.setParent(self.menu)
+        self.menu.addAction(self.quit_action)
+
         # Add the menu to the tray
         self.setContextMenu(self.menu)
 
@@ -64,6 +70,21 @@ class Tray(QSystemTrayIcon):
             # left click action for Windows and Linux
             self.activated.connect(self.open_menu)
         self.open_action.triggered.connect(self.open)
+        self.quit_action.triggered.connect(self.quit_app)
+
+    def quit_app(self):
+        """Ferme proprement le kiosk : socket serveur + pid file + Qt."""
+        try:
+            self.app.receiver.eventkill.set()
+            self.app.receiver.sock.close()
+        except Exception:
+            pass
+        try:
+            os.remove("/tmp/kiosk.pid")
+        except Exception:
+            pass
+        self.setVisible(False)
+        self.app.quit()
 
         # Connect the input_search from the menu with actions, only for Windows
         # and Linux OS

@@ -7,6 +7,7 @@
 
 
 import json
+import sys
 
 try:
     from kiosk_interface.views.toaster import ToasterWidget
@@ -242,6 +243,14 @@ class EventController(object):
         # only minimized/hidden behind other windows.
         self.app.kiosk.raise_()
         self.app.kiosk.activateWindow()
+        # macOS : force l'activation de l'app pour que la fenetre passe au
+        # premier plan meme en mode Accessory (LSUIElement).
+        if sys.platform.startswith("darwin"):
+            try:
+                from AppKit import NSApp
+                NSApp.activateIgnoringOtherApps_(True)
+            except Exception:
+                pass
 
     def action_toaster_new_update(self, datas):
         self.app.independant["toaster"] = ToasterWidget(self.app, datas)
