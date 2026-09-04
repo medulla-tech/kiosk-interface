@@ -1,5 +1,8 @@
 # Change Log
 
+## [2.1.3](https://github.com/medulla-tech/kiosk-interface/tree/2.1.3) (2026-09-03)
+- [FEATURE] Refresh the kiosk when a deployment ends instead of waiting for the inventory
+
 ## [2.1.2](https://github.com/medulla-tech/kiosk-interface/tree/2.1.2) (2026-06-18)
 - [FEATURE] Standardise process name as Medulla Kiosk and tab bar alignment
 - [BUGFIX]  Fix socket reception limitation
