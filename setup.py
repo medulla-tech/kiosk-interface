@@ -30,7 +30,7 @@ setup(
     ],
     keywords="medulla xmpp kiosk interface",
     name="kiosk_interface",
-    version='2.1.3',
+    version='2.1.4',
     debian_distro="stretch",
     description="XMPP Agent for Medulla",
     url="http://www.medulla-tech.io",

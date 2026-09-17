@@ -1,5 +1,8 @@
 # Change Log
 
+## [2.1.4](https://github.com/medulla-tech/kiosk-interface/tree/2.1.4) (2026-09-18)
+- [FEATURE] Kiosk support for MacOS clients
+
 ## [2.1.3](https://github.com/medulla-tech/kiosk-interface/tree/2.1.3) (2026-09-03)
 - [FEATURE] Refresh the kiosk when a deployment ends instead of waiting for the inventory
 
