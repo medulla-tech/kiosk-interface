@@ -29,6 +29,12 @@ class MessengerFromAM(object):
                 self.eventkill,
             ),
         )
+        # Daemon thread: it spends its life blocked in accept(). Otherwise it
+        # keeps the process alive after the Qt loop has stopped (SIGTERM sent
+        # by the agent after an update, logout...): no window and no tray icon
+        # left, but the port and the pid file still held, so the agent never
+        # starts a new kiosk.
+        self.client_handlertcp.daemon = True
         # run server tcpserver for kiosk
         self.client_handlertcp.start()
 

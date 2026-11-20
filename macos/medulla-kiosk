@@ -1,10 +1,19 @@
 #!/bin/bash
 # Lanceur du bundle Medulla Kiosk.app
 # Utilise l'interpreteur du venv Medulla si disponible, sinon fallback systeme.
+#
+# --show : l'agent a en general deja lance le kiosk. Ouvrir l'application doit
+# alors afficher la fenetre du kiosk en cours, pas en demarrer un second (qui
+# echouerait sur le port local deja occupe). Si aucun kiosk ne tourne, il
+# demarre et ouvre sa fenetre.
 
 for PYTHON in /opt/medulla/venv/bin/python3 /opt/medulla/bin/python3 /usr/bin/python3; do
     if [ -x "$PYTHON" ]; then
-        exec "$PYTHON" -m kiosk_interface "$@"
+        # Pas de exec : demarre comme processus du bundle, le kiosk n'a pas
+        # d'icone dans la barre des menus. On le detache donc du bundle, comme
+        # quand l'agent le lance directement avec python.
+        nohup "$PYTHON" -m kiosk_interface --show "$@" >/dev/null 2>&1 &
+        exit 0
     fi
 done
 
