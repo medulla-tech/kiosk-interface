@@ -1,5 +1,9 @@
 # Change Log
 
+## [2.1.5](https://github.com/medulla-tech/kiosk-interface/tree/2.1.5) (2026-11-20)
+- [BUGFIX]  Open the kiosk window when Medulla Kiosk is started from the Applications folder on MacOS
+- [BUGFIX]  Fix kiosk process staying alive without its interface after a termination request
+
 ## [2.1.4](https://github.com/medulla-tech/kiosk-interface/tree/2.1.4) (2026-09-18)
 - [FEATURE] Kiosk support for MacOS clients
 
