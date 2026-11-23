@@ -168,6 +168,13 @@ class Application(QApplication):
         if not QSystemTrayIcon.isSystemTrayAvailable():
             self.log.info("No system tray available, opening kiosk window directly")
             self.notifier.tray_action_open.emit("")
+        elif "--show" in sys.argv:
+            # Started by the user through the application launcher (e.g.
+            # "Medulla Kiosk.app" on macOS) while no kiosk was running: the
+            # user asked for the window, so open it instead of staying hidden
+            # behind the tray icon.
+            self.log.info("Started with --show, opening kiosk window directly")
+            self.notifier.tray_action_open.emit("")
 
     def run(self):
         """Launch the main loop"""
@@ -247,7 +254,7 @@ if __name__ == "__main__":
 
     # `--show` is used by the desktop menu launcher to reopen the window of an
     # already-running instance. If none is running, fall through and start the
-    # kiosk normally.
+    # kiosk, which then opens its window at startup (see Application.__init__).
     if "--show" in sys.argv:
         if notify_running_instance_to_show(conf):
             sys.exit(0)
